@@ -1,0 +1,29 @@
+# Language: C
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+TabWidth: 4
+
+BraceWrapping:
+    AfterFunction: true
+    AfterControlStatement: true
+    AfterEnum: true
+    AfterStruct: true
+    BeforeElse: true
+    BeforeCatch: true
+
+ColumnLimit: 100
+PointerAlignment: Left
+BreakBeforeBinaryOperators: None
+SpaceInEmptyBlock: false
+SpaceAfterCStyleCast: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+AlwaysBreakBeforeMultilineStrings: true
+AlignAfterOpenBracket: Align
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: Inline
+BinPackArguments: false
+BinPackParameters: true
+UseTab: ForContinuationAndIndentation
