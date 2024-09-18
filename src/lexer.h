@@ -8,6 +8,8 @@
  */
 
 
+
+
 #ifndef LEXER_H
 #define LEXER_H
 #include <stdbool.h>
@@ -43,12 +45,36 @@ typedef struct{
     // char* err_msg
 } Lexer;
 
+
+
+/**
+ * @brief takes an array, type that was checked before, and length of token
+ * 
+ * @param value array of symbols that constructs a value of the token(32, int, firstNumber)
+ * @param type  enum of T_TYPE
+ * @param length 
+ * @return TOKEN* pointer
+ */
 TOKEN* init_token(char* value, T_TYPE type, unsigned int length);
+
+
+
+/**
+ * @brief analyzing the input for lexems
+ * 
+ * @param input the code that is being checked for tokens
+ * @return Lexer* 
+ */
 Lexer* init_lexer(char* input);
+
+
 void lexer_advance(Lexer* lexer);
 void lexer_skip_whitespace(Lexer* lexer);
+
+
 TOKEN* get_next_token(Lexer* lexer);
 TOKEN* find_token_value(Lexer* lexer, T_TYPE type);
+
 bool isNum(char c);
 bool isOperator(char c);
 
