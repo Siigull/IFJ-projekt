@@ -21,6 +21,7 @@ typedef enum {
 	T_DOT = 10,
 	T_QUOTATION,
 	T_QUESTMARK,
+	T_EXCLEMARK,
 	T_EXPONENT,
 	T_STRING,
 	T_RPAR = 20, // (
@@ -48,6 +49,8 @@ typedef enum {
 	T_GETHAN,
 	T_STHAN,
 	T_SETHAN,
+	T_OPERATOR = 70,
+	T_UNDEF,
 	T_NULL = 90,
 	T_EOF,
 } T_TYPE;
