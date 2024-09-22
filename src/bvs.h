@@ -1,9 +1,9 @@
 /**
  * @file bvs.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief Function and struct definition of red-black tree 
+ * @brief Function and struct definition of red-black tree
  * @date 2024-09-21
- * 
+ *
  */
 
 #ifndef BVS_H
@@ -11,10 +11,7 @@
 
 #include <stdbool.h>
 
-enum {
-    BLACK = 0,
-    RED = 1
-} Node_Color;
+enum { BLACK = 0, RED = 1 } Node_Color;
 
 typedef struct Entry {
 	const char* key; // TODO(Sigull): change const char* string to our own type
@@ -23,8 +20,8 @@ typedef struct Entry {
 typedef struct Node {
 	Entry* entry;
 
-    bool color;
-    struct Node* parent;
+	bool color;
+	struct Node* parent;
 	struct Node* left;
 	struct Node* right;
 } Node;
