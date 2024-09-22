@@ -18,7 +18,6 @@ enum {
 
 typedef struct Entry {
 	const char* key; // TODO(Sigull): change const char* string to our own type
-
 } Entry;
 
 typedef struct Node {

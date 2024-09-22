@@ -1,7 +1,7 @@
 /**
  * @file bvs.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief Implementation of red-black tree
+ * @brief Implementation of red-black tree and helper function for creation and deletion of entries
  * @date 2024-09-21
  * 
  */
@@ -131,6 +131,7 @@ void node_fix(Node* node) {
         } else {
             if (node->parent->right == node) {
                 rotate_left(node->parent, false);
+                node = node->left;
             }
             rotate_right(node->parent->parent, true);
         }
@@ -144,6 +145,7 @@ void node_fix(Node* node) {
         } else {
             if (node->parent->left == node) {
                 rotate_right(node->parent, false);
+                node = node->right;
             }
             rotate_left(node->parent->parent, true);
         }
@@ -199,9 +201,7 @@ void tree_insert(Tree* tree, Entry* entry) {
     }
 }
 
-bool tree_delete(Tree* tree, const char* key);
-
-Entry* tree_find_traverse(Node* node, const char* key) {
+Node* tree_find_traverse(Node* node, const char* key) {
     if (node == NULL) {
         return NULL;
     }
@@ -209,25 +209,166 @@ Entry* tree_find_traverse(Node* node, const char* key) {
     int cmp = strcmp(key, node->entry->key);
 
     if (cmp < 0) {
-        tree_find_traverse(node->left, key);
+        return tree_find_traverse(node->left, key);
         
     } else if(cmp > 0) {
-        tree_find_traverse(node->right, key);
+        return tree_find_traverse(node->right, key);
 
     } else {
-        return node->entry;
+        return node;
     }
 }
 
 Entry* tree_find(Tree* tree, const char* key) {
-    tree_find_traverse(tree->root, key);
+    return tree_find_traverse(tree->root, key)->entry;
+}
+
+Node* transplant(Node* from, Node* to) {
+    if (to->parent->left == to) {
+        to->parent->left = from;
+
+    } else {
+        to->parent->right = from;
+    }
+
+    if (from != NULL) {
+        from->parent = to->parent;
+    }
+
+    node_destroy(to);
+
+    return from;
+}
+
+Node* find_smallest_node(Node* node) {
+    if (node->left == NULL) {
+        return node;
+    }
+
+    return find_smallest_node(node->left);
+}
+
+void node_delete_fix(Node* parent, bool dir) {
+    if (parent->entry == NULL) {
+        if (parent->left != NULL) {
+            parent->left->color = BLACK;
+            return;
+        }
+    }
+
+    if (dir == 0) {
+        if (parent->left != NULL && parent->left->color == RED) {
+            parent->left->color = BLACK;
+            return;
+        }
+
+        Node* sibling = parent->right;
+        if (sibling != NULL && sibling->color == RED) {
+            sibling->color = BLACK;
+            parent->color = RED;
+            sibling = sibling->left;
+            rotate_left(parent, false);
+        }
+
+        if ((sibling->right == NULL || sibling->right->color == BLACK) && (sibling->left == NULL || sibling->left->color == BLACK)) {
+            sibling->color = RED;
+            node_delete_fix(parent->parent, parent->parent->right == parent);
+
+        } else {
+            if (sibling->right == NULL || sibling->right->color == BLACK) {
+                sibling->right->color = BLACK;
+                sibling->color = RED;
+                sibling = sibling->left;
+                rotate_right(sibling, false);
+            }
+
+            sibling->color = parent->color;
+            parent->color = BLACK;
+            sibling->left->color = BLACK;
+            rotate_left(parent, false);
+            return;
+        }
+
+    } else {
+        if (parent->right != NULL && parent->right->color == RED) {
+            parent->right->color = BLACK;
+            return;
+        }
+
+        Node* sibling = parent->left;
+        if (sibling != NULL && sibling->color == RED) {
+            sibling->color = BLACK;
+            parent->color = RED;
+            sibling = sibling->right;
+            rotate_right(parent, false);
+        }
+
+        if ((sibling->right == NULL || sibling->right->color == BLACK) && (sibling->left == NULL || sibling->left->color == BLACK)) {
+            sibling->color = RED;
+            node_delete_fix(parent->parent, parent->parent->right == parent);
+
+        } else {
+            if (sibling->left == NULL || sibling->left->color == BLACK) {
+                sibling->right->color = BLACK;
+                sibling->color = RED;
+                sibling = sibling->right;
+                rotate_left(sibling, false);
+            }
+
+            sibling->color = parent->color;
+            parent->color = BLACK;
+            sibling->left->color = BLACK;
+            rotate_right(parent, false);
+            return;
+        }
+    }
+}
+
+void node_delete(Node* node) {
+    bool orig_color = node->color;
+
+    Node* from_parent = node->parent;
+    bool child_dir = node->parent->right == node;
+
+    if (node->left == NULL) {
+        transplant(node->right, node);
+
+    } else if (node->right == NULL) {
+        transplant(node->left, node);
+
+    } else {
+        Node* smallest = find_smallest_node(node->right);
+        orig_color = smallest->color;
+        from_parent = smallest->parent;
+        child_dir = 0;
+        if (smallest == node->right) {
+            child_dir = 1;
+        }
+        Entry* temp = node->entry;
+        node->entry = smallest->entry;
+        smallest->entry = temp;
+        transplant(smallest->right, smallest);
+    }
+
+    if (orig_color == BLACK) {
+        node_delete_fix(from_parent, child_dir);
+    }
+}
+
+bool tree_delete(Tree* tree, const char* key) {
+    Node* node = tree_find_traverse(tree->root, key);
+
+    if (node == NULL) return false;
+
+    node_delete(node);
+
+    return true;
 }
 
 void node_print(Node* node, int depth) {
     if (node == NULL) {
         return;
     }
-
 
     printf("%d:%s|", depth, node->entry->key);
     if (node->color == 0) {
