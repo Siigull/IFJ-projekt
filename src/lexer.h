@@ -81,6 +81,7 @@ typedef struct {
  * @param type  enum of T_TYPE
  * @param length
  * @return TOKEN* pointer
+ * 
  */
 TOKEN* init_token(char* value, T_TYPE type, unsigned int length);
 
@@ -89,17 +90,70 @@ TOKEN* init_token(char* value, T_TYPE type, unsigned int length);
  *
  * @param input the code that is being checked for tokens
  * @return Lexer*
+ * 
  */
 Lexer* init_lexer(char* input);
 
+
+/**
+ * @brief moves main index of lexer to scan next character, but makes sure we are still in range
+ * 
+ * @param lexer Lexer
+ * 
+ */
 void lexer_advance(Lexer* lexer);
-void lexer_skip_whitespace(Lexer* lexer);
+
+
+/**
+ * @brief skips whole line in input - used for skipping comments in code
+ * 
+ * @param lexer Lexer
+ * 
+ */
 void lexer_skip_line(Lexer* lexer);
+
+/**
+ * @brief skips all whitespace characters to get to the next token
+ * 
+ * @param c character being skipped
+ * @return true if whitespace
+ * @return false if not whitespace
+ * 
+ */
+bool is_whitespace(char c);
+
+
+/**
+ * @brief detects all whitespace characters
+ * 
+ * @param c char to be evaluated
+ * @return true if whitespace
+ * @return false if not whitespace
+ * 
+ */
+void lexer_skip_whitespace(Lexer* lexer);
+
+
+/**
+ * @brief evaluates if character is one of arithmetic operators used in the language
+ * 
+ * @param c character to be evaluated
+ * @return true if operator
+ * @return false if not operator
+ * 
+ */
+bool is_operator(char c);
+
+/**
+ * @brief evaluates if char is a number (digit)
+ * 
+ * @param c character to be evaluated
+ * @return true if number
+ * @return false if not a number
+ */
+bool is_num(char c);
 
 TOKEN* get_next_token(Lexer* lexer);
 TOKEN* find_token_value(Lexer* lexer, T_TYPE type);
-
-bool is_num(char c);
-bool is_operator(char c);
 
 #endif
