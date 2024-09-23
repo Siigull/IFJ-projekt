@@ -53,69 +53,137 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 		value[i] = lexer->input[lexer->idl + i];
 	}
 
-    // partially initializing token but we need to ensure it has correct type
-    TOKEN* token = init_token(value, type, len);
+	// partially initializing token but we need to ensure it has correct type
+	TOKEN* token = init_token(value, type, len);
 
+	while (token->type == T_UNDEF) {
+		if (strcmp(token->value, "while") == 0) {
+			token->type = T_WHILE;
+			return token;
+		}
+		if (strcmp(token->value, "else") == 0) {
+			token->type = T_ELSE;
+			return token;
+		}
+		if (strcmp(token->value, "const") == 0) {
+			token->type = T_CONST;
+			return token;
+		}
+		if (strcmp(token->value, "fn") == 0) {
+			token->type = T_FN;
+			return token;
+		}
+		if (strcmp(token->value, "i32") == 0) {
+			token->type = T_I32;
+			return token;
+		}
+		if (strcmp(token->value, "f64") == 0) {
+			token->type = T_F64;
+			return token;
+		}
+		if (strcmp(token->value, "u8") == 0) {
+			token->type = T_U8;
+			return token;
+		}
+		if (strcmp(token->value, "var") == 0) {
+			token->type = T_VAR;
+			return token;
+		}
+		if (strcmp(token->value, "null") == 0) {
+			token->type = T_NULL;
+			return token;
+		}
+		if (strcmp(token->value, "pub") == 0) {
+			token->type = T_PUB;
+			return token;
+		}
+		if (strcmp(token->value, "return") == 0) {
+			token->type = T_RETURN;
+			return token;
+		}
+		if (strcmp(token->value, "void") == 0) {
+			token->type = T_VOID;
+			return token;
+		}
+		if (strcmp(token->value, "if") == 0) {
+			token->type = T_IF;
+			return token;
+		}
+		// TODO(VACKO): CHECK IF TOKEN IS NUM OR ID  327878 my_int42 "string3224.3432"
+		int dot_counter = 0;
+		for (unsigned int i = 0; i < len; i++) {
+			if (value[i] == '_' || isalpha(value[i] != 0)) {
+				token->type = T_ID;
+				if (value[i] != '_' && len != 1) {
+					return token;
 
-	while(token->type == T_UNDEF){
-        if (strcmp(token->value, "while") == 0) {
-        token->type = T_WHILE;
-        return token;
-    }
-    if (strcmp(token->value, "else") == 0) {
-        token->type = T_ELSE;
-        return token;
-    }
-    if (strcmp(token->value, "const") == 0) {
-        token->type = T_CONST;
-        return token;
-    }
-    if (strcmp(token->value, "fn") == 0) {
-        token->type = T_FN;
-        return token;
-    }
-    if (strcmp(token->value, "i32") == 0) {
-        token->type = T_I32;
-        return token;
-    }
-    if (strcmp(token->value, "f64") == 0) {
-        token->type = T_F64;
-        return token;
-    }
-    if (strcmp(token->value, "u8") == 0) {
-        token->type = T_U8;
-        return token;
-    }
-    if (strcmp(token->value, "var") == 0) {
-        token->type = T_VAR;
-        return token;
-    }
-    if (strcmp(token->value, "null") == 0) {
-        token->type = T_NULL;
-        return token;
-    }
-    if (strcmp(token->value, "pub") == 0) {
-        token->type = T_PUB;
-        return token;
-    }
-    if (strcmp(token->value, "return") == 0) {
-        token->type = T_RETURN;
-        return token;
-    }
-    if (strcmp(token->value, "void") == 0) {
-        token->type = T_VOID;
-        return token;
-    }
-    if (strcmp(token->value, "if") == 0) {
-        token->type = T_IF;
-        return token;
-    }
-    //TODO(VACKO): CHECK IF TOKEN IS NUM OR ID 
-    }
-    //TODO(VACKO): HANDLE OPERATORS 
-    while(type == T_OPERATOR){
-        return token;
-    }
+				} else {
+					/**
+					 * \todo Vacko: Handle _ string that is not valid, and should return 1 as an
+					 * error code
+					 */
+				}
+			}
+			if (value[i] == '.') {
+				dot_counter++;
+			}
+		}
+		if (dot_counter == 1) {
+			token->type = T_F64;
+			return token;
+		} else if (dot_counter == 0) {
+			token->type = T_I32;
+			return token;
+		} else {
+			/**
+			 * \todo Vacko: add an error code, multiple decimal dots, error code 1
+			 * error code
+			 */
+		}
+	}
+
+	if (type == T_OPERATOR) {
+		if (strcmp(token->value, "+") == 0) {
+			token->type = T_PLUS;
+			return token;
+		}
+		if (strcmp(token->value, "-") == 0) {
+			token->type = T_MINUS;
+			return token;
+		}
+		if (strcmp(token->value, "*") == 0) {
+			token->type = T_MUL;
+			return token;
+		}
+		if (strcmp(token->value, "/") == 0) {
+			token->type = T_DIV;
+			return token;
+		}
+		if (strcmp(token->value, "=") == 0) {
+			token->type = T_EQUAL;
+			return token;
+		}
+		if (strcmp(token->value, "!") == 0) {
+			token->type = T_EXCLEMARK;
+			return token;
+		}
+		if (strcmp(token->value, "<") == 0) {
+			token->type = T_STHAN;
+			return token;
+		}
+		if (strcmp(token->value, ">") == 0) {
+			token->type = T_GTHAN;
+			return token;
+		}
+		if (strcmp(token->value, "<=") == 0) {
+			token->type = T_SETHAN;
+			return token;
+		}
+		if (strcmp(token->value, ">=") == 0) {
+			token->type = T_GETHAN;
+			return token;
+		}
+	}
 };
 
 TOKEN* get_next_token(Lexer* lexer) {
@@ -124,7 +192,7 @@ TOKEN* get_next_token(Lexer* lexer) {
 	if (lexer->input[lexer->idr] != '\0') {
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_') {
 			while (is_num(lexer->input[lexer->idr] || isalpha(lexer->input[lexer->idr]) ||
-						  lexer->input[lexer->idr] == '_')) {
+						  lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.')) {
 				lexer_advance(lexer); // only idr advances, so we can scan it later
 			}
 			return find_token_value(lexer, T_UNDEF);
@@ -160,7 +228,11 @@ TOKEN* get_next_token(Lexer* lexer) {
 			TOKEN* token = init_token("}", T_CUYLBRACKET, 1);
 			return token;
 		};
-		//TODO(VACKO): handle operators in find_token
+		if (lexer->input[lexer->idr] == '?') {
+			lexer_advance(lexer);
+			TOKEN* token = init_token("?", T_QUESTMARK, 1);
+			return token;
+		};
 		if (is_operator(lexer->input[lexer->idr])) {
 			while (is_operator(lexer->input[lexer->idr])) {
 				lexer_advance(lexer);
