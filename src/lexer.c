@@ -130,7 +130,7 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 			token->type = T_IMPORT;
 			return token;
 		}
-
+		
 		// TODO(VACKO): CHECK IF TOKEN IS NUM OR ID  327878 my_int42 "string3224.3432"
 		int dot_counter = 0;
 		for (unsigned int i = 0; i < len; i++) {
@@ -145,8 +145,6 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 					 * \todo Vacko: Handle _ string that is not valid, and should return 1 as an
 					 * error code
 					 */
-					free(token);
-					free(lexer);
 					exit(1);
 				}
 			}
@@ -219,7 +217,7 @@ TOKEN* get_next_token(Lexer* lexer) {
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
-			lexer->input[lexer->idr] == '@') {
+			lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
 			lexer_advance(lexer);
 			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr]) != 0 ||
 				   lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.') {
