@@ -98,6 +98,7 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 					 * \todo Vacko: Handle _ string that is not valid, and should return 1 as an
 					 * error code
 					 */
+					exit(1);
 				}
 			}
 			if (value[i] == '.') {
@@ -138,7 +139,8 @@ TOKEN* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
-		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
+		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
+			lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
 			lexer_advance(lexer);
 			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr]) != 0 ||
 				   lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.') {

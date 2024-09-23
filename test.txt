@@ -1,0 +1,12 @@
+gcc -MMD -MP -g  -c -o obj/lexer.o src/lexer.c
+gcc    obj/lexer.o  obj/main.o  obj/tests.o -o bin/app	
+./bin/app
+@
+i
+m
+p
+o
+r
+t
+0 0Token type: 39,
+Token value:@import, 
