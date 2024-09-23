@@ -7,16 +7,15 @@ void test_input(char* input, char* expected_result) {
 	Lexer* lexer = init_lexer(input);
 	TOKEN* token = get_next_token(lexer);
 	while (token->type != T_EOF) {
-		printf("Token type: %d,\n", token->type);
-		printf("Token value:%s, \n", token->value);
+		fprintf(stderr, "Token type: %d\t Token value: %s \n", token->type, token->value);
 		token = get_next_token(lexer);
 	}
 };
 
 int main() {
 	// const ifj = @import("ifj24.zig"); jeden token
-	char input1[50] = "+=";
+	char input1[50] = ">= pub fn const main 212 @import()";
 	char expected_result1[2] = {1};
-	test_input(input1, expected_result1);
+	test_input(input1, expected_result1);	
 	return 0;
 };

@@ -3,13 +3,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 TOKEN* init_token(char* value, T_TYPE type, unsigned int length) {
 	TOKEN* token = malloc(sizeof(TOKEN));
 	token->value = value;
 	token->type = type;
 	token->length = length;
-};
+}
+
 Lexer* init_lexer(char* input) {
 	Lexer* lexer = malloc(sizeof(Lexer));
 	lexer->input = input;
@@ -20,40 +22,41 @@ Lexer* init_lexer(char* input) {
 };
 
 void lexer_advance(Lexer* lexer) {
-	if (lexer->idr < lexer->input_len && lexer->input[lexer->idr] != '\0') {
-		lexer->idr += 1;
-	}
+	if (lexer->idr < lexer->input_len && lexer->input[lexer->idr] != '\0') lexer->idr++;
 }
 
 void lexer_skip_line(Lexer* lexer) {
-	// end of line add?
 	while (lexer->input[lexer->idr] != '\n') {
 		lexer_advance(lexer);
 	}
 };
 
+bool is_whitespace(char c) {
+	return (c == ' ' || c == 10 || c == 13 || c == '\t' || c == '\v');
+}
+
 void lexer_skip_whitespace(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	while (c == 13 || c == 10 || c == ' ' || c == '\t' || c == '/') {
-		if (c == '/' && lexer->input[lexer->idr + 1] == '/') {
-			lexer_skip_line(lexer);
-		} else if (c == '/') {
-			break;
+	if(c == '/' && lexer->input[lexer->idr + 1] == '/'){
+		lexer_skip_line(lexer);
+		return;
+	}
+	else{
+		while (is_whitespace(c)) {
+			lexer_advance(lexer);
+			c = lexer->input[lexer->idr];
 		}
-		lexer_advance(lexer);
-		c = lexer->input[lexer->idr];
-	};
-};
-bool is_num(char c) {
-	return c >= '0' && c <= '9';
+	}
 }
+
 bool is_operator(char c) {
-	if (c == '+' || c == '-' || c == '*' || c == '/' || c == '<' || c == '>' || c == '=' ||
-		c == '!') {
-		return true;
-	};
-	return false;
-};
+	return (c == '+' || c == '-' || c == '*' || c == '/' || c == '<' || c == '>' || c == '=' ||c == '!');
+}
+
+bool is_num(char c){
+	return (c >= '0' && c <= '9');
+}
+
 
 TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 	if (type == T_EOF) {
@@ -66,69 +69,25 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 	// load the value
 	for (unsigned int i = 0; i < len; i++) {
 		value[i] = lexer->input[lexer->idl + i];
-		printf("%c\n", value[i]);
 	}
 
 	// partially initializing token but we need to ensure it has correct type
 	TOKEN* token = init_token(value, type, len);
 
-	while (token->type == T_UNDEF) {
-		if (strcmp(token->value, "while") == 0) {
-			token->type = T_WHILE;
-			return token;
+	// KEYWORD TOKENS - tokens that are yet to be defined
+	if (token->type == T_UNDEF) {
+		char* values[14] = {"while", "else", "const", "fn", "i32", "f64", "u8", "var", "null", "pub", "return", "void", "if", "@import"};
+		T_TYPE types[14] = {T_WHILE, T_ELSE, T_CONST, T_FN, T_I32, T_F64, T_U8, T_VAR, T_NULL, T_PUB, T_RETURN, T_VOID, T_IF, T_IMPORT};
+		for(int i = 0; i < 14; i++){
+			if(!strcmp(token->value, values[i])){
+				token->type = types[i];
+				return token;
+			}
 		}
-		if (strcmp(token->value, "else") == 0) {
-			token->type = T_ELSE;
-			return token;
-		}
-		if (strcmp(token->value, "const") == 0) {
-			token->type = T_CONST;
-			return token;
-		}
-		if (strcmp(token->value, "fn") == 0) {
-			token->type = T_FN;
-			return token;
-		}
-		if (strcmp(token->value, "i32") == 0) {
-			token->type = T_I32;
-			return token;
-		}
-		if (strcmp(token->value, "f64") == 0) {
-			token->type = T_F64;
-			return token;
-		}
-		if (strcmp(token->value, "u8") == 0) {
-			token->type = T_U8;
-			return token;
-		}
-		if (strcmp(token->value, "var") == 0) {
-			token->type = T_VAR;
-			return token;
-		}
-		if (strcmp(token->value, "null") == 0) {
-			token->type = T_NULL;
-			return token;
-		}
-		if (strcmp(token->value, "pub") == 0) {
-			token->type = T_PUB;
-			return token;
-		}
-		if (strcmp(token->value, "return") == 0) {
-			token->type = T_RETURN;
-			return token;
-		}
-		if (strcmp(token->value, "void") == 0) {
-			token->type = T_VOID;
-			return token;
-		}
-		if (strcmp(token->value, "if") == 0) {
-			token->type = T_IF;
-			return token;
-		}
+		//ID and number handling
 		// TODO(VACKO): CHECK IF TOKEN IS NUM OR ID  327878 my_int42 "string3224.3432"
 		int dot_counter = 0;
 		for (unsigned int i = 0; i < len; i++) {
-			printf("%c", value[i]);
 			if (value[i] == '_' || isalpha(value[i]) != 0) {
 				token->type = T_ID;
 				if (value[i] != '_' && len != 1) {
@@ -159,94 +118,46 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 		}
 	}
 
+	//OPERATOR TOKENS
 	if (type == T_OPERATOR) {
-		if (strcmp(token->value, "+") == 0) {
-			token->type = T_PLUS;
-			return token;
+		char* values[10] = {"+", "-", "*", "/", "=", "!", "<", ">", "<=", ">="};
+		T_TYPE types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_EQUAL, T_EXCLEMARK, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+		for(int i = 0; i < 10; i++){
+			if(!strcmp(token->value, values[i])){
+				token->type = types[i];
+				return token;
+			}
 		}
-		if (strcmp(token->value, "-") == 0) {
-			token->type = T_MINUS;
-			return token;
-		}
-		if (strcmp(token->value, "*") == 0) {
-			token->type = T_MUL;
-			return token;
-		}
-		if (strcmp(token->value, "/") == 0) {
-			token->type = T_DIV;
-			return token;
-		}
-		if (strcmp(token->value, "=") == 0) {
-			token->type = T_EQUAL;
-			return token;
-		}
-		if (strcmp(token->value, "!") == 0) {
-			token->type = T_EXCLEMARK;
-			return token;
-		}
-		if (strcmp(token->value, "<") == 0) {
-			token->type = T_STHAN;
-			return token;
-		}
-		if (strcmp(token->value, ">") == 0) {
-			token->type = T_GTHAN;
-			return token;
-		}
-		if (strcmp(token->value, "<=") == 0) {
-			token->type = T_SETHAN;
-			return token;
-		}
-		if (strcmp(token->value, ">=") == 0) {
-			token->type = T_GETHAN;
-			return token;
-		}
-		token->type = T_ERR;
-		return token;
 	}
-};
+	//if we didn't match with anything, its error
+	token->type = T_ERR;
+	return token;
+} // end of find_token_value
 
 TOKEN* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
-		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_') {
+		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
+			lexer_advance(lexer);
 			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr]) != 0 ||
 				   lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.') {
 				lexer_advance(lexer); // only idr advances, so we can scan it later
 			}
 			return find_token_value(lexer, T_UNDEF);
 		}
-		// parenthesis check
-		if (lexer->input[lexer->idr] == '(') {
-			lexer_advance(lexer);
-			TOKEN* token = init_token("(", T_RPAR, 1);
-			return token;
+
+		//handling brackets
+		char brackets[6] = {'(', ')', '[', ']', '{', '}'};
+		char* string_brackets[6] = {"(", ")", "[", "]", "{", "}"};
+		T_TYPE bracket_types[6] = {T_LPAR, T_RPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
+		for(int i = 0; i < 6; i++){
+			if(lexer->input[lexer->idr] == brackets[i]){
+				lexer_advance(lexer);
+				return init_token(string_brackets[i], bracket_types[i], 1);
+			}
 		}
-		if (lexer->input[lexer->idr] == ')') {
-			lexer_advance(lexer);
-			TOKEN* token = init_token(")", T_LPAR, 1);
-			return token;
-		}
-		if (lexer->input[lexer->idr] == '[') {
-			lexer_advance(lexer);
-			TOKEN* token = init_token("[", T_SQRBRACKET, 1);
-			return token;
-		};
-		if (lexer->input[lexer->idr] == ']') {
-			lexer_advance(lexer);
-			TOKEN* token = init_token("]", T_SQLBRACKET, 1);
-			return token;
-		};
-		if (lexer->input[lexer->idr] == '{') {
-			lexer_advance(lexer);
-			TOKEN* token = init_token("{", T_CUYRBRACKET, 1);
-			return token;
-		};
-		if (lexer->input[lexer->idr] == '}') {
-			lexer_advance(lexer);
-			TOKEN* token = init_token("}", T_CUYLBRACKET, 1);
-			return token;
-		};
+
 		if (lexer->input[lexer->idr] == '?') {
 			lexer_advance(lexer);
 			TOKEN* token = init_token("?", T_QUESTMARK, 1);
@@ -259,8 +170,7 @@ TOKEN* get_next_token(Lexer* lexer) {
 			}
 			return find_token_value(lexer, T_OPERATOR);
 		}
-	} else {
-		TOKEN* eoftoken = init_token("0", T_EOF, 0);
-		return eoftoken;
 	}
-};
+	else
+		return init_token("0", T_EOF, 0);
+} // end of get_next_token
