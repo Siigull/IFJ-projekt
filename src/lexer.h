@@ -40,6 +40,7 @@ typedef enum {
 	T_VAR,
 	T_VOID,
 	T_WHILE,
+	T_IMPORT,
 	T_PLUS = 50,
 	T_MINUS,
 	T_MUL,

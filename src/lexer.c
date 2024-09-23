@@ -125,6 +125,12 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 			token->type = T_IF;
 			return token;
 		}
+		printf("%d %d", lexer->idl, lexer->idl);
+		if (strcmp(token->value, "@import") == 0) {
+			token->type = T_IMPORT;
+			return token;
+		}
+
 		// TODO(VACKO): CHECK IF TOKEN IS NUM OR ID  327878 my_int42 "string3224.3432"
 		int dot_counter = 0;
 		for (unsigned int i = 0; i < len; i++) {
@@ -209,7 +215,9 @@ TOKEN* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
-		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_') {
+		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
+			lexer->input[lexer->idr] == '@') {
+			lexer_advance(lexer);
 			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr]) != 0 ||
 				   lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.') {
 				lexer_advance(lexer); // only idr advances, so we can scan it later
