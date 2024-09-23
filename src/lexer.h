@@ -41,6 +41,8 @@ typedef enum {
 	T_VOID,
 	T_WHILE,
 	T_IMPORT,
+	T_SEMI,
+	T_DDOT,
 	T_PLUS = 50,
 	T_MINUS,
 	T_MUL,

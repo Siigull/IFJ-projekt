@@ -87,31 +87,26 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 		//ID and number handling
 		// TODO(VACKO): CHECK IF TOKEN IS NUM OR ID  327878 my_int42 "string3224.3432"
 		int dot_counter = 0;
-		for (unsigned int i = 0; i < len; i++) {
-			if (value[i] == '_' || isalpha(value[i]) != 0) {
-				token->type = T_ID;
-				if (value[i] != '_' && len != 1) {
-					return token;
-
-				} else {
-					/**
-					 * \todo Vacko: Handle _ string that is not valid, and should return 1 as an
-					 * error code
-					 */
-					exit(1);
+		
+		// first we look if we start with number, if yes number is decided
+			if(is_num(value[0])){
+				for (unsigned int i = 0; i < len; i++){
+					if(token->value[i] == '.'){
+						token->type = T_F64;
+						return token;
+					}
 				}
+				token->type = T_I32;
+				return token;
+
 			}
-			if (value[i] == '.') {
-				dot_counter++;
+
+			if(token->value[0] != '_' || len != 1){
+				token->type = T_ID;
+				return token;
 			}
-		}
-		if (dot_counter == 1) {
-			token->type = T_F64;
-			return token;
-		} else if (dot_counter == 0) {
-			token->type = T_I32;
-			return token;
-		} else {
+
+		 else {
 			/**
 			 * \todo Vacko: add an error code, multiple decimal dots, error code 1
 			 * error code
@@ -165,6 +160,17 @@ TOKEN* get_next_token(Lexer* lexer) {
 			TOKEN* token = init_token("?", T_QUESTMARK, 1);
 			return token;
 		};
+		if (lexer->input[lexer->idr] == ';') {
+			lexer_advance(lexer);
+			TOKEN* token = init_token(";", T_SEMI, 1);
+			return token;
+		};
+		if (lexer->input[lexer->idr] == ':') {
+			lexer_advance(lexer);
+			TOKEN* token = init_token(":", T_DDOT, 1);
+			return token;
+		};
+		
 
 		if (is_operator(lexer->input[lexer->idr])) {
 			while (is_operator(lexer->input[lexer->idr])) {
