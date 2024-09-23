@@ -24,6 +24,7 @@ typedef enum {
 	T_EXCLEMARK,
 	T_EXPONENT,
 	T_STRING,
+	T_COMMENT,
 	T_RPAR = 20, // (
 	T_LPAR,      // )
 	T_SQRBRACKET,
@@ -53,6 +54,7 @@ typedef enum {
 	T_UNDEF,
 	T_NULL = 90,
 	T_EOF,
+	T_ERR
 } T_TYPE;
 
 typedef struct {
@@ -91,6 +93,7 @@ Lexer* init_lexer(char* input);
 
 void lexer_advance(Lexer* lexer);
 void lexer_skip_whitespace(Lexer* lexer);
+void lexer_skip_line(Lexer* lexer);
 
 TOKEN* get_next_token(Lexer* lexer);
 TOKEN* find_token_value(Lexer* lexer, T_TYPE type);

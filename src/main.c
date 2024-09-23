@@ -9,6 +9,6 @@
  *
  */
 
-int main() {
+int main3232() {
 	return 0;
 }

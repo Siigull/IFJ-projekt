@@ -25,10 +25,23 @@ void lexer_advance(Lexer* lexer) {
 	}
 }
 
+void lexer_skip_line(Lexer* lexer) {
+	// end of line add?
+	while (lexer->input[lexer->idr] != '\n') {
+		lexer_advance(lexer);
+	}
+};
+
 void lexer_skip_whitespace(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	if (c == 13 || c == 10 || c == ' ' || c == '\t') {
+	while (c == 13 || c == 10 || c == ' ' || c == '\t' || c == '/') {
+		if (c == '/' && lexer->input[lexer->idr + 1] == '/') {
+			lexer_skip_line(lexer);
+		} else if (c == '/') {
+			break;
+		}
 		lexer_advance(lexer);
+		c = lexer->input[lexer->idr];
 	};
 };
 bool is_num(char c) {
@@ -37,7 +50,9 @@ bool is_num(char c) {
 bool is_operator(char c) {
 	if (c == '+' || c == '-' || c == '*' || c == '/' || c == '<' || c == '>' || c == '=' ||
 		c == '!') {
+		return true;
 	};
+	return false;
 };
 
 TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
@@ -51,6 +66,7 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 	// load the value
 	for (unsigned int i = 0; i < len; i++) {
 		value[i] = lexer->input[lexer->idl + i];
+		printf("%c\n", value[i]);
 	}
 
 	// partially initializing token but we need to ensure it has correct type
@@ -112,7 +128,8 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 		// TODO(VACKO): CHECK IF TOKEN IS NUM OR ID  327878 my_int42 "string3224.3432"
 		int dot_counter = 0;
 		for (unsigned int i = 0; i < len; i++) {
-			if (value[i] == '_' || isalpha(value[i] != 0)) {
+			printf("%c", value[i]);
+			if (value[i] == '_' || isalpha(value[i]) != 0) {
 				token->type = T_ID;
 				if (value[i] != '_' && len != 1) {
 					return token;
@@ -183,6 +200,8 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 			token->type = T_GETHAN;
 			return token;
 		}
+		token->type = T_ERR;
+		return token;
 	}
 };
 
@@ -191,8 +210,8 @@ TOKEN* get_next_token(Lexer* lexer) {
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_') {
-			while (is_num(lexer->input[lexer->idr] || isalpha(lexer->input[lexer->idr]) ||
-						  lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.')) {
+			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr]) != 0 ||
+				   lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.') {
 				lexer_advance(lexer); // only idr advances, so we can scan it later
 			}
 			return find_token_value(lexer, T_UNDEF);
@@ -233,11 +252,15 @@ TOKEN* get_next_token(Lexer* lexer) {
 			TOKEN* token = init_token("?", T_QUESTMARK, 1);
 			return token;
 		};
+
 		if (is_operator(lexer->input[lexer->idr])) {
 			while (is_operator(lexer->input[lexer->idr])) {
 				lexer_advance(lexer);
 			}
 			return find_token_value(lexer, T_OPERATOR);
 		}
+	} else {
+		TOKEN* eoftoken = init_token("0", T_EOF, 0);
+		return eoftoken;
 	}
 };
