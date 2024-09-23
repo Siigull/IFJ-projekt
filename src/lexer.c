@@ -145,6 +145,9 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 					 * \todo Vacko: Handle _ string that is not valid, and should return 1 as an
 					 * error code
 					 */
+					free(token);
+					free(lexer);
+					exit(1);
 				}
 			}
 			if (value[i] == '.') {
