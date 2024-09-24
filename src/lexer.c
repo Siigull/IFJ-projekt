@@ -23,6 +23,9 @@ Lexer* init_lexer(char* input) {
 
 void lexer_advance(Lexer* lexer) {
 	if (lexer->idr < lexer->input_len && lexer->input[lexer->idr] != '\0') lexer->idr++;
+	else{
+		// handle error
+	}
 }
 
 void lexer_skip_line(Lexer* lexer) {
@@ -91,7 +94,7 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 		// first we look if we start with number, if yes number is decided
 			if(is_num(value[0])){
 				for (unsigned int i = 0; i < len; i++){
-					if(token->value[i] == '.'){
+					if(token->value[i] == '.' || token->value[i] == 'e' || token->value[i] == 'E'){
 						token->type = T_F64;
 						return token;
 					}
@@ -125,6 +128,12 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 			}
 		}
 	}
+
+	if (type == T_STRING){
+		lexer_advance(lexer);
+		return token;
+	}
+
 	//if we didn't match with anything, its error
 	token->type = T_ERR;
 	return token;
@@ -134,14 +143,62 @@ TOKEN* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
+
+		if(lexer->input[lexer->idr] == '"'){
+			lexer->idl++;
+			lexer_advance(lexer);
+			while(lexer->input[lexer->idr] != '"'){
+				if(lexer->input[lexer->idr] == '\\'){
+					if(lexer->input[lexer->idr] == '"'){
+						lexer_advance(lexer);
+						
+					}
+				}
+				lexer_advance(lexer);
+			}
+			return find_token_value(lexer, T_STRING);
+		}
+
+
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
 			lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
+
+			int has_number = 0;
+			if(is_num(lexer->input[lexer->idr]) == true){
+				has_number++;
+			}
+
 			lexer_advance(lexer);
+
+
+
+
+			if(has_number == 0){
+
 			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr]) != 0 ||
 				   lexer->input[lexer->idr] == '_' || lexer->input[lexer->idr] == '.') {
 				lexer_advance(lexer); // only idr advances, so we can scan it later
 			}
 			return find_token_value(lexer, T_UNDEF);
+			}
+
+			else if(has_number == 1){
+				while(is_num(lexer->input[lexer->idr] ) || lexer->input[lexer->idr] == '.'){
+					lexer_advance(lexer);
+				}
+				if(lexer->input[lexer->idr] == 'E' || lexer->input[lexer->idr] == 'e'){
+					lexer_advance(lexer);
+					if(lexer->input[lexer->idr] == '+' || lexer->input[lexer->idr] == '-'){
+						lexer_advance(lexer);
+					}
+					while(is_num(lexer->input[lexer->idr]) == true){
+						lexer_advance(lexer);
+					}
+				}
+				return find_token_value(lexer, T_UNDEF);
+			}
+
+
 		}
 
 		//handling brackets
