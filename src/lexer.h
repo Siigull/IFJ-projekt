@@ -87,4 +87,6 @@ Lexer* init_lexer(char* input);
 
 Token* get_next_token(Lexer* lexer);
 
+void print_token(Token* token, FILE* out);
+
 #endif
