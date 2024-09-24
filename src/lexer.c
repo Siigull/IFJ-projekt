@@ -195,6 +195,9 @@ Token* get_next_token(Lexer* lexer) {
 					if(lexer->input[lexer->idr] == '+' || lexer->input[lexer->idr] == '-'){
 						lexer_advance(lexer);
 					}
+					else{
+						exit(1);
+					}
 					while(is_num(lexer->input[lexer->idr]) == true){
 						lexer_advance(lexer);
 					}
