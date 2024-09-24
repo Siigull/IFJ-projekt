@@ -5,8 +5,8 @@
 #include <string.h>
 #include <ctype.h>
 
-TOKEN* init_token(char* value, T_TYPE type, unsigned int length) {
-	TOKEN* token = malloc(sizeof(TOKEN));
+Token* init_token(char* value, T_TYPE type, unsigned int length) {
+	Token* token = malloc(sizeof(Token));
 	token->value = value;
 	token->type = type;
 	token->length = length;
@@ -58,9 +58,9 @@ bool is_num(char c){
 }
 
 
-TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
+Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	if (type == T_EOF) {
-		TOKEN* token = init_token("0", T_EOF, 0);
+		Token* token = init_token("0", T_EOF, 0);
 		return token;
 	}
 
@@ -72,7 +72,7 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 	}
 
 	// partially initializing token but we need to ensure it has correct type
-	TOKEN* token = init_token(value, type, len);
+	Token* token = init_token(value, type, len);
 
 	// KEYWORD TOKENS - tokens that are yet to be defined
 	if (token->type == T_UNDEF) {
@@ -130,7 +130,7 @@ TOKEN* find_token_value(Lexer* lexer, T_TYPE type) {
 	return token;
 } // end of find_token_value
 
-TOKEN* get_next_token(Lexer* lexer) {
+Token* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
@@ -157,17 +157,17 @@ TOKEN* get_next_token(Lexer* lexer) {
 
 		if (lexer->input[lexer->idr] == '?') {
 			lexer_advance(lexer);
-			TOKEN* token = init_token("?", T_QUESTMARK, 1);
+			Token* token = init_token("?", T_QUESTMARK, 1);
 			return token;
 		};
 		if (lexer->input[lexer->idr] == ';') {
 			lexer_advance(lexer);
-			TOKEN* token = init_token(";", T_SEMI, 1);
+			Token* token = init_token(";", T_SEMI, 1);
 			return token;
 		};
 		if (lexer->input[lexer->idr] == ':') {
 			lexer_advance(lexer);
-			TOKEN* token = init_token(":", T_DDOT, 1);
+			Token* token = init_token(":", T_DDOT, 1);
 			return token;
 		};
 		

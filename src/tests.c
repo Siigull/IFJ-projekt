@@ -5,7 +5,7 @@
 void test_input(char* input, char* expected_result) {
 	// while token blbllalblbal, compare two strings
 	Lexer* lexer = init_lexer(input);
-	TOKEN* token = get_next_token(lexer);
+	Token* token = get_next_token(lexer);
 	while (token->type != T_EOF) {
 		fprintf(stderr, "Token type: %d\t Token value: %s \n", token->type, token->value);
 		token = get_next_token(lexer);
