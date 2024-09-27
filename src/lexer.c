@@ -5,7 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 
-Token* init_token(char* value, T_TYPE type, unsigned int length) {
+Token* init_token(char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));
 	token->value = value;
 	token->type = type;
@@ -62,7 +62,7 @@ bool is_num(char c){
 }
 
 
-Token* find_token_value(Lexer* lexer, T_TYPE type) {
+Token* find_token_value(Lexer* lexer, T_Type type) {
 	if (type == T_EOF) {
 		Token* token = init_token("0", T_EOF, 0);
 		return token;
@@ -81,7 +81,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	// KEYWORD TOKENS - tokens that are yet to be defined
 	if (token->type == T_UNDEF) {
 		char* values[14] = {"while", "else", "const", "fn", "i32", "f64", "u8", "var", "null", "pub", "return", "void", "if", "@import"};
-		T_TYPE types[14] = {T_WHILE, T_ELSE, T_CONST, T_FN, T_I32, T_F64, T_U8, T_VAR, T_NULL, T_PUB, T_RETURN, T_VOID, T_IF, T_IMPORT};
+		T_Type types[14] = {T_WHILE, T_ELSE, T_CONST, T_FN, T_I32, T_F64, T_U8, T_VAR, T_NULL, T_PUB, T_RETURN, T_VOID, T_IF, T_IMPORT};
 		for(int i = 0; i < 14; i++){
 			if(!strcmp(token->value, values[i])){
 				token->type = types[i];
@@ -121,7 +121,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	//OPERATOR TOKENS
 	if (type == T_OPERATOR) {
 		char* values[10] = {"+", "-", "*", "/", "=", "!", "<", ">", "<=", ">="};
-		T_TYPE types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_EQUAL, T_EXCLEMARK, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+		T_Type types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_EQUAL, T_EXCLEMARK, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
 		for(int i = 0; i < 10; i++){
 			if(!strcmp(token->value, values[i])){
 				token->type = types[i];
@@ -151,7 +151,7 @@ Token* get_next_token(Lexer* lexer) {
 		//handling brackets
 		char brackets[6] = {'(', ')', '[', ']', '{', '}'};
 		char* string_brackets[6] = {"(", ")", "[", "]", "{", "}"};
-		T_TYPE bracket_types[6] = {T_LPAR, T_RPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
+		T_Type bracket_types[6] = {T_LPAR, T_RPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
 		for(int i = 0; i < 6; i++){
 			if(lexer->input[lexer->idr] == brackets[i]){
 				lexer_advance(lexer);

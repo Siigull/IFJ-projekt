@@ -58,10 +58,10 @@ typedef enum {
 	T_NULL = 90,
 	T_EOF,
 	T_ERR
-} T_TYPE;
+} T_Type;
 
 typedef struct {
-	T_TYPE type;
+	T_Type type;
 	char* value;
 	unsigned int length;
 } Token;

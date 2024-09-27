@@ -4,14 +4,6 @@ BasedOnStyle: LLVM
 IndentWidth: 4
 TabWidth: 4
 
-BraceWrapping:
-    AfterFunction: true
-    AfterControlStatement: true
-    AfterEnum: true
-    AfterStruct: true
-    BeforeElse: true
-    BeforeCatch: true
-
 ColumnLimit: 100
 PointerAlignment: Left
 BreakBeforeBinaryOperators: None
