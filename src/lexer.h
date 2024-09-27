@@ -59,7 +59,8 @@ typedef enum {
 	T_UNDEF,
 	T_NULL = 90,
 	T_EOF,
-	T_ERR
+	T_ERR,
+	T_PROLOG,
 } T_TYPE;
 
 typedef struct {
