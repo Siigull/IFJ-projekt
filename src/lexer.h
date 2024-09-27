@@ -18,6 +18,7 @@ typedef enum {
 	T_F64,
 	T_I32,
 	T_U8,
+	T_DTYPE,
 	T_DOT = 10,
 	T_QUOTATION,
 	T_QUESTMARK,
@@ -43,6 +44,7 @@ typedef enum {
 	T_IMPORT,
 	T_SEMI,
 	T_DDOT,
+	T_COMMA,
 	T_PLUS = 50,
 	T_MINUS,
 	T_MUL,
@@ -81,7 +83,7 @@ typedef struct {
  *
  * @param input the code that is being checked for tokens
  * @return Lexer*
- * 
+ *
  */
 Lexer* init_lexer(char* input);
 
