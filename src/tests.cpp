@@ -39,7 +39,7 @@ TEST_F(test_lexer, prolog) {
 }
 
 TEST_F(test_lexer, random) {
-	char input[] = "ahovno pub kokot";
+	char input[] = "test1 pub test2";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_PUB);
@@ -91,10 +91,50 @@ TEST_F(test_lexer, error) {
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
 
-/*
-TEST_F(test_lexer, prologtoken) {
-	char input[] = "const ifj = @import(\"ifj24.zig\");";
-	lexer = init_lexer(input);
-	assert(get_next_token(lexer)->type == T_PROLOG);
+TEST_F(test_lexer, keywords){
+    char input[] = "test pub test2 pub fn const else if i32 f64 null return var void while";
+    lexer = init_lexer(input);
+    EXPECT_EQ(get_next_token(lexer)->type, T_ID) << "test";
+    EXPECT_EQ(get_next_token(lexer)->type, T_PUB) << "pub";
+    EXPECT_EQ(get_next_token(lexer)->type, T_ID) << "test2";
+    EXPECT_EQ(get_next_token(lexer)->type, T_PUB) << "pub";
+    EXPECT_EQ(get_next_token(lexer)->type, T_FN) << "fn";
+    EXPECT_EQ(get_next_token(lexer)->type, T_CONST) << "const";
+    EXPECT_EQ(get_next_token(lexer)->type, T_ELSE) << "else";
+    EXPECT_EQ(get_next_token(lexer)->type, T_IF) << "if";
+    EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "i32";
+    EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "f64";
+    EXPECT_EQ(get_next_token(lexer)->type, T_NULL) << "null";
+    EXPECT_EQ(get_next_token(lexer)->type, T_RETURN) << "return";
+    //EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "u8";
+    EXPECT_EQ(get_next_token(lexer)->type, T_VAR) << "var";
+    EXPECT_EQ(get_next_token(lexer)->type, T_VOID) << "void";
+    EXPECT_EQ(get_next_token(lexer)->type, T_WHILE) << "while";
 }
-*/
+
+TEST_F(test_lexer, numbers){
+    char input[] = "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 15.2 14.325 15e-2 16.0000 13.2";
+    lexer = init_lexer(input);
+    for(int i = 0; i < 16; i++){
+        EXPECT_EQ(get_next_token(lexer)->type, T_I32) << i;
+    }
+    for(int i = 16; i < 21; i++){
+        EXPECT_EQ(get_next_token(lexer)->type, T_F64) << i;
+    }
+}
+
+TEST_F(test_lexer, float_error){
+    char input[] = "1. 1.1. 1.1e 1.1e+ 1.1e- 1.1e+1.1 1.1e-1.1 .223";
+    lexer = init_lexer(input);
+    for(int i = 0; i < 8; i++){
+        EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+    }
+}
+
+
+TEST_F(test_lexer, error2){
+    char input[] = "01.111 1.23e+2";
+    lexer = init_lexer(input);
+    EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+    EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
