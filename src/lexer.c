@@ -223,8 +223,8 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 
 	// OPERATOR TOKENS
 	if (type == T_OPERATOR) {
-		char* values[10] = {"+", "-", "*", "/", "=", "!", "<", ">", "<=", ">="};
-		T_TYPE types[10] = {T_PLUS,
+		char* values[12] = {"+", "-", "*", "/", "=", "!", "<", ">", "<=", ">=", "==", "!="};
+		T_TYPE types[12] = {T_PLUS,
 							T_MINUS,
 							T_MUL,
 							T_DIV,
@@ -233,8 +233,10 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 							T_STHAN,
 							T_GTHAN,
 							T_SETHAN,
-							T_GETHAN};
-		for (int i = 0; i < 10; i++) {
+							T_GETHAN,
+							T_DDEQ,
+							T_NEQUAL};
+		for (int i = 0; i < 12; i++) {
 			if (!strcmp(token->value, values[i])) {
 				token->type = types[i];
 				return token;
@@ -249,6 +251,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 
 	// if we didn't match with anything, its error
 	token->type = T_ERR;
+	exit(1);
 	return token;
 } // end of find_token_value
 
@@ -492,6 +495,9 @@ void print_token(Token* token, FILE* out) {
 		break;
 	case T_DTYPE:
 		fprintf(out, "T_DTYPE");
+		break;
+	case T_DDEQ:
+		fprintf(out, "T_DDEQ");
 		break;
 	default:
 		fprintf(out, "Unknown token");

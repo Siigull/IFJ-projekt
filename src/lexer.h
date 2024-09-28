@@ -50,6 +50,7 @@ typedef enum {
 	T_MUL,
 	T_DIV,
 	T_EQUAL,
+	T_DDEQ, // ==
 	T_NEQUAL,
 	T_GTHAN,
 	T_GETHAN,
