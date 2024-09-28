@@ -25,6 +25,19 @@ TEST_F(test_lexer, mathfloat) {
 	assert(get_next_token(lexer)->type == T_SQLBRACKET);
 }
 
+TEST_F(test_lexer, prolog) {
+	char input1[] = "const ifj = @import(\" ifj24.zig \");";
+	lexer = init_lexer(input1);
+	assert(get_next_token(lexer)->type == T_CONST);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_EQUAL);
+	assert(get_next_token(lexer)->type == T_IMPORT);
+	assert(get_next_token(lexer)->type == T_RPAR);
+	assert(get_next_token(lexer)->type == T_STRING);
+	assert(get_next_token(lexer)->type == T_LPAR);
+	assert(get_next_token(lexer)->type == T_SEMI);
+}
+
 TEST_F(test_lexer, random) {
 	char input[] = "ahovno pub kokot";
 	lexer = init_lexer(input);
@@ -40,6 +53,35 @@ TEST_F(test_lexer, basic) {
 	assert(get_next_token(lexer)->type == T_ID);
 	assert(get_next_token(lexer)->type == T_EQUAL);
 	assert(get_next_token(lexer)->type == T_F64);
+}
+TEST_F(test_lexer, funcdeclaration) {
+	char input[] = "pub fn build(x : []u8, y : []u8) []u8 {const res = x + y;return res;}";
+	lexer = init_lexer(input);
+	assert(get_next_token(lexer)->type == T_PUB);
+	assert(get_next_token(lexer)->type == T_FN);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_RPAR);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_DDOT);
+	assert(get_next_token(lexer)->type == T_DTYPE);
+	assert(get_next_token(lexer)->type == T_COMMA);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_DDOT);
+	assert(get_next_token(lexer)->type == T_DTYPE);
+	assert(get_next_token(lexer)->type == T_LPAR);
+	assert(get_next_token(lexer)->type == T_DTYPE);
+	assert(get_next_token(lexer)->type == T_CUYRBRACKET);
+	assert(get_next_token(lexer)->type == T_CONST);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_EQUAL);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_PLUS);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_SEMI);
+	assert(get_next_token(lexer)->type == T_RETURN);
+	assert(get_next_token(lexer)->type == T_ID);
+	assert(get_next_token(lexer)->type == T_SEMI);
+	assert(get_next_token(lexer)->type == T_CUYLBRACKET);
 }
 
 TEST_F(test_lexer, error) {
