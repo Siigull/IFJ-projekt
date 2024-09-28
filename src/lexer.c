@@ -161,7 +161,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	for (unsigned int i = 0; i < len; i++) {
 		value[i] = lexer->input[lexer->idl + i];
 	}
-
+	value[len] = '\0';
 	// partially initializing token but we need to ensure it has correct type
 	Token* token = init_token(value, type, len);
 

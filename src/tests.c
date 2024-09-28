@@ -16,7 +16,7 @@ void test_input(char* input, char* expected_result) {
 
 int main() {
 	// const ifj = @import("ifj24.zig"); jeden token
-	char input1[200] = "[23-423+(12.33-2)]";
+	char input1[200] = "var []u8 = \"Hello World;";
 	char expected_result1[2] = {1};
 	test_input(input1, expected_result1);
 	return 0;
