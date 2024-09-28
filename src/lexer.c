@@ -126,7 +126,7 @@ bool is_float_token(Token* token) {
 			mistake_check++;
 		}
 		if (mistake_check == 0) {
-			exit(1);
+			return false;
 		}
 	}
 	if (token->value[i] == 'e' || token->value[i] == 'E') {
@@ -289,9 +289,15 @@ Token* get_next_token(Lexer* lexer) {
 			// if we read number we will still read chars and nums
 			else if (has_number == 1) {
 				while (is_num(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '.' ||
-					   isalpha(lexer->input[lexer->idr]) != 0 || lexer->input[lexer->idr] == '+' ||
-					   lexer->input[lexer->idr] == '-') {
-					lexer_advance(lexer);
+					   isalpha(lexer->input[lexer->idr]) != 0) {
+					if (lexer->input[lexer->idr] != 'e' && lexer->input[lexer->idl] != 'E') {
+						lexer_advance(lexer);
+					} else {
+						lexer_advance(lexer);
+						if (lexer->input[lexer->idr] == '+' || lexer->input[lexer->idr] == '-') {
+							lexer_advance(lexer);
+						}
+					}
 				}
 				return find_token_value(lexer, T_UNDEF);
 			}
@@ -308,7 +314,7 @@ Token* get_next_token(Lexer* lexer) {
 		char brackets[6] = {'(', ')', '[', ']', '{', '}'};
 		char* string_brackets[6] = {"(", ")", "[", "]", "{", "}"};
 		T_TYPE bracket_types[6] =
-			{T_LPAR, T_RPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
+			{T_RPAR, T_LPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
 		for (int i = 0; i < 6; i++) {
 			if (lexer->input[lexer->idr] == brackets[i]) {
 				lexer_advance(lexer);
