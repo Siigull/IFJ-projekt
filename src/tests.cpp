@@ -242,7 +242,6 @@ TEST_F(test_lexer, string_escape){
 	char input[] = " cbjkkvb2id\"; ";
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
-<<<<<<< HEAD
 }*/
 
 TEST_F(test_lexer, string_hex){
@@ -281,8 +280,6 @@ TEST_F(test_lexer, ids){
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
-=======
-}
 
 TEST_F(test_lexer, I32_minus_err){
 	char input[] = " -1 ";
@@ -303,4 +300,3 @@ TEST_F(test_lexer, unrecognized_input_err){
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
->>>>>>> added tests for -1 and unknown input
