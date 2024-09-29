@@ -140,18 +140,18 @@ TEST_F(test_lexer, numbers) {
 }
 
 TEST_F(test_lexer, float_error) {
-	char input[] = "1. 1.1. 1.1e 1.1e+ 1.1e- 1.1e+1.1 1.1e-1.1 .223";
+	char input[] = "1. 1.1. 1.1e 1.1e+ 1.1e- 1.1e+1.1 1.1e-1.1 .223 123.1E+ 0.23e- 0.001e";
 	lexer = init_lexer(input);
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 11; i++) {
 		EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 	}
 }
 
 //taken from zig language reference
 TEST_F(test_lexer, floats){
-	char input[] = "123.0E+77 123.0 123.0e+77";
+	char input[] = "123.0E+77 123.0 123.0e+77 3.141592653589793 1.23e-10 4.56231e+42 0.0e0 0.023E000045 0.23e-15";
 	lexer = init_lexer(input);
-	for(int i = 0; i < 3; i++){
+	for(int i = 0; i < 9; i++){
 		EXPECT_EQ(get_next_token(lexer)->type, T_F64);
 	}
 }
