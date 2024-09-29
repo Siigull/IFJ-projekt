@@ -272,3 +272,11 @@ TEST_F(test_lexer, comment_error){
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
+
+TEST_F(test_lexer, ids){
+	char input[] = " _ideNtIfi3Cat___2or1 ___________identifier";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
