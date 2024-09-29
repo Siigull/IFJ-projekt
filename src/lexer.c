@@ -277,7 +277,7 @@ Token* get_next_token(Lexer* lexer) {
 			return find_token_value(lexer, T_STRING);
 		}//normal strings
 
-		//multiline strings
+		/*//multiline strings
 		if(lexer->input[lexer->idr] == 92 && lexer->input[lexer->idr+1] == 92){
 			lexer->idl+=2;
 			lexer_advance(lexer);
@@ -287,7 +287,7 @@ Token* get_next_token(Lexer* lexer) {
 
 			}
 			return find_token_value(lexer, T_STRING);
-		}//multiline
+		}//multiline*/
 
 
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||

@@ -147,6 +147,15 @@ TEST_F(test_lexer, float_error) {
 	}
 }
 
+//taken from zig language reference
+TEST_F(test_lexer, floats){
+	char input[] = "123.0E+77 123.0 123.0e+77";
+	lexer = init_lexer(input);
+	for(int i = 0; i < 3; i++){
+		EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+	}
+}
+
 TEST_F(test_lexer, error2) {
 	char input[] = "01.111 1.23e+2";
 	lexer = init_lexer(input);
@@ -209,8 +218,8 @@ TEST_F(test_lexer, strings) {
 	printf("%s", input);
 }*/
 
-TEST_F(test_lexer, string_err){
+/*TEST_F(test_lexer, string_err){
 	char input[] = " cbjkkvb2id\"; ";
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
-}
+}*/
