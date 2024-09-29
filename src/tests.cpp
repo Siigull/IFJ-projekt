@@ -163,7 +163,7 @@ TEST_F(test_lexer, error3) {
 TEST_F(test_lexer, error4) {
 	char input[] = "var #invalid = 10";
 	lexer = init_lexer(input);
-	get_next_token(lexer);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
 
@@ -178,10 +178,39 @@ TEST_F(test_lexer, error5) {
 }
 
 TEST_F(test_lexer, error6) {
-	char input[] = "var []u8 = \"Hello World;";
+	char input[] = "var []u8 = \"Hello World;\n";
 	lexer = init_lexer(input);
-	get_next_token(lexer);
-	get_next_token(lexer);
-	get_next_token(lexer);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR) << "var";
+	EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "[]u8";
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL) << "=";
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
+
+TEST_F(test_lexer, strings) {
+	char input[] = "\"\", \"string\", \"#23@#bvcn\", value = ";
+	lexer = init_lexer(input);
+	Token* token = get_next_token(lexer);
+	EXPECT_EQ(token->type, T_STRING);
+	EXPECT_EQ(token->length, 0);
+	EXPECT_EQ(get_next_token(lexer)->type, T_COMMA);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	EXPECT_EQ(get_next_token(lexer)->type, T_COMMA);
+	token = get_next_token(lexer);
+	EXPECT_EQ(token->type, T_STRING);
+	EXPECT_EQ(get_next_token(lexer)->type, T_COMMA);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+}
+
+/*TEST_F(test_lexer, strings_multi_line){
+	char input[] = "\\\\hovnohovno";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	printf("%s", input);
+}*/
+
+TEST_F(test_lexer, string_err){
+	char input[] = " cbjkkvb2id\"; ";
+	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }

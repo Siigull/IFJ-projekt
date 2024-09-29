@@ -150,18 +150,18 @@ bool is_float_token(Token* token) {
 };
 
 Token* find_token_value(Lexer* lexer, T_TYPE type) {
-	if (type == T_EOF) {
-		Token* token = init_token("0", T_EOF, 0);
-		return token;
-	}
+    if (type == T_EOF) {
+        Token* token = init_token("0", T_EOF, 0);
+        return token;
+    }
 
-	unsigned int len = lexer->idr - lexer->idl;
-	char* value = (char*) malloc(len + 1);
-	// load the value
-	for (unsigned int i = 0; i < len; i++) {
-		value[i] = lexer->input[lexer->idl + i];
-	}
-	value[len] = '\0';
+    unsigned int len = lexer->idr - lexer->idl;
+    char* value = (char*) malloc(len + 1);
+    // load the value
+    for (unsigned int i = 0; i < len; i++) {
+        value[i] = lexer->input[lexer->idl + i];
+    }
+    value[len] = '\0';
 	// partially initializing token but we need to ensure it has correct type
 	Token* token = init_token(value, type, len);
 
@@ -259,19 +259,36 @@ Token* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
+		//normal strings
 		if (lexer->input[lexer->idr] == '"') {
 			lexer->idl++;
 			lexer_advance(lexer);
-			while (lexer->input[lexer->idr] != '"') {
+			while (lexer->input[lexer->idr] != '"') { 
 				if (lexer->input[lexer->idr] == '\\') {
 					if (lexer->input[lexer->idr] == '"') {
 						lexer_advance(lexer);
 					}
 				}
+				if(lexer->input[lexer->idr] == '\n'){
+					exit(1);
+				}
 				lexer_advance(lexer);
 			}
 			return find_token_value(lexer, T_STRING);
-		}
+		}//normal strings
+
+		//multiline strings
+		if(lexer->input[lexer->idr] == 92 && lexer->input[lexer->idr+1] == 92){
+			lexer->idl+=2;
+			lexer_advance(lexer);
+			lexer_advance(lexer);
+			bool not_continuing = true;
+			while(lexer->input[lexer->idr] != '\n' && not_continuing){
+
+			}
+			return find_token_value(lexer, T_STRING);
+		}//multiline
+
 
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
 			lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
