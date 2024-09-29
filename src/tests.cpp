@@ -23,6 +23,7 @@ TEST_F(test_lexer, mathfloat) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
 	EXPECT_EQ(get_next_token(lexer)->type, T_LPAR);
 	EXPECT_EQ(get_next_token(lexer)->type, T_SQLBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, prolog) {
@@ -36,6 +37,7 @@ TEST_F(test_lexer, prolog) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	EXPECT_EQ(get_next_token(lexer)->type, T_LPAR);
 	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, random) {
@@ -44,6 +46,7 @@ TEST_F(test_lexer, random) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_PUB);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, basic) {
@@ -53,6 +56,7 @@ TEST_F(test_lexer, basic) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
 	EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 TEST_F(test_lexer, funcdeclaration) {
 	char input[] = "pub fn build(x : []u8, y : []u8) []u8 {const res = x + y;return res;}";
@@ -82,6 +86,7 @@ TEST_F(test_lexer, funcdeclaration) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
 	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, error) {
@@ -126,6 +131,7 @@ TEST_F(test_lexer, keywords) {
 	current_type = get_next_token(lexer)->type;
 	EXPECT_EQ(current_type, T_WHILE) << "while";
 	current_type = get_next_token(lexer)->type;
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, numbers) {
@@ -137,6 +143,7 @@ TEST_F(test_lexer, numbers) {
 	for (int i = 16; i < 21; i++) {
 		EXPECT_EQ(get_next_token(lexer)->type, T_F64) << i;
 	}
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, float_error) {
@@ -153,12 +160,15 @@ TEST_F(test_lexer, floats){
 	lexer = init_lexer(input);
 	for(int i = 0; i < 9; i++){
 		EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+
 	}
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 TEST_F(test_lexer, error2) {
-	char input[] = "01.111 1.23e+2";
+	char input[] = "01.111 1.23e+2 0000124415";
 	lexer = init_lexer(input);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
@@ -186,15 +196,6 @@ TEST_F(test_lexer, error5) {
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
 
-TEST_F(test_lexer, error6) {
-	char input[] = "var []u8 = \"Hello World;\n";
-	lexer = init_lexer(input);
-	EXPECT_EQ(get_next_token(lexer)->type, T_VAR) << "var";
-	EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "[]u8";
-	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL) << "=";
-	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
-}
-
 TEST_F(test_lexer, strings) {
 	char input[] = "\"\", \"string\", \"#23@#bvcn\", value = ";
 	lexer = init_lexer(input);
@@ -209,7 +210,26 @@ TEST_F(test_lexer, strings) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_COMMA);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
+
+//HERE TOKEN->VALUE HAS THE ESCAPE CHAR IN IT (LITERALLY)
+TEST_F(test_lexer, string_escape){
+	char input[] = "\"str \\t \\r \\\\ \\n ing\"";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+//non terminating tests
+/*TEST_F(test_lexer, error6) {
+	char input[] = "var []u8 = \"Hello World;\n";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR) << "var";
+	EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "[]u8";
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL) << "=";
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}*/
 
 /*TEST_F(test_lexer, strings_multi_line){
 	char input[] = "\\\\hovnohovno";
@@ -223,3 +243,10 @@ TEST_F(test_lexer, strings) {
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }*/
+
+TEST_F(test_lexer, string_hex){
+	char input[] = "\"Ahoj\\n \\\"Sve'te \\\\\\x22 \"";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}

@@ -269,9 +269,6 @@ Token* get_next_token(Lexer* lexer) {
 						lexer_advance(lexer);
 					}
 				}
-				if(lexer->input[lexer->idr] == '\n'){
-					exit(1);
-				}
 				lexer_advance(lexer);
 			}
 			return find_token_value(lexer, T_STRING);
