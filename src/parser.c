@@ -220,7 +220,11 @@ AST_Node* decl() {
     return func_decl();
 }
 
-void parse(char* input) {
+void parse(char* orig_input) {
+    size_t len = strlen(orig_input) + 1;
+    char* input = malloc(sizeof(char) * (len + 10));
+    memcpy(input, orig_input, len * sizeof(char));
+
     lexer = init_lexer(input);
     parser = init_parser();
 
