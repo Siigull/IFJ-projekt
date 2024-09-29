@@ -242,6 +242,7 @@ TEST_F(test_lexer, string_escape){
 	char input[] = " cbjkkvb2id\"; ";
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+<<<<<<< HEAD
 }*/
 
 TEST_F(test_lexer, string_hex){
@@ -280,3 +281,26 @@ TEST_F(test_lexer, ids){
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
+=======
+}
+
+TEST_F(test_lexer, I32_minus_err){
+	char input[] = " -1 ";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+}
+
+TEST_F(test_lexer, F64_minus_err){
+	char input[] = " -1.0 ";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+}
+
+// Lexer nic nematchne a místo toho aby dal exit(1) vyskočí z
+// if (lexer->input[lexer->idr] != '\0'), kde je return eof
+TEST_F(test_lexer, unrecognized_input_err){
+	char input[] = " Č ";
+	lexer = init_lexer(input);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
+>>>>>>> added tests for -1 and unknown input
