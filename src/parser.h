@@ -1,3 +1,10 @@
+/**
+ * @file parser.h
+ * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
+ * @brief 
+ * 
+ */
+
 #ifndef PARSER_H
 #define PARSER_H
 
@@ -9,6 +16,6 @@ typedef struct Parser {
     Token* prev;
 } Parser;
 
-void parse(const char* input);
+void parse(char* input);
 
 #endif

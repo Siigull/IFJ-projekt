@@ -41,4 +41,4 @@ Entry* tree_find(Tree* tree, const char* key);
 
 void tree_print(Tree* tree);
 
-#endif BVS_H
+#endif /* BVS_H */

@@ -15,7 +15,13 @@ typedef enum {
     BINARY,
     GROUPING,
     VAR,
-    FUNCTION_DECLARATION,
+    FUNCTION_DECL,
+    VAR_DECL,
+    VAR_ASSIGNMENT,
+    EXPR,
+    IF,
+    ELSE,
+    NNULL_VAR_DECL,
 } AST_Type;
 
 typedef enum {
@@ -25,6 +31,11 @@ typedef enum {
     NIL,
 } Literal_Type;
 
+typedef struct {
+    Literal_Type type;
+
+} Literal_value;
+
 typedef enum {
     PLUS, MINUS, MUL, DIV,
     EQUAL, NOT_EQUAL,
@@ -32,15 +43,33 @@ typedef enum {
     SMALLER_EQUAL, LARGER_EQUAL
 } Operator_Type;
 
+// typedef struct {
+//     Arr* 
+//     AST_Node* expr;
+//     AST_Node* without_null;
+// } If_Data;
+
+/**
+ *  - If statement
+ *      - left child is expr.
+ *      - right child is else.
+ *      - as is arr, first el in arr can be NNUL_VAR_DECL
+ *        which should be initialized from expr and has 
+ *        the same type as expr but without null
+ *  
+ *  - Var declaration
+ *      - left child is init expr
+ *      - as is var_name, var details in bvs
+ */
 typedef struct AST_Node {
     AST_Type type;
     struct AST_Node* left;
     struct AST_Node* right;
 
     union {
-        Literal_Type literal;
-        Operator_Type operator;
+        const char* var_name;
         Arr* arr;
+        // size_t data;
     } as;
 
 } AST_Node;

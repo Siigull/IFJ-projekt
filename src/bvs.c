@@ -20,7 +20,7 @@ Entry* entry_create(const char* key) {
 	return entry;
 }
 
-Node* node_init(Entry* entry, Node* parent) {
+Node* bvs_node_init(Entry* entry, Node* parent) {
 	Node* node = malloc(sizeof(Node));
 
 	node->parent = parent;
@@ -157,7 +157,7 @@ void node_insert(Node* node, Entry* entry) {
 
 	if (cmp < 0) {
 		if (node->left == NULL) {
-			node->left = node_init(entry, node);
+			node->left = bvs_node_init(entry, node);
 			node_fix(node->left);
 
 		} else {
@@ -166,7 +166,7 @@ void node_insert(Node* node, Entry* entry) {
 
 	} else if (cmp > 0) {
 		if (node->right == NULL) {
-			node->right = node_init(entry, node);
+			node->right = bvs_node_init(entry, node);
 			node_fix(node->right);
 
 		} else {
@@ -184,10 +184,10 @@ void node_insert(Node* node, Entry* entry) {
 
 void tree_insert(Tree* tree, Entry* entry) {
 	if (tree->root == NULL) {
-		tree->root = node_init(entry, NULL);
+		tree->root = bvs_node_init(entry, NULL);
 		tree->root->color = BLACK;
 
-		tree->root->parent = node_init(NULL, NULL);
+		tree->root->parent = bvs_node_init(NULL, NULL);
 		tree->root->parent->left = tree->root;
 
 	} else {

@@ -9,12 +9,18 @@
 #include "ast.h"
 
 AST_Node* node_init(AST_Type type) {
-    AST_Node* node = malloc(sizeof(AST_Node*));
+    AST_Node* node = malloc(sizeof(AST_Node));
 
     node->type = type;
 
-    if (type == FUNCTION_DECLARATION) {
-        node->as.arr = arr_init();
+    switch(type) {
+        case FUNCTION_DECL:
+        case IF:
+            node->as.arr = arr_init();
+            break;
+        case VAR_DECL:
+            node->as.var_name = NULL;
+            break;
     }
 
     return node;

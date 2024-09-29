@@ -9,17 +9,31 @@
 #ifndef HELPER_H
 #define HELPER_H
 #include <stdlib.h>
-#include <ast.h>
+
+typedef enum {
+    S_I32,
+    S_F64,
+    S_U8_ARR,
+} Symbol_Type;
+
+typedef struct {
+    Symbol_Type type;
+    const char* ident;
+} Symbol;
+
+typedef enum {
+    A_SYMBOL,
+    A_AST,
+} Arr_Type;
 
 typedef struct {
     size_t length;
     size_t capacity;
-    size_t element_length;
 
-    AST_Node** data;
+    size_t* data;
 } Arr;
 
-void arr_append(Arr* arr, AST_Node* el);
+void arr_append(Arr* arr, size_t address);
 
 Arr* arr_init();
 

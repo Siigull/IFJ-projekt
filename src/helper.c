@@ -8,31 +8,36 @@
 
 #include "helper.h"
 
-void arr_append(Arr* arr, AST_Node* el) {
-    if (arr->length >= arr->capacity) {
-        if (arr->capacity == 0) {
-            arr->capacity = 2;
+void extend_array(Arr* arr) {
+    if (arr->capacity == 0) {
+        arr->capacity = 2;
 
-        } else {
-            arr->capacity *= 2;
-        }
-
-        void* data = arr->data;
-        arr->data = realloc(arr->data, arr->capacity * sizeof(AST_Node*));
-        if (arr->data == NULL) {
-            free(data);
-            exit(99);
-        }
+    } else {
+        arr->capacity *= 2;
     }
 
-    arr->data[arr->length++] = el;
+    size_t* data = realloc(arr->data, arr->capacity * sizeof(size_t));
+    if (data == NULL) {
+        free(arr->data);
+        exit(99);
+    }
+
+    arr->data = data;
+}
+
+void arr_append(Arr* arr, size_t address) {
+    if (arr->length >= arr->capacity) {
+        extend_array(arr);
+    }
+
+    arr->data[arr->length++] = address;
 }
 
 Arr* arr_init() {
     Arr* arr = malloc(sizeof(Arr));
     arr->length = 0;
     arr->capacity = 0;
-    arr->element_length;
+    arr->data = NULL;
 
     return arr;
 }
