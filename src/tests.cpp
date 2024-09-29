@@ -250,3 +250,15 @@ TEST_F(test_lexer, string_hex){
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
+
+TEST_F(test_lexer, comment){
+	char input[] = 	"var input = \"jejda\" //comment comment comment\n pub fn";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	EXPECT_EQ(get_next_token(lexer)->type, T_PUB);
+	EXPECT_EQ(get_next_token(lexer)->type, T_FN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}

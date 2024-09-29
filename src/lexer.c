@@ -36,6 +36,7 @@ void lexer_skip_line(Lexer* lexer) {
 	while (lexer->input[lexer->idr] != '\n') {
 		lexer_advance(lexer);
 	}
+	lexer_advance(lexer);
 };
 
 bool is_whitespace(char c) {
@@ -44,14 +45,17 @@ bool is_whitespace(char c) {
 
 void lexer_skip_whitespace(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
+	while(is_whitespace(c)){
+		lexer_advance(lexer);
+		c = lexer->input[lexer->idr];
+	}
 	if (c == '/' && lexer->input[lexer->idr + 1] == '/') {
 		lexer_skip_line(lexer);
-		return;
-	} else {
-		while (is_whitespace(c)) {
-			lexer_advance(lexer);
-			c = lexer->input[lexer->idr];
-		}
+	}
+	c = lexer->input[lexer->idr];
+	while (is_whitespace(c)) {
+		lexer_advance(lexer);
+	c = lexer->input[lexer->idr];
 	}
 }
 
