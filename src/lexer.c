@@ -309,8 +309,8 @@ Token* get_next_token(Lexer* lexer) {
 			// if we read number we will still read chars and nums
 			else if (has_number == 1) {
 				while (is_num(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '.' ||
-					   isalpha(lexer->input[lexer->idr]) != 0) {
-					if (lexer->input[lexer->idr] != 'e' && lexer->input[lexer->idl] != 'E') {
+					   	isalpha(lexer->input[lexer->idr]) != 0) {
+					if (lexer->input[lexer->idr] != 'e' && lexer->input[lexer->idr] != 'E') {
 						lexer_advance(lexer);
 					} else {
 						lexer_advance(lexer);
