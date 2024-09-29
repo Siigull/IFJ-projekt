@@ -262,3 +262,13 @@ TEST_F(test_lexer, comment){
 	EXPECT_EQ(get_next_token(lexer)->type, T_FN);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
+
+TEST_F(test_lexer, comment_error){
+	char input[] = 	"var input = \"jejda\" //comment comment comment pub fn bomba";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
