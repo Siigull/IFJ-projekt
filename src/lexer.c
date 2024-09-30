@@ -272,7 +272,7 @@ Token* get_next_token(Lexer* lexer) {
 			lexer->idl++;
 			lexer_advance(lexer);
 			while (lexer->input[lexer->idr] != '"') { 
-				if (lexer->input[lexer->idr] == 92) {
+				if (lexer->input[lexer->idr] == BACKSLASH) {
 					if (lexer->input[lexer->idr+1] == '"') {
 						lexer_advance(lexer);
 					}
@@ -283,7 +283,7 @@ Token* get_next_token(Lexer* lexer) {
 		}//normal strings
 
 		/*//multiline strings
-		if(lexer->input[lexer->idr] == 92 && lexer->input[lexer->idr+1] == 92){
+		if(lexer->input[lexer->idr] == BACKSLASH && lexer->input[lexer->idr+1] == BACKSLASH){
 			lexer->idl+=2;
 			lexer_advance(lexer);
 			lexer_advance(lexer);
