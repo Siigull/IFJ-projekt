@@ -34,6 +34,7 @@ typedef enum {
 	T_SQLBRACKET,
 	T_CUYRBRACKET, // {
 	T_CUYLBRACKET, // }
+	T_VBAR, // |
 	T_CONST = 30,
 	T_IF,
 	T_ELSE,
@@ -47,11 +48,13 @@ typedef enum {
 	T_SEMI,
 	T_DDOT,
 	T_COMMA,
+	T_UNDER,
 	T_PLUS = 50,
 	T_MINUS,
 	T_MUL,
 	T_DIV,
 	T_EQUAL,
+	T_DDEQ, // ==
 	T_NEQUAL,
 	T_GTHAN,
 	T_GETHAN,

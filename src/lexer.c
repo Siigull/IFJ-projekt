@@ -202,6 +202,10 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 				return token;
 			}
 		}
+		if(token->length == 1 && token->value[0] == '_'){
+			token->type = T_UNDER;
+			return token;
+		}
 
 		// first we look if we start with number, if yes number is decided
 		if (is_num(value[0])) {
@@ -342,7 +346,11 @@ Token* get_next_token(Lexer* lexer) {
 				return init_token(string_brackets[i], bracket_types[i], 1);
 			}
 		}
-
+		if (lexer->input[lexer->idr] == '|') {
+			lexer_advance(lexer);
+			Token* token = init_token("|", T_VBAR, 1);
+			return token;
+		};
 		if (lexer->input[lexer->idr] == '?') {
 			lexer_advance(lexer);
 			Token* token = init_token("?", T_QUESTMARK, 1);
@@ -521,6 +529,9 @@ void print_token(Token* token, FILE* out) {
 		break;
 	case T_DDEQ:
 		fprintf(out, "T_DDEQ");
+		break;
+	case T_UNDER:
+		fprintf(out, "T_UNDER");
 		break;
 	default:
 		fprintf(out, "Unknown token");
