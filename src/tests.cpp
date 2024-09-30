@@ -300,3 +300,18 @@ TEST_F(test_lexer, unrecognized_input_err){
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
+
+TEST_F(test_lexer, string_err_end) {
+	char input[] = "\"Hello World;\n;";
+	lexer = init_lexer(input);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
+
+TEST_F(test_lexer, string_err_start) {
+	char input[] = "Hello World;\n\";";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
