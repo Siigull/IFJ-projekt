@@ -221,28 +221,13 @@ TEST_F(test_lexer, string_escape){
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-//non terminating tests
-/*TEST_F(test_lexer, error6) {
-	char input[] = "var []u8 = \"Hello World;\n";
-	lexer = init_lexer(input);
-	EXPECT_EQ(get_next_token(lexer)->type, T_VAR) << "var";
-	EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE) << "[]u8";
-	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL) << "=";
-	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
-}*/
-
 /*TEST_F(test_lexer, strings_multi_line){
-	char input[] = "\\\\hovnohovno";
+	char input[] = "\\\\multilinestring";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	printf("%s", input);
 }*/
 
-/*TEST_F(test_lexer, string_err){
-	char input[] = " cbjkkvb2id\"; ";
-	lexer = init_lexer(input);
-	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
-}*/
 
 TEST_F(test_lexer, string_hex){
 	char input[] = "\"Ahoj\\n \\\"Sve'te \\\\\\x22 \"";
@@ -281,20 +266,22 @@ TEST_F(test_lexer, ids){
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, I32_minus_err){
+TEST_F(test_lexer, I32_minus){
 	char input[] = " -1 ";
 	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
 	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, F64_minus_err){
+TEST_F(test_lexer, F64_minus){
 	char input[] = " -1.0 ";
 	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
 	EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-// Lexer nic nematchne a místo toho aby dal exit(1) vyskočí z
-// if (lexer->input[lexer->idr] != '\0'), kde je return eof
 TEST_F(test_lexer, unrecognized_input_err){
 	char input[] = " Č ";
 	lexer = init_lexer(input);

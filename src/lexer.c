@@ -251,9 +251,12 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	}
 
 	// if we didn't match with anything, its error
-	token->type = T_ERR;
-	exit(1);
-	return token;
+	if(lexer->idr == lexer->input_len){
+		return init_token("0", T_EOF, 0);
+	}
+	else{
+		exit(1);
+	}
 } // end of find_token_value
 
 Token* get_next_token(Lexer* lexer) {
@@ -265,8 +268,8 @@ Token* get_next_token(Lexer* lexer) {
 			lexer->idl++;
 			lexer_advance(lexer);
 			while (lexer->input[lexer->idr] != '"') { 
-				if (lexer->input[lexer->idr] == '\\') {
-					if (lexer->input[lexer->idr] == '"') {
+				if (lexer->input[lexer->idr] == 92) {
+					if (lexer->input[lexer->idr+1] == '"') {
 						lexer_advance(lexer);
 					}
 				}
@@ -368,7 +371,12 @@ Token* get_next_token(Lexer* lexer) {
 			return find_token_value(lexer, T_OPERATOR);
 		}
 	}
-	return init_token("0", T_EOF, 0);
+	if(lexer->idr == lexer->input_len){
+		return init_token("0", T_EOF, 0);
+	}
+	else{
+		exit(1);
+	}
 } // end of get_next_token
 
 void print_token(Token* token, FILE* out) {
