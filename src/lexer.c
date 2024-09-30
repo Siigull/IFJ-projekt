@@ -254,6 +254,13 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 		return token;
 	}
 
+
+	if(type == T_BUILDIN){
+// error TODO handling of buildin function that do not exist
+	return token;
+	};
+
+
 	// if we didn't match with anything, its error
 	if(lexer->idr == lexer->input_len){
 		return init_token("0", T_EOF, 0);
@@ -293,6 +300,19 @@ Token* get_next_token(Lexer* lexer) {
 			}
 			return find_token_value(lexer, T_STRING);
 		}//multiline*/
+
+
+		if(lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' && lexer->input[lexer->idr] == 'j' && lexer->input[lexer->idr] == '.'){
+			for(int i = 0; i < 4; i++){
+				lexer_advance(lexer);
+			}
+			// now scanning inbuild function
+			while(is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr] != 0)){
+				lexer_advance(lexer);
+			}
+			return find_token_value(lexer, T_BUILDIN);
+		}
+
 
 
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||

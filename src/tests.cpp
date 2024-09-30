@@ -306,6 +306,26 @@ TEST_F(test_lexer, pseudo_var){
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
+
+
+TEST_F(test_lexer, no_spaces){
+	char input[] = "varx=-5";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+}
+
+
+TEST_F(test_lexer, built_in_one){
+	char input[] = "ifj.length ifj.substring";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_BUILDIN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_BUILDIN);
+}
+
+
 /**
 "	const ifj = @import(\"ifj24.zig\"); \n 
 	pub fn f (x : i32) i32    // seznam parametru \n 
@@ -374,3 +394,5 @@ TEST_F(test_lexer, complex){
 	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
 	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
 }
+
+

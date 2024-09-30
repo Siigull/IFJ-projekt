@@ -29,6 +29,7 @@ typedef enum {
 	T_EXPONENT,
 	T_STRING,
 	T_COMMENT,
+	T_BUILDIN,
 	T_RPAR = 20, // (
 	T_LPAR,      // )
 	T_SQRBRACKET,
