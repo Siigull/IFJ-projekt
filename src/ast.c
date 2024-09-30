@@ -19,6 +19,7 @@ AST_Node* node_init(AST_Type type) {
             node->as.arr = arr_init();
             break;
         case VAR_DECL:
+        case FUNC_CALL:
             node->as.var_name = NULL;
             break;
     }

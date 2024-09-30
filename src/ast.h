@@ -11,17 +11,14 @@
 #include "helper.h"
 
 typedef enum {
-    LITERAL,
-    BINARY,
-    GROUPING,
-    VAR,
+    FUNC_CALL,
     FUNCTION_DECL,
     VAR_DECL,
     VAR_ASSIGNMENT,
-    EXPR,
     IF,
     ELSE,
     NNULL_VAR_DECL,
+    RETURN,
 } AST_Type;
 
 typedef enum {

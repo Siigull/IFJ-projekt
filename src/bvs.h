@@ -13,8 +13,23 @@
 
 enum { BLACK = 0, RED = 1 } Node_Color;
 
+typedef enum {
+	E_FUNC,
+	E_VAR,
+} Entry_Type;
+
+typedef enum {
+	R_VOID,
+	R_I32,
+	R_F64,
+	R_U8,
+} Entry_Ret_Type;
+
 typedef struct Entry {
+	Entry_Type type;
+	
 	const char* key; // TODO(Sigull): change const char* string to our own type
+	Entry_Ret_Type ret_type;
 } Entry;
 
 typedef struct Node {
@@ -30,7 +45,8 @@ typedef struct Tree {
 	Node* root;
 } Tree;
 
-Entry* entry_create(const char* key);
+Entry* entry_init(const char* key, Entry_Type type,
+				  Entry_Ret_Type ret_type);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);

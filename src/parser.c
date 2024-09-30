@@ -125,17 +125,44 @@ AST_Node* var_decl() {
     return node;
 }
 
+AST_Node* func_call() {
+    AST_Node* node = node_init(FUNC_CALL);
+    node->as.var_name = parser->prev->value;
+
+    consume(T_RPAR);
+
+    while(check(T_ID)) {
+        advance();
+
+        if (!check(T_COMMA)) {
+            break;
+        }
+
+        consume(T_COMMA);
+    }
+
+    consume(T_LPAR);
+    consume(T_SEMI);
+
+    return node;
+}
+
 AST_Node* assignment() {
+    advance();
+    if (check(T_RPAR)) {
+        return func_call();
+    }
+
     AST_Node* node;
 
-    if (check(T_UNDER)) {
+    if (parser->prev->type == T_UNDER) {
         consume(T_EQUAL);
         node = expr();
 
     } else {
         node = node_init(VAR_ASSIGNMENT);
-        consume(T_ID);
         node->as.var_name = parser->prev->value;
+        consume(T_EQUAL);
         node->left = expr();
     }
 
@@ -143,17 +170,15 @@ AST_Node* assignment() {
     return node;
 }
 
-AST_Node* func_call() {
-    advance();
-    if (check(T_EQUAL)) {
-        return assignment();
+AST_Node* _return() {
+    AST_Node* node = node_init(RETURN);
+    consume(T_RETURN);
+
+    if (!check(T_SEMI)) {
+        node->left = expr;
     }
 
-    return NULL;
-}
-
-AST_Node* _return() {
-    return NULL;
+    return node;
 }
 
 AST_Node* stmt() {
