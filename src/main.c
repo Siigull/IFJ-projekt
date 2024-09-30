@@ -1,6 +1,7 @@
 /**
  * @file main.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
+ * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief
