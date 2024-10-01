@@ -302,12 +302,13 @@ Token* get_next_token(Lexer* lexer) {
 		}//multiline*/
 
 
-		if(lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' && lexer->input[lexer->idr] == 'j' && lexer->input[lexer->idr] == '.'){
+		if(lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' && lexer->input[lexer->idr + 2] == 'j' && lexer->input[lexer->idr + 3] == '.'){
 			for(int i = 0; i < 4; i++){
 				lexer_advance(lexer);
 			}
 			// now scanning inbuild function
-			while(is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr] != 0)){
+			
+			while(is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr])){
 				lexer_advance(lexer);
 			}
 			return find_token_value(lexer, T_BUILDIN);
@@ -552,6 +553,9 @@ void print_token(Token* token, FILE* out) {
 		break;
 	case T_UNDER:
 		fprintf(out, "T_UNDER");
+		break;
+	case T_BUILDIN:
+		fprintf(out, "T_BUILDIN");
 		break;
 	default:
 		fprintf(out, "Unknown token");
