@@ -1,6 +1,6 @@
 #include "parser.h"
 #include "ast.h"
-
+#include "string.h"
 Lexer* lexer;
 Parser* parser;
 Token* debug_token_array;

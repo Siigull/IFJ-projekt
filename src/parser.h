@@ -8,7 +8,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "lexer.h"
+#include "expressionparser.h"
 #include "helper.h"
 
 typedef struct Parser {
