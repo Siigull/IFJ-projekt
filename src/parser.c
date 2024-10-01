@@ -12,6 +12,8 @@ Parser* init_parser() {
     parser->next = NULL;
     parser->prev = NULL;
 
+    parser->s_table = tree_init();
+
     return parser;
 }
 
@@ -101,22 +103,31 @@ AST_Node* _if() {
 AST_Node* var_decl() {
     AST_Node* node = node_init(VAR_DECL);
 
+    bool can_mut;
+
     if (check(T_VAR)) {
         advance();
+        can_mut = true;
 
     } else {
         consume(T_CONST);
-        // TODO(Sigull) Add mut flag to ast
+        can_mut = false;
     }
 
     consume(T_ID);
     node->as.var_name = parser->prev->value;
 
+    Ret_Type ret_type = IMPLICIT;
     if (check(T_DDOT)) {
         advance();
         consume(T_DTYPE);
-        // TODO(Sigull) Add type flag
+        ret_type = get_ret_type();
     }
+
+    Entry* entry = entry_init(node->as.var_name, E_VAR,
+                              ret_type, can_mut);
+
+    tree_insert(parser->s_table, entry);
 
     consume(T_EQUAL);
     node->left = expr();
@@ -202,13 +213,27 @@ AST_Node* stmt() {
     }
 }
 
+Ret_Type get_ret_type() {
+    if (strcmp(parser->prev->value, "void")) {
+        return R_VOID;
+    } else if(strcmp(parser->prev->value, "i32")) {
+        return R_I32;
+    } else if(strcmp(parser->prev->value, "f64")) {
+        return R_F64;
+    } else if(strcmp(parser->prev->value, "[]u8")) {
+        return R_U8;
+    }
+
+    exit(4);
+}
+
 AST_Node* func_decl() {
     AST_Node* node = node_init(FUNCTION_DECL);
     consume(T_PUB);
     consume(T_FN);
     consume(T_ID);
 
-    // TODO(Sigull) Add func to bvs
+    const char* func_name = parser->prev->value;
 
     consume(T_RPAR);
     while(check(T_ID)) {
@@ -224,17 +249,39 @@ AST_Node* func_decl() {
     }
     consume(T_LPAR);
 
-    if (check(T_DTYPE) || check(T_VOID)) {
-        advance();
-        // TODO(Sigull) Add return type to func
-    }
+    if (!check(T_DTYPE) && !check(T_VOID)) {
+        exit(2);
+    } 
+    advance();
+
+    Entry* entry = entry_init(func_name, E_FUNC, get_ret_type(), false);
+    tree_insert(parser->s_table, entry);
 
     consume(T_CUYRBRACKET);
     
     while(!check(T_CUYLBRACKET)) {
         arr_append(node->as.arr, (size_t)stmt());
     }
-    // TODO(Sigull) Check if non void func has return
+
+    // TODO(Sigull) This can be done better. Maybe second pass.
+    // We need to take into accout implicit conversion
+    // Has return with correct expr value
+    if (entry->ret_type != R_VOID) {
+        bool has_ret = false;
+        Arr* arr = node->as.arr;
+        for(int i=0; i < arr->length; i++) {
+            AST_Node* current = (AST_Node*)arr->data[i];
+            if (current->type == RETURN && current->left != NULL) {
+                if (current->left->as.expr_type != entry->ret_type) {
+                    has_ret = true;
+                }
+            }
+        }
+
+        if(!has_ret) {
+            exit(6);
+        }
+    }
 
     consume(T_CUYLBRACKET);
 

@@ -10,12 +10,14 @@
 #define BVS_H
 
 #include <stdbool.h>
+#include "helper.h"
 
 enum { BLACK = 0, RED = 1 } Node_Color;
 
 typedef enum {
 	E_FUNC,
 	E_VAR,
+	IMPLICIT,
 } Entry_Type;
 
 typedef enum {
@@ -23,13 +25,18 @@ typedef enum {
 	R_I32,
 	R_F64,
 	R_U8,
-} Entry_Ret_Type;
+} Ret_Type;
 
 typedef struct Entry {
 	Entry_Type type;
 	
 	const char* key; // TODO(Sigull): change const char* string to our own type
-	Entry_Ret_Type ret_type;
+	Ret_Type ret_type;
+
+	union {
+		Arr* function_args;
+		bool can_mut;
+	} as;
 } Entry;
 
 typedef struct Node {
@@ -46,7 +53,7 @@ typedef struct Tree {
 } Tree;
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Entry_Ret_Type ret_type);
+				  Ret_Type ret_type, bool can_mut);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);

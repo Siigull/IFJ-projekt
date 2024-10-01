@@ -10,10 +10,13 @@
 
 #include "expressionparser.h"
 #include "helper.h"
+#include "ast.h"
 
 typedef struct Parser {
     Token* next;
     Token* prev;
+
+    Tree* s_table;
 } Parser;
 
 void parse(char* input);

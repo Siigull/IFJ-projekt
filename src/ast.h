@@ -9,6 +9,7 @@
 #ifndef AST_H
 #define AST_H
 #include "helper.h"
+#include "bvs.h"
 
 typedef enum {
     FUNC_CALL,
@@ -66,6 +67,7 @@ typedef struct AST_Node {
     union {
         const char* var_name;
         Arr* arr;
+        Ret_Type expr_type;
         // size_t data;
     } as;
 

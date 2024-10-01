@@ -14,12 +14,18 @@
 #include "bvs.h"
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Entry_Ret_Type ret_type) {
+				  Ret_Type ret_type, bool can_mut) {
 	Entry* entry = malloc(sizeof(Entry));
 
 	entry->type = type;
 	entry->key = key;
 	entry->ret_type = ret_type;
+
+	if (type == E_FUNC) {
+		entry->as.function_args = arr_init();
+	} else if (type == E_VAR) {
+		entry->as.can_mut = can_mut;
+	}
 
 	return entry;
 }
