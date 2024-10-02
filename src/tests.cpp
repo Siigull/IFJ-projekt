@@ -154,13 +154,14 @@ TEST_F(test_lexer, float_error) {
 	}
 }
 
-//taken from zig language reference
-TEST_F(test_lexer, floats){
-	char input[] = "123.0E+77 123.0 123.0e+77 3.141592653589793 1.23e-10 4.56231e+42 0.0e0 0.023E000045 0.23e-15";
+// taken from zig language reference
+TEST_F(test_lexer, floats) {
+	char input[] =
+		"123.0E+77 123.0 123.0e+77 3.141592653589793 1.23e-10 4.56231e+42 0.0e0 0.023E000045 "
+		"0.23e-15";
 	lexer = init_lexer(input);
-	for(int i = 0; i < 9; i++){
+	for (int i = 0; i < 9; i++) {
 		EXPECT_EQ(get_next_token(lexer)->type, T_F64);
-
 	}
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
@@ -213,15 +214,15 @@ TEST_F(test_lexer, strings) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-//HERE TOKEN->VALUE HAS THE ESCAPE CHAR IN IT (LITERALLY)
-TEST_F(test_lexer, string_escape){
+// HERE TOKEN->VALUE HAS THE ESCAPE CHAR IN IT (LITERALLY)
+TEST_F(test_lexer, string_escape) {
 	char input[] = "\"str \\t \\r \\\\ \\n ing\"";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-//non terminating tests
+// non terminating tests
 /*TEST_F(test_lexer, error6) {
 	char input[] = "var []u8 = \"Hello World;\n";
 	lexer = init_lexer(input);
@@ -244,15 +245,15 @@ TEST_F(test_lexer, string_escape){
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }*/
 
-TEST_F(test_lexer, string_hex){
+TEST_F(test_lexer, string_hex) {
 	char input[] = "\"Ahoj\\n \\\"Sve'te \\\\\\x22 \"";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, comment){
-	char input[] = 	"var input = \"jejda\" //comment comment comment\n pub fn";
+TEST_F(test_lexer, comment) {
+	char input[] = "var input = \"jejda\" //comment comment comment\n pub fn";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
@@ -263,8 +264,8 @@ TEST_F(test_lexer, comment){
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, comment_error){
-	char input[] = 	"var input = \"jejda\" //comment comment comment pub fn bomba";
+TEST_F(test_lexer, comment_error) {
+	char input[] = "var input = \"jejda\" //comment comment comment pub fn bomba";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
@@ -273,7 +274,7 @@ TEST_F(test_lexer, comment_error){
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
 
-TEST_F(test_lexer, ids){
+TEST_F(test_lexer, ids) {
 	char input[] = " _ideNtIfi3Cat___2or1 ___________identifier";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
@@ -281,21 +282,25 @@ TEST_F(test_lexer, ids){
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, I32_minus_err){
+TEST_F(test_lexer, I32_minus_err) {
 	char input[] = " -1 ";
 	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
 	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, F64_minus_err){
+TEST_F(test_lexer, F64_minus_err) {
 	char input[] = " -1.0 ";
 	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
 	EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
 // Lexer nic nematchne a místo toho aby dal exit(1) vyskočí z
 // if (lexer->input[lexer->idr] != '\0'), kde je return eof
-TEST_F(test_lexer, unrecognized_input_err){
+TEST_F(test_lexer, unrecognized_input_err) {
 	char input[] = " Č ";
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
