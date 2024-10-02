@@ -46,7 +46,7 @@ bool is_whitespace(char c) {
 
 void lexer_skip_whitespace(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	while(is_whitespace(c)){
+	while (is_whitespace(c)) {
 		lexer_advance(lexer);
 		c = lexer->input[lexer->idr];
 		if (c == '/' && lexer->input[lexer->idr + 1] == '/') {
@@ -151,18 +151,18 @@ bool is_float_token(Token* token) {
 };
 
 Token* find_token_value(Lexer* lexer, T_TYPE type) {
-    if (type == T_EOF) {
-        Token* token = init_token("0", T_EOF, 0);
-        return token;
-    }
+	if (type == T_EOF) {
+		Token* token = init_token("0", T_EOF, 0);
+		return token;
+	}
 
-    unsigned int len = lexer->idr - lexer->idl;
-    char* value = (char*) malloc(len + 1);
-    // load the value
-    for (unsigned int i = 0; i < len; i++) {
-        value[i] = lexer->input[lexer->idl + i];
-    }
-    value[len] = '\0';
+	unsigned int len = lexer->idr - lexer->idl;
+	char* value = (char*) malloc(len + 1);
+	// load the value
+	for (unsigned int i = 0; i < len; i++) {
+		value[i] = lexer->input[lexer->idl + i];
+	}
+	value[len] = '\0';
 	// partially initializing token but we need to ensure it has correct type
 	Token* token = init_token(value, type, len);
 
@@ -202,7 +202,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 				return token;
 			}
 		}
-		if(token->length == 1 && token->value[0] == '_'){
+		if (token->length == 1 && token->value[0] == '_') {
 			token->type = T_UNDER;
 			return token;
 		}
@@ -254,18 +254,15 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 		return token;
 	}
 
-
-	if(type == T_BUILDIN){
-// error TODO handling of buildin function that do not exist
-	return token;
+	if (type == T_BUILDIN) {
+		// error TODO handling of buildin function that do not exist
+		return token;
 	};
 
-
 	// if we didn't match with anything, its error
-	if(lexer->idr == lexer->input_len){
+	if (lexer->idr == lexer->input_len) {
 		return init_token("0", T_EOF, 0);
-	}
-	else{
+	} else {
 		exit(1);
 	}
 } // end of find_token_value
@@ -274,20 +271,20 @@ Token* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
-		//normal strings
+		// normal strings
 		if (lexer->input[lexer->idr] == '"') {
 			lexer->idl++;
 			lexer_advance(lexer);
-			while (lexer->input[lexer->idr] != '"') { 
+			while (lexer->input[lexer->idr] != '"') {
 				if (lexer->input[lexer->idr] == BACKSLASH) {
-					if (lexer->input[lexer->idr+1] == '"') {
+					if (lexer->input[lexer->idr + 1] == '"') {
 						lexer_advance(lexer);
 					}
 				}
 				lexer_advance(lexer);
 			}
 			return find_token_value(lexer, T_STRING);
-		}//normal strings
+		} // normal strings
 
 		/*//multiline strings
 		if(lexer->input[lexer->idr] == BACKSLASH && lexer->input[lexer->idr+1] == BACKSLASH){
@@ -301,20 +298,18 @@ Token* get_next_token(Lexer* lexer) {
 			return find_token_value(lexer, T_STRING);
 		}//multiline*/
 
-
-		if(lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' && lexer->input[lexer->idr + 2] == 'j' && lexer->input[lexer->idr + 3] == '.'){
-			for(int i = 0; i < 4; i++){
+		if (lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' &&
+			lexer->input[lexer->idr + 2] == 'j' && lexer->input[lexer->idr + 3] == '.') {
+			for (int i = 0; i < 4; i++) {
 				lexer_advance(lexer);
 			}
 			// now scanning inbuild function
-			
-			while(is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr])){
+
+			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr])) {
 				lexer_advance(lexer);
 			}
 			return find_token_value(lexer, T_BUILDIN);
 		}
-
-
 
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
 			lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
@@ -335,7 +330,7 @@ Token* get_next_token(Lexer* lexer) {
 			// if we read number we will still read chars and nums
 			else if (has_number == 1) {
 				while (is_num(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '.' ||
-					   	isalpha(lexer->input[lexer->idr]) != 0) {
+					   isalpha(lexer->input[lexer->idr]) != 0) {
 					if (lexer->input[lexer->idr] != 'e' && lexer->input[lexer->idr] != 'E') {
 						lexer_advance(lexer);
 					} else {
@@ -393,17 +388,28 @@ Token* get_next_token(Lexer* lexer) {
 			return token;
 		};
 
+		//{"+", "-", "*", "/", "=", "!", "<", ">", "<=", ">=", "==", "!="};
 		if (is_operator(lexer->input[lexer->idr])) {
-			while (is_operator(lexer->input[lexer->idr])) {
+			lexer_advance(lexer);
+			if (lexer->input[lexer->idr - 1] == '=' && lexer->input[lexer->idr] == '=') {
 				lexer_advance(lexer);
 			}
+			else if (lexer->input[lexer->idr - 1] == '<' && lexer->input[lexer->idr] == '=') {
+				lexer_advance(lexer);
+			}
+			else if (lexer->input[lexer->idr - 1] == '>' && lexer->input[lexer->idr] == '=') {
+				lexer_advance(lexer);
+			}
+			else if (lexer->input[lexer->idr - 1] == '!' && lexer->input[lexer->idr] == '=') {
+				lexer_advance(lexer);
+			}
+
 			return find_token_value(lexer, T_OPERATOR);
 		}
 	}
-	if(lexer->idr == lexer->input_len){
+	if (lexer->idr == lexer->input_len) {
 		return init_token("0", T_EOF, 0);
-	}
-	else{
+	} else {
 		exit(1);
 	}
 } // end of get_next_token

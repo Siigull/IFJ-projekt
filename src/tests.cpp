@@ -316,8 +316,7 @@ TEST_F(test_lexer, pseudo_var) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-/*
-TEST_F(test_lexer, no_spaces){
+TEST_F(test_lexer, no_spaces) {
 	char input[] = "varx=-5";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
@@ -325,7 +324,6 @@ TEST_F(test_lexer, no_spaces){
 	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
 	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
 }
-*/
 
 TEST_F(test_lexer, built_in_one) {
 	char input[] = "ifj.length ifj.substring";
