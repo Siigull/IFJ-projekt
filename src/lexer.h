@@ -12,7 +12,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-/// \todo ’\"’, ’\n’, ’\r’, ’\t’, ’\\’
+/// \todo ’\"’, ’\n’, ’\r’, ’\t’
+
+#define BACKSLASH 92
+
 typedef enum {
 	T_ID,
 	T_F64,
@@ -26,12 +29,14 @@ typedef enum {
 	T_EXPONENT,
 	T_STRING,
 	T_COMMENT,
+	T_BUILDIN,
 	T_RPAR = 20, // (
 	T_LPAR,      // )
 	T_SQRBRACKET,
 	T_SQLBRACKET,
 	T_CUYRBRACKET, // {
 	T_CUYLBRACKET, // }
+	T_VBAR, // |
 	T_CONST = 30,
 	T_IF,
 	T_ELSE,
@@ -45,6 +50,7 @@ typedef enum {
 	T_SEMI,
 	T_DDOT,
 	T_COMMA,
+	T_UNDER,
 	T_PLUS = 50,
 	T_MINUS,
 	T_MUL,

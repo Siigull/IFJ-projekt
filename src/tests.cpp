@@ -175,19 +175,13 @@ TEST_F(test_lexer, error2) {
 }
 
 TEST_F(test_lexer, error3) {
-	char input[] = "_ = 5";
-	lexer = init_lexer(input);
-	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
-}
-
-TEST_F(test_lexer, error4) {
 	char input[] = "var #invalid = 10";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }
 
-TEST_F(test_lexer, error5) {
+TEST_F(test_lexer, error4) {
 	char input[] = "var num = 10 @ 5;";
 	lexer = init_lexer(input);
 	get_next_token(lexer);
@@ -233,16 +227,10 @@ TEST_F(test_lexer, string_escape) {
 }*/
 
 /*TEST_F(test_lexer, strings_multi_line){
-	char input[] = "\\\\hovnohovno";
+	char input[] = "\\\\multilinestring";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	printf("%s", input);
-}*/
-
-/*TEST_F(test_lexer, string_err){
-	char input[] = " cbjkkvb2id\"; ";
-	lexer = init_lexer(input);
-	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }*/
 
 TEST_F(test_lexer, string_hex) {
@@ -282,7 +270,7 @@ TEST_F(test_lexer, ids) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, I32_minus_err) {
+TEST_F(test_lexer, I32_minus) {
 	char input[] = " -1 ";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
@@ -290,7 +278,7 @@ TEST_F(test_lexer, I32_minus_err) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-TEST_F(test_lexer, F64_minus_err) {
+TEST_F(test_lexer, F64_minus) {
 	char input[] = " -1.0 ";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
@@ -298,10 +286,134 @@ TEST_F(test_lexer, F64_minus_err) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
-// Lexer nic nematchne a místo toho aby dal exit(1) vyskočí z
-// if (lexer->input[lexer->idr] != '\0'), kde je return eof
 TEST_F(test_lexer, unrecognized_input_err) {
 	char input[] = " Č ";
 	lexer = init_lexer(input);
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
+
+TEST_F(test_lexer, string_err_end) {
+	char input[] = "\"Hello World;\n;";
+	lexer = init_lexer(input);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
+
+TEST_F(test_lexer, string_err_start) {
+	char input[] = "Hello World;\n\";";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
+}
+
+TEST_F(test_lexer, pseudo_var) {
+	char input[] = "_ = foo";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_UNDER);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+/*
+TEST_F(test_lexer, no_spaces){
+	char input[] = "varx=-5";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+}
+*/
+
+TEST_F(test_lexer, built_in_one) {
+	char input[] = "ifj.length ifj.substring";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_BUILDIN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_BUILDIN);
+}
+
+/**
+"	const ifj = @import(\"ifj24.zig\"); \n
+	pub fn f (x : i32) i32    // seznam parametru \n
+	{ //deklarace funkce; v IFJ24 nejsou blokove komentare \n
+		if(x<10){return x-1;} else {const y = x - 1; // cannot redefine x (shadowing is forbidden)
+\n const res = g(y); \n return res; \n } \n
+	}";
+ */
+TEST_F(test_lexer, complex) {
+	char input[] =
+		"const ifj = @import(\"ifj24.zig\"); \n pub fn f (x : i32) i32    // seznam parametru \n { "
+		"//deklarace funkce; v IFJ24 nejsou blokove komentare \n if(x<10){return x-1;}else{const y "
+		"= x - 1; // cannot redefine x (shadowing is forbidden) \n const res = g(y); \nreturn res; "
+		"\n} \n}";
+
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CONST);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_IMPORT);
+	EXPECT_EQ(get_next_token(lexer)->type, T_RPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
+	EXPECT_EQ(get_next_token(lexer)->type, T_LPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EQ(get_next_token(lexer)->type, T_PUB);
+	EXPECT_EQ(get_next_token(lexer)->type, T_FN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_RPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_DDOT);
+	EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE);
+	EXPECT_EQ(get_next_token(lexer)->type, T_LPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_DTYPE);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CUYRBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_IF);
+	EXPECT_EQ(get_next_token(lexer)->type, T_RPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_STHAN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_LPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CUYRBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_RETURN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ELSE);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CUYRBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CONST);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CONST);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_RPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_LPAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EQ(get_next_token(lexer)->type, T_RETURN);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
+	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
+}
+
+TEST_F(test_lexer, random_spaces) {
+	char input[] = "var x    =     -1.0 + 2 ;";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+	EXPECT_EQ(get_next_token(lexer)->type, T_PLUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
 }
