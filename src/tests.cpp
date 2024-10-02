@@ -395,4 +395,15 @@ TEST_F(test_lexer, complex){
 	EXPECT_EQ(get_next_token(lexer)->type, T_CUYLBRACKET);
 }
 
-
+TEST_F(test_lexer, random_spaces) {
+	char input[] = "var x    =     -1.0 + 2 ;";
+	lexer = init_lexer(input);
+	EXPECT_EQ(get_next_token(lexer)->type, T_VAR);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+	EXPECT_EQ(get_next_token(lexer)->type, T_MINUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_F64);
+	EXPECT_EQ(get_next_token(lexer)->type, T_PLUS);
+	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
+	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
+}
