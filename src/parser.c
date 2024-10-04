@@ -71,6 +71,8 @@ AST_Node* _if() {
 
     if (!check(T_LPAR)) {
         node->left = expr();
+    } else {
+        exit(2);
     }
 
     consume(T_LPAR);
@@ -261,26 +263,6 @@ AST_Node* func_decl() {
     
     while(!check(T_CUYLBRACKET)) {
         arr_append(node->as.arr, (size_t)stmt());
-    }
-
-    // TODO(Sigull) This can be done better. Maybe second pass.
-    // We need to take into accout implicit conversion
-    // Has return with correct expr value
-    if (entry->ret_type != R_VOID) {
-        bool has_ret = false;
-        Arr* arr = node->as.arr;
-        for(int i=0; i < arr->length; i++) {
-            AST_Node* current = (AST_Node*)arr->data[i];
-            if (current->type == RETURN && current->left != NULL) {
-                if (current->left->as.expr_type != entry->ret_type) {
-                    has_ret = true;
-                }
-            }
-        }
-
-        if(!has_ret) {
-            exit(6);
-        }
     }
 
     consume(T_CUYLBRACKET);
