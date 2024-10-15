@@ -1,6 +1,4 @@
 #include "parser_semantics.h"
-#include <stdio.h>
-#include "ast.h"
 #include "parser.h"
 
 extern Parser* parser;

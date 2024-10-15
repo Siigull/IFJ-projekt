@@ -11,6 +11,8 @@
 #include "expressionparser.h"
 #include "helper.h"
 #include "ast.h"
+#include "error.h"
+#include "string.h"
 
 typedef struct Parser {
     Token* next;

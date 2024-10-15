@@ -1,6 +1,4 @@
 #include "parser.h"
-#include "ast.h"
-#include "string.h"
 Lexer* lexer;
 Parser* parser;
 Token* debug_token_array;
@@ -31,7 +29,7 @@ void consume(T_Type type) {
         advance();
 
     } else {
-        exit(2);
+        exit(ERR_PARSE);
     }
 }
 
@@ -73,7 +71,7 @@ AST_Node* _if() {
     if (!check(T_LPAR)) {
         node->left = expr();
     } else {
-        exit(2);
+        exit(ERR_PARSE);
     }
 
     consume(T_LPAR);
@@ -130,6 +128,9 @@ AST_Node* var_decl() {
     Entry* entry = entry_init(node->as.var_name, E_VAR,
                               ret_type, false, can_mut);
 
+    if(tree_find(parser->s_table, node->as.var_name) != NULL) {
+        exit(ERR_SEM_NOT_DEF_FNC_VAR);
+    }
     tree_insert(parser->s_table, entry);
 
     consume(T_EQUAL);
@@ -212,7 +213,7 @@ AST_Node* stmt() {
 
         default:
             // TODO(Sigull) Add error message
-            exit(2);
+            exit(ERR_PARSE);
     }
 }
 
@@ -227,7 +228,7 @@ Ret_Type get_ret_type() {
         return R_U8;
     }
 
-    exit(4);
+    exit(ERR_SEM_RET_TYPE_DISCARD);
 }
 
 AST_Node* func_decl() {
@@ -253,7 +254,7 @@ AST_Node* func_decl() {
     consume(T_LPAR);
 
     if (!check(T_DTYPE) && !check(T_VOID)) {
-        exit(2);
+        exit(ERR_PARSE);
     } 
     advance();
 
