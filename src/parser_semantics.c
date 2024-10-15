@@ -1,49 +1,55 @@
 #include "parser_semantics.h"
+#include <stdio.h>
+#include "ast.h"
+#include "parser.h"
+
+extern Parser* parser;
 
 //TODO(Sigull) Once expr parser is fleshed out add
 //             functions for expr, literals, binary...
+bool is_nullable(Ret_Type type) {
+    return false;
+}
 
-void _if(node) {
+void check_node(AST_Node* node);
+
+void sem_func_call(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
-void func_call(node) {
+void sem_function_decl(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
-void function_decl(node) {
+void sem_var_decl(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
-void var_decl(node) {
+void sem_var_assignment(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
-void var_assignment(node) {
+void sem_else(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
-void _else(node) {
+void sem_nnull_var_decl(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
-void nnull_var_decl(node) {
-    //TODO(Sigull) todo
-}
-
-void _return(node) {
-    //TODO(Sigull) todo
+void sem_return(AST_Node* node) {
+    check_node(node->left);
 }
 
 
-void _if (AST_Node* node) {
+void sem_if (AST_Node* node) {
     check_node(node->left);
  
     if (node->as.arr->length) {
         AST_Node* node = (AST_Node*)node->as.arr->data[0];
 
         if (node->type == NNULL_VAR_DECL) {
-            if(is_nullable(node->left->type)) {
+            if(is_nullable(node->left->as.expr_type)) {
                 exit(10);
             }
         }
@@ -59,14 +65,14 @@ void check_node(AST_Node* node) {
     }
 
     switch(node->type) {
-        case IF:             _if(node); break;
-        case FUNC_CALL:      func_call(node); break;
-        case FUNCTION_DECL:  function_decl(node); break;
-        case VAR_DECL:       var_decl(node); break;
-        case VAR_ASSIGNMENT: var_assignment(node); break;
-        case ELSE:           _else(node); break;
-        case NNULL_VAR_DECL: nnull_var_decl(node); break;
-        case RETURN:         _return(node); break;
+        case IF:             sem_if(node); break;
+        case FUNC_CALL:      sem_func_call(node); break;
+        case FUNCTION_DECL:  sem_function_decl(node); break;
+        case VAR_DECL:       sem_var_decl(node); break;
+        case VAR_ASSIGNMENT: sem_var_assignment(node); break;
+        case ELSE:           sem_else(node); break;
+        case NNULL_VAR_DECL: sem_nnull_var_decl(node); break;
+        case RETURN:         sem_return(node); break;
         
         default:             printf("Unknown node type!\n"); break;
     }

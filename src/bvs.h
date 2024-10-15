@@ -17,7 +17,6 @@ enum { BLACK = 0, RED = 1 } Node_Color;
 typedef enum {
 	E_FUNC,
 	E_VAR,
-	IMPLICIT,
 } Entry_Type;
 
 typedef enum {
@@ -25,6 +24,7 @@ typedef enum {
 	R_I32,
 	R_F64,
 	R_U8,
+	IMPLICIT,
 } Ret_Type;
 
 typedef struct Entry {
@@ -32,6 +32,7 @@ typedef struct Entry {
 	
 	const char* key; // TODO(Sigull): change const char* string to our own type
 	Ret_Type ret_type;
+	bool has_null;
 
 	union {
 		Arr* function_args;
@@ -53,7 +54,8 @@ typedef struct Tree {
 } Tree;
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Ret_Type ret_type, bool can_mut);
+				  Ret_Type ret_type, bool has_null,
+				  bool can_mut);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);

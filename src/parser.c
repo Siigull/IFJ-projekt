@@ -48,6 +48,7 @@ AST_Node* expr() {
 
 // Normal parser
 AST_Node* stmt();
+Ret_Type get_ret_type();
 
 AST_Node* _else() {
     AST_Node* node = node_init(ELSE);
@@ -127,7 +128,7 @@ AST_Node* var_decl() {
     }
 
     Entry* entry = entry_init(node->as.var_name, E_VAR,
-                              ret_type, can_mut);
+                              ret_type, false, can_mut);
 
     tree_insert(parser->s_table, entry);
 
@@ -188,7 +189,7 @@ AST_Node* _return() {
     consume(T_RETURN);
 
     if (!check(T_SEMI)) {
-        node->left = expr;
+        node->left = expr();
     }
 
     return node;
@@ -256,7 +257,7 @@ AST_Node* func_decl() {
     } 
     advance();
 
-    Entry* entry = entry_init(func_name, E_FUNC, get_ret_type(), false);
+    Entry* entry = entry_init(func_name, E_FUNC, get_ret_type(), false, false);
     tree_insert(parser->s_table, entry);
 
     consume(T_CUYRBRACKET);
