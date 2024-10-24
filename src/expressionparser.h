@@ -14,15 +14,31 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "lexer.h"
-typedef struct Stack {
-    // union type of token terminals and nonterminals
-    int top;
-} Stack;
+#include "stack.h"
+#include "ast.h"
 
+#define TABLE_SIZE 8
 
+typedef enum {
+    N, // no precedence
+    L, // left precedence
+    R, // right precedence
+    M, // equal precedence
+} precedence;
 
+int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
+//   id +  -  *  /  (  )  $ 
+    {N, L, L, L, L, N, L, L}, // id
+    {R, L, L, R, R, R, L, L}, // +
+    {R, L, L, R, R, R, L, L}, // -
+    {R, L, L, L, L, R, L, L}, // *
+    {R, L, L, L, L, R, L, L}, // /
+    {R, R, R, R, R, R, M, N}, // (
+    {N, L, L, L, L, N, L, L}, // )
+    {R, R, R, R, R, R, N, R}  // $
 
+};
 
-
+AST_Node* parse_expression(List* list);
 
 #endif
