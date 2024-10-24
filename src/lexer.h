@@ -61,7 +61,10 @@ typedef enum {
 	T_UNDEF,
 	T_NULL = 90,
 	T_EOF,
-	T_ERR
+	T_ERR,
+	T_DOLLARLIST,
+	T_LEFTISHIFTLIST, // >
+	T_RIGHTSHIFTLIST  // <
 } T_Type;
 
 typedef struct {
@@ -85,12 +88,12 @@ typedef struct {
  *
  * @param input the code that is being checked for tokens
  * @return Lexer*
- * 
+ *
  */
 Lexer* init_lexer(char* input);
 
 Token* get_next_token(Lexer* lexer);
-
+Token* init_token(char* value, T_Type type, unsigned int length);
 void print_token(Token* token, FILE* out);
 
 #endif
