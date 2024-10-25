@@ -41,7 +41,7 @@ void List_delete(List *list ) {
 	return;
 }
 
-void DLL_insertF(List *list, Token* data ) {
+void List_insertF(List *list, Token* data ) {
 	List_elem* new_elem = (List_elem*)malloc(sizeof(List_elem));
 	if(new_elem == NULL){ // memory allocation error
 		return;

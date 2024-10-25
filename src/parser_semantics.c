@@ -48,7 +48,7 @@ void sem_if (AST_Node* node) {
 
         if (node->type == NNULL_VAR_DECL) {
             if(is_nullable(node->left->as.expr_type)) {
-                exit(10);
+                exit(ERR_SEM_OTHER);
             }
         }
     }

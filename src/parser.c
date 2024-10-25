@@ -1,4 +1,6 @@
 #include "parser.h"
+#include "ast.h"
+#include "string.h"
 Lexer* lexer;
 Parser* parser;
 Token* debug_token_array;
@@ -16,7 +18,7 @@ Parser* init_parser() {
 }
 
 void advance() {
-    // free(parser->prev);
+    // free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
     // parser->prev = parser->next;
     // parser->next = get_next_token(lexer);
 
@@ -37,10 +39,70 @@ bool check(T_Type type) {
     return parser->next->type == type;
 }
 
+void binary_load(Arr* ta);
+
+void literal_load(Arr* ta) {
+    Token* token = malloc(sizeof(Token));
+    memcpy(token, parser->next, sizeof(Token));
+    arr_append(ta, (size_t)token);
+
+    if (check(T_ID)) {
+        advance();
+
+    } else if (check(T_I32) || check(T_F64) || 
+               check(T_U8) || check(T_STRING)) {
+        advance();
+
+    } else if (check(T_RPAR)) {
+        advance();
+        binary_load(ta);
+        consume(T_LPAR);
+        Token* token = malloc(sizeof(Token));
+        memcpy(token, parser->prev, sizeof(Token));
+        arr_append(ta, (size_t)token);
+
+    } else {
+        exit(ERR_PARSE);
+    } 
+}
+
+bool check_operator() {
+    T_Type operator_types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_EQUAL, T_EXCLEMARK, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+    int len = sizeof(operator_types) / sizeof(T_Type);
+    for (int i=0; i < len; i++) {
+        if (check(operator_types[i])){
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+void binary_load(Arr* ta) {
+    literal_load(ta);
+
+    while(check_operator()) {
+        advance();
+        Token* token = malloc(sizeof(Token));
+        memcpy(token, parser->prev, sizeof(Token));
+        arr_append(ta, (size_t)token);
+        literal_load(ta);
+    }
+}
+
 // Expression parser
 AST_Node* expr() {
-    advance();
-    printf("expr parser takes over\n");
+    Arr* token_array = arr_init();
+
+    binary_load(token_array);
+
+    for(int i=0; i < token_array->length; i++) {
+        print_token((Token*)token_array->data[i], stdout);
+        printf(" ");
+    }
+
+    // printf("expr parser takes over\n");
+    printf("\n");
     return NULL;
 }
 
@@ -289,7 +351,10 @@ void parse(char* orig_input) {
                          {T_LPAR, ")", 1},        {T_VOID, "void", 4},
                          {T_CUYRBRACKET, "{", 1}, {T_CONST, "const", 5}, 
                          {T_ID, "a", 1},          {T_EQUAL, "=", 1},
-                         {T_I32, "10", 2},        {T_SEMI, ";", 1},
+                         {T_I32, "10", 2},        {T_PLUS, "+", 1},
+                         {T_RPAR, "(", 1},        {T_I32, "69", 2},
+                         {T_DIV, "/", 1},         {T_I32, "420", 2},
+                         {T_LPAR, ")", 1},        {T_SEMI, ";", 1},
                          {T_IF, "if", 2},         {T_RPAR, "(", 1}, 
                          {T_ID, "a", 1},          {T_LPAR, ")", 1},
                          {T_BAR, "|", 1},         {T_ID, "A", 1},

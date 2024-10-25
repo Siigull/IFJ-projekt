@@ -25,18 +25,6 @@ typedef enum {
 	M, // equal precedence
 } precedence;
 
-int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
-	//   id +  -  *  /  (  )  $
-	{N, L, L, L, L, N, L, L}, // id
-	{R, L, L, R, R, R, L, L}, // +
-	{R, L, L, R, R, R, L, L}, // -
-	{R, L, L, L, L, R, L, L}, // *
-	{R, L, L, L, L, R, L, L}, // /
-	{R, R, R, R, R, R, M, N}, // (
-	{N, L, L, L, L, N, L, L}, // )
-	{R, R, R, R, R, R, N, R}  // $
-
-};
 /*
 Rules: E  → E + E
 	   E  → E - E

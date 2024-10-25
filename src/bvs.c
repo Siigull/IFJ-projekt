@@ -231,7 +231,12 @@ Node* tree_find_traverse(Node* node, const char* key) {
 }
 
 Entry* tree_find(Tree* tree, const char* key) {
-	return tree_find_traverse(tree->root, key)->entry;
+	Node* node = tree_find_traverse(tree->root, key);
+	if (node == NULL) {
+		return NULL;
+	}
+
+	return node->entry;
 }
 
 Node* transplant(Node* from, Node* to) {
