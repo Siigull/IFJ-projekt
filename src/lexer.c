@@ -252,11 +252,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	if (type == T_STRING) {
 		if(value[0] == '\\') {
 			int last_newline = -1;
-
-			if(value[len - 1] == '\n') {
-				memmove(value + len - 1, value + len, 1);
-			}
-
+			
 			for(int i=0; i < len; i++) {
 				if (value[i] == '\n' && last_newline == -1) {
 					last_newline = i;
@@ -274,7 +270,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 				value[last_newline] = '\0';
 			}
 			
-			memmove(value, value + 2, len - 2);
+			memmove(value, value + 2, len - 1);
 
 		} else {
 			lexer_advance(lexer);
