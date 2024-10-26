@@ -11,10 +11,13 @@
 #define LEXER_H
 #include <stdbool.h>
 #include <stdio.h>
+#include "ast.h"
+/// \todo ’\"’, ’\n’, ’\r’, ’\t’
 
-/// \todo ’\"’, ’\n’, ’\r’, ’\t’, ’\\’
+#define BACKSLASH 92
+
 typedef enum {
-	T_ID,
+	
 	T_F64,
 	T_I32,
 	T_U8,
@@ -26,12 +29,12 @@ typedef enum {
 	T_EXPONENT,
 	T_STRING,
 	T_COMMENT,
-	T_RPAR = 20, // (
-	T_LPAR,      // )
-	T_SQRBRACKET,
+	T_BUILDIN,
+	T_SQRBRACKET = 20,
 	T_SQLBRACKET,
 	T_CUYRBRACKET, // {
 	T_CUYLBRACKET, // }
+	T_VBAR, // |
 	T_CONST = 30,
 	T_IF,
 	T_ELSE,
@@ -45,12 +48,18 @@ typedef enum {
 	T_SEMI,
 	T_DDOT,
 	T_COMMA,
-	T_BAR,
 	T_UNDER,
-	T_PLUS = 50,
+	T_ID = 50,
+	T_PLUS,
 	T_MINUS,
 	T_MUL,
 	T_DIV,
+	T_RPAR , // (
+	T_LPAR,      // )
+	T_DOLLARLIST,
+	T_LEFTSHIFTLIST,
+	T_RIGHTSHIFTLIST,
+	T_DDEQ, // ==
 	T_EQUAL,
 	T_NEQUAL,
 	T_GTHAN,
@@ -62,15 +71,15 @@ typedef enum {
 	T_NULL = 90,
 	T_EOF,
 	T_ERR,
-	T_DOLLARLIST,
-	T_LEFTISHIFTLIST, // >
-	T_RIGHTSHIFTLIST  // <
+	T_PROLOG,
 } T_Type;
 
 typedef struct {
 	T_Type type;
 	char* value;
 	unsigned int length;
+	bool isProcessed; 
+	AST_Node* node;
 } Token;
 
 typedef struct {
@@ -91,9 +100,7 @@ typedef struct {
  *
  */
 Lexer* init_lexer(char* input);
-
 Token* get_next_token(Lexer* lexer);
 Token* init_token(char* value, T_Type type, unsigned int length);
 void print_token(Token* token, FILE* out);
-
 #endif

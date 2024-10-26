@@ -20,6 +20,10 @@ typedef enum {
     ELSE,
     NNULL_VAR_DECL,
     RETURN,
+    I32,
+    F64, 
+    ID,
+    PLUS,
 } AST_Type;
 
 typedef enum {

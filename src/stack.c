@@ -103,24 +103,24 @@ void List_activeL(List *list ) {
 	return;
 }//DLL_Last
 
-void List_first_val(List *list, Token *dataPtr ) {
+void List_first_val(List *list, Token **dataPtr ) {
 	if(list->first == NULL && list->last == NULL){ //empty list error
 		return;
 	}
 	//non empty list
 	if(dataPtr != NULL){
-		dataPtr = list->first->token; //setting dataPtr to the correct value of first element
+		*dataPtr = list->first->token; //setting dataPtr to the correct value of first element
 	}
 	return;
 }
 
-void List_last_val(List *list, Token *dataPtr ) {
+void List_last_val(List *list, Token **dataPtr ) {
 	if(list->first == NULL && list->last == NULL){ //empty list error
 		return;
 	}
 	//non empty list
 	if(dataPtr != NULL){
-		dataPtr = list->last->token; //setting dataPtr to the correct value of last element
+		*dataPtr = list->last->token; //setting dataPtr to the correct value of last element
 	}
 	return;
 }
@@ -291,13 +291,13 @@ void List_insert_before(List *list, Token* data ) {
 	return;
 }
 
-void List_get_val(List *list, Token *dataPtr ) {
+void List_get_val(List *list, Token **dataPtr ) {
 	if(list->act == NULL){ //non active list error
 		return;
 	}
 	//active list
 	if(dataPtr != NULL){
-		dataPtr = list->act->token; // setting dataPtr to the correct value of active element
+		*dataPtr = list->act->token; // setting dataPtr to the correct value of active element
 	}
 	return;
 }
@@ -339,6 +339,14 @@ void List_active_prev(List *list ) {
 	else{
 		return;
 	}
+}
+T_Type List_get_first_type(List* list){
+	return list->first->token->type;
+};
+
+
+T_Type List_get_last_type(List* list){
+	return list->first->token->type;
 }
 
 bool List_is_active(List *list ) {
