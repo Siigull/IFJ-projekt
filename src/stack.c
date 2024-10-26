@@ -291,13 +291,13 @@ void List_insert_before(List *list, Token* data ) {
 	return;
 }
 
-void List_get_val(List *list, Token *dataPtr ) {
+void List_get_val(List *list, Token **dataPtr ) {
 	if(list->act == NULL){ //non active list error
 		return;
 	}
 	//active list
 	if(dataPtr != NULL){
-		dataPtr = list->act->token; // setting dataPtr to the correct value of active element
+		*dataPtr = list->act->token; // setting dataPtr to the correct value of active element
 	}
 	return;
 }

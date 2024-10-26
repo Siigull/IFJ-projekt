@@ -45,7 +45,7 @@ bool List_is_active(List* list);
 // get token pointers
 void List_first_val(List* list, Token* dataPtr);
 void List_last_val(List* list, Token* dataPtr);
-void List_get_val(List* list, Token* dataPtr);
+void List_get_val(List* list, Token** dataPtr);
 void List_set_val(List* list, Token* data);
 
 #endif
