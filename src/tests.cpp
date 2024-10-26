@@ -226,12 +226,12 @@ TEST_F(test_lexer, string_escape) {
 	EXPECT_EXIT(get_next_token(lexer), ExitedWithCode(1), ".*");
 }*/
 
-/*TEST_F(test_lexer, strings_multi_line){
+TEST_F(test_lexer, strings_multi_line){
 	char input[] = "\\\\multilinestring";
 	lexer = init_lexer(input);
 	EXPECT_EQ(get_next_token(lexer)->type, T_STRING);
 	printf("%s", input);
-}*/
+}
 
 TEST_F(test_lexer, string_hex) {
 	char input[] = "\"Ahoj\\n \\\"Sve'te \\\\\\x22 \"";
