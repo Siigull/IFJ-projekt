@@ -14,8 +14,6 @@
 
 /// \todo ’\"’, ’\n’, ’\r’, ’\t’
 
-#define BACKSLASH 92
-
 typedef enum {
 	T_ID,
 	T_F64,
