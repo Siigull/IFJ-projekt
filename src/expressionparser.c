@@ -92,8 +92,8 @@ void insert_dollar(List* input){
 void handle_rule(int rule, List* Stack){
 	if(rule == 0){
 		//handling <E+E rule 
-		Node* firstNode = Stack->last->token->node;
-		Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* plusnode = node_init(PLUS);
 		plusnode->left = firstNode;
 		plusnode->right = secondeNode;
@@ -108,8 +108,8 @@ void handle_rule(int rule, List* Stack){
 	}
 	else if(rule == 1){
 		//handling <E-E rule 
-		Node* firstNode = Stack->last->token->node;
-		Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* minusnode = node_init(MINUS);
 		minusnode->left = firstNode;
 		minusnode->right = secondeNode;
@@ -125,8 +125,8 @@ void handle_rule(int rule, List* Stack){
 	}
 	else if(rule == 2){
 		//handling <E*E rule 
-		Node* firstNode = Stack->last->token->node;
-		Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* mulnode = node_init(MUL);
 		mulnode->left = firstNode;
 		mulnode->right = secondeNode;
@@ -141,8 +141,8 @@ void handle_rule(int rule, List* Stack){
 	}
 	else if(rule == 3){
 		//handling <E/E rule 
-		Node* firstNode = Stack->last->token->node;
-		Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* divnode = node_init(DIV);
 		divnode->left = firstNode;
 		divnode->right = secondeNode;
@@ -158,8 +158,8 @@ void handle_rule(int rule, List* Stack){
 	else if(rule == 4){
 		//handling  E → E == E, <E==E rule
 		// from rule 2, has minus node names but works the same 
-		Node* firstNode = Stack->last->token->node;
-		Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* minusnode = node_init(ISEQ);
 		minusnode->left = firstNode;
 		minusnode->right = secondeNode;
