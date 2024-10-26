@@ -415,3 +415,43 @@ TEST_F(test_lexer, random_spaces) {
 	EXPECT_EQ(get_next_token(lexer)->type, T_I32);
 	EXPECT_EQ(get_next_token(lexer)->type, T_SEMI);
 }
+
+TEST_F(test_lexer, strings_multi_line_basic){
+    char input[] = "\\\\Line one\n\\\\Line two\n\\\\Line three";
+    lexer = init_lexer(input);
+	EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "Line one\nLine two\nLine three"));
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+TEST_F(test_lexer, strings_multi_line_no_newline){
+	char input[] = "\\\\Line one\\\\Line two\\\\Line three";
+	lexer = init_lexer(input);
+	EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "Line one\\\\Line two\\\\Line three"));
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+TEST_F(test_lexer, strings_multi_line_misplaced_backslash){
+    char input[] = "\\\\Valid line\nThis line lacks starting backslash";
+    lexer = init_lexer(input);
+	EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "Valid line"));
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+TEST_F(test_lexer, strings_multi_line_with_whitespaces){
+    char input[] = "\\\\   multi    line\n\\\\st  ring   ";
+    lexer = init_lexer(input);
+	EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "   multi    line\nst  ring   "));
+	EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+TEST_F(test_lexer, strings_multi_line_code_like_content){
+    char input[] = "\\\\#include <stdio.h>\n\\\\int main() { return 0; }";
+    lexer = init_lexer(input);
+    EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "#include <stdio.h>\nint main() { return 0; }"));
+    EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
