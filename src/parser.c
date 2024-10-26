@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "ast.h"
+#include "stack.h"
 #include "string.h"
 Lexer* lexer;
 Parser* parser;
@@ -39,27 +40,27 @@ bool check(T_Type type) {
     return parser->next->type == type;
 }
 
-void binary_load(Arr* ta);
+void binary_load(List* tl);
 
-void literal_load(Arr* ta) {
+void literal_load(List* tl) {
     Token* token = malloc(sizeof(Token));
     memcpy(token, parser->next, sizeof(Token));
-    arr_append(ta, (size_t)token);
+    List_insertF(tl, token);
 
     if (check(T_ID)) {
         advance();
 
     } else if (check(T_I32) || check(T_F64) || 
-               check(T_U8) || check(T_STRING)) {
+               check(T_U8)  || check(T_STRING)) {
         advance();
 
     } else if (check(T_RPAR)) {
         advance();
-        binary_load(ta);
+        binary_load(tl);
         consume(T_LPAR);
         Token* token = malloc(sizeof(Token));
         memcpy(token, parser->prev, sizeof(Token));
-        arr_append(ta, (size_t)token);
+        List_insertF(tl, token);
 
     } else {
         exit(ERR_PARSE);
@@ -78,27 +79,32 @@ bool check_operator() {
     return false;
 }
 
-void binary_load(Arr* ta) {
-    literal_load(ta);
+void binary_load(List* tl) {
+    literal_load(tl);
 
     while(check_operator()) {
         advance();
         Token* token = malloc(sizeof(Token));
         memcpy(token, parser->prev, sizeof(Token));
-        arr_append(ta, (size_t)token);
-        literal_load(ta);
+        List_insertF(tl, token);
+        literal_load(tl);
     }
 }
 
 // Expression parser
 AST_Node* expr() {
-    Arr* token_array = arr_init();
+    List* token_list = malloc(sizeof(List));
+    List_init(token_list);
 
-    binary_load(token_array);
+    binary_load(token_list);
 
-    for(int i=0; i < token_array->length; i++) {
-        print_token((Token*)token_array->data[i], stdout);
+    List_activeF(token_list);
+    while(List_is_active(token_list)){
+        Token* temp;
+        List_get_val(token_list, &temp);
+        print_token(temp, stdout);
         printf(" ");
+        List_active_next(token_list);
     }
 
     // printf("expr parser takes over\n");
