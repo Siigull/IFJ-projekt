@@ -1,6 +1,7 @@
-#include "lexer.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include "lexer.h"
+#include "parser.h"
 
 void test_input(char* input, char* expected_result) {
 	// while token blbllalblbal, compare two strings
@@ -16,8 +17,12 @@ void test_input(char* input, char* expected_result) {
 
 int main() {
 	// const ifj = @import("ifj24.zig"); jeden token
-	char input1[200] = "\\\\Line one\n\\\\askdjhasd\n\n\\\\kjashd";
-	char expected_result1[2] = {1};
-	test_input(input1, expected_result1);
+	// char input1[50] = "456e2 7.89E-2 test1iden _identf";
+	// char expected_result1[2] = {1};
+	// test_input(input1, expected_result1);
+
+	char* temp = "";
+
+	parse(temp);	
 	return 0;
 };

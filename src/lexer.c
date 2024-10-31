@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-Token* init_token(char* value, T_TYPE type, unsigned int length) {
+Token* init_token(char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));
 	token->value = value;
 	token->type = type;
 	token->length = length;
-
+	token->isProcessed = false;
+	token->node == NULL;
 	return token;
 }
 
@@ -150,7 +151,78 @@ bool is_float_token(Token* token) {
 	return false;
 };
 
-Token* find_token_value(Lexer* lexer, T_TYPE type) {
+bool is_id_token(Token* token) {
+	int i = 0;
+	int match_undr = 0;
+	while (token->value[i] == '_' || isalpha(token->value[i]) != 0) {
+		if (token->value[i] == '_') {
+			match_undr++;
+		}
+		i++;
+		while (token->value[i] == '_' || isalpha(token->value[i]) != 0 || is_num(token->value[i])) {
+			i++;
+		}
+	}
+	if (token->length == 1 && match_undr != 0) {
+		return false;
+
+	} else if (i == token->length) {
+		return true;
+	}
+	return false;
+}
+
+bool is_float_token(Token* token) {
+	int i = 0;
+	int prefix_match = 0;
+	while (token->value[i] == '-') {
+		i++;
+	}
+	if (is_num(token->value[i])) {
+		i++;
+		prefix_match++;
+		while (is_num(token->value[i]) && token->value[i] != '0') {
+			if (token->value[i - 1] == '0') {
+				return false;
+			} // cant read another number if 0 was read, need .
+			i++;
+		}
+	}
+	if (prefix_match == 0) {
+		return false;
+	}
+	if (token->value[i] == '.') {
+		i++;
+		int mistake_check = 0;
+		while (is_num(token->value[i])) {
+			i++;
+			mistake_check++;
+		}
+		if (mistake_check == 0) {
+			return false;
+		}
+	}
+	if (token->value[i] == 'e' || token->value[i] == 'E') {
+		i++;
+		if (token->value[i] == '+' || token->value[i] == '-') {
+			i++;
+		}
+		int must_match = 0;
+		while (is_num(token->value[i])) {
+			i++;
+			must_match++;
+		}
+		if (must_match == 0) {
+			return false;
+		}
+	}
+	if (token->length == i) {
+		return true;
+	}
+	return false;
+};
+
+Token* find_token_value(Lexer* lexer, T_Type type) {
 	if (type == T_EOF) {
 		Token* token = init_token("0", T_EOF, 0);
 		return token;
@@ -182,7 +254,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 							"void",
 							"if",
 							"@import"};
-		T_TYPE types[14] = {T_WHILE,
+		T_Type types[14] = {T_WHILE,
 							T_ELSE,
 							T_CONST,
 							T_FN,
@@ -229,7 +301,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	// OPERATOR TOKENS
 	if (type == T_OPERATOR) {
 		char* values[12] = {"+", "-", "*", "/", "=", "!", "<", ">", "<=", ">=", "==", "!="};
-		T_TYPE types[12] = {T_PLUS,
+		T_Type types[12] = {T_PLUS,
 							T_MINUS,
 							T_MUL,
 							T_DIV,
@@ -398,12 +470,12 @@ Token* get_next_token(Lexer* lexer) {
 		// handling brackets
 		char brackets[6] = {'(', ')', '[', ']', '{', '}'};
 		char* string_brackets[6] = {"(", ")", "[", "]", "{", "}"};
-		T_TYPE bracket_types[6] =
+		T_Type brackeT_Types[6] =
 			{T_RPAR, T_LPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
 		for (int i = 0; i < 6; i++) {
 			if (lexer->input[lexer->idr] == brackets[i]) {
 				lexer_advance(lexer);
-				return init_token(string_brackets[i], bracket_types[i], 1);
+				return init_token(string_brackets[i], brackeT_Types[i], 1);
 			}
 		}
 		if (lexer->input[lexer->idr] == '|') {
