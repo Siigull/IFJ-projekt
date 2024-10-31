@@ -24,6 +24,7 @@ typedef enum {
     F64, 
     ID,
     PLUS,
+    ISEQ,
 } AST_Type;
 
 typedef enum {
