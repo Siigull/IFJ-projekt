@@ -12,9 +12,9 @@
 #ifndef EXPRESSIONPARSER_HH
 #define EXPRESSIONPARSER_HH
 extern "C" {
-#include "ast.h"
-#include "lexer.h"
-#include "stack.h"
+#include "ast.hh"
+#include "lexer.hh"
+#include "stack.hh"
 #include <stdbool.h>
 #include <stdio.h>
 #define TABLE_SIZE 8

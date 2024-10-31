@@ -22,9 +22,11 @@ def generate_hh_file(h_file_path):
                 if "#endif" in line:
                     hh_file.write("\n}\n")
                 
-                if re.match("#include *\.h\"", line):
-                    line = line[:-2] + "h\n" 
-
-                hh_file.write(line)
+                if re.search(r'#include "\w+\.h"', line):
+                    line = line[:-1]
+                    line = line.rstrip()
+                    hh_file.write(line[:-1] + "h\"\n")
+                else: 
+                    hh_file.write(line)
 
 generate_hh_file("expressionparser.h")
