@@ -1,4 +1,5 @@
 #include "lexer.hh"
+#include "expresionparser.hh"
 #include <gtest/gtest.h>
 
 using namespace ::testing;
@@ -7,6 +8,11 @@ using namespace std;
 class test_lexer : public Test {
   protected:
 	Lexer* lexer;
+};
+
+class test_exparser : public Test {
+  protected:
+	AST_Node* node;
 };
 
 TEST_F(test_lexer, mathfloat) {

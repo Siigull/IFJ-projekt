@@ -1,5 +1,5 @@
 /**
- * @file lexer.h
+ * @file lexer.hh
  * @brief Lexer implementation header file
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  *
