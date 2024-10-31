@@ -1,5 +1,5 @@
-#include "lexer.hh"
-#include "expresionparser.hh"
+
+#include "expressionparser.hh"
 #include <gtest/gtest.h>
 
 using namespace ::testing;
@@ -105,7 +105,7 @@ TEST_F(test_lexer, error) {
 TEST_F(test_lexer, keywords) {
 	char input[] = "test pub test2 pub fn const else if i32 f64 null return var void while";
 	lexer = init_lexer(input);
-	T_TYPE current_type = get_next_token(lexer)->type;
+	T_Type current_type = get_next_token(lexer)->type;
 	EXPECT_EQ(current_type, T_ID) << "test";
 	current_type = get_next_token(lexer)->type;
 	EXPECT_EQ(current_type, T_PUB) << "pub";
@@ -460,4 +460,23 @@ TEST_F(test_lexer, strings_multi_line_code_like_content){
     lexer = init_lexer(input);
     EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "#include <stdio.h>\nint main() { return 0; }"));
     EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
+}
+
+TEST_F(test_exparser, first_test_lol){
+	List* tokenlist;
+	Token* a;
+	Token* b; 
+	Token* c;
+	char* aa = "25";
+	char* bb = "25";
+	char* cc = "25";
+	List_init(tokenlist);
+	a = init_token(aa, T_I32, 2);
+	c = init_token(bb, T_I32, 3);
+	b = init_token(cc, T_PLUS, 1);
+	List_insertF(tokenlist, a);
+	List_insertF(tokenlist, b);
+	List_insertF(tokenlist, c);
+	AST_Node* testedNode = parse_expression(tokenlist);
+
 }

@@ -40,6 +40,7 @@ bool is_id(T_Type type){
 int find_precedence_index(List* list){
 	List_activeL(list);
 	Token* current; 
+	// IS DEQ CARE 
 	while(1) // THIS CAN BE DONE BETTER
 	{
 		List_get_val(list, &current); 
@@ -91,8 +92,8 @@ void insert_dollar(List* input){
 void handle_rule(int rule, List* Stack){
 	if(rule == 0){
 		//handling <E+E rule 
-		Node* firstNode = Stack->last->token->node;
-		Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* plusnode = node_init(PLUS);
 		plusnode->left = firstNode;
 		plusnode->right = secondeNode;
@@ -102,20 +103,84 @@ void handle_rule(int rule, List* Stack){
 		List_removeL(Stack);
 		Token* plustoken = init_token("0", T_ID, 1); // has to be ID, plus is in node 
 		plustoken->node = plusnode;
-		List_insertL(Stack, plusnode);
+		plustoken->isProcessed = true;
+		List_insertL(Stack, plustoken);
 	}
 	else if(rule == 1){
-
-
+		//handling <E-E rule 
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* minusnode = node_init(MINUS);
+		minusnode->left = firstNode;
+		minusnode->right = secondeNode;
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		Token* minustoken = init_token("0", T_ID, 1); // has to be ID, plus is in node 
+		minustoken->node = minusnode;
+		minustoken->isProcessed = true;
+		List_insertL(Stack, minustoken);
 
 	}
-
-
-
-	else if(rule == 2){}
-	else if(rule == 3){}
-	else if(rule == 4){}
-	else if(rule == 5){}
+	else if(rule == 2){
+		//handling <E*E rule 
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* mulnode = node_init(MUL);
+		mulnode->left = firstNode;
+		mulnode->right = secondeNode;
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		Token* multoken = init_token("0", T_ID, 1); // has to be ID, plus is in node 
+		multoken->node = mulnode;
+		multoken->isProcessed = true;
+		List_insertL(Stack, multoken);
+	}
+	else if(rule == 3){
+		//handling <E/E rule 
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* divnode = node_init(DIV);
+		divnode->left = firstNode;
+		divnode->right = secondeNode;
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		Token* divtoken = init_token("0", T_ID, 1); // has to be ID, plus is in node 
+		divtoken->node = divnode;
+		divtoken->isProcessed = true;
+		List_insertL(Stack, divtoken);
+	}
+	else if(rule == 4){
+		//handling  E → E == E, <E==E rule
+		// from rule 2, has minus node names but works the same 
+		AST_Node* firstNode = Stack->last->token->node;
+		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
+		AST_Node* minusnode = node_init(ISEQ);
+		minusnode->left = firstNode;
+		minusnode->right = secondeNode;
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		List_removeL(Stack);
+		Token* minustoken = init_token("0", T_ID, 1); // has to be ID, plus is in node 
+		minustoken->node = minusnode;
+		minustoken->isProcessed = true;
+		List_insertL(Stack, minustoken);
+	}
+	else if(rule == 5){
+			// ( E ), we do not care at all about the brackets and thats why we just remove them and the token will remain the same 
+			Token* processed_token = Stack->last->previousElement->token;
+			List_removeL(Stack);
+			List_removeL(Stack);
+			List_removeL(Stack);
+			List_removeL(Stack);
+			List_insertL(Stack,processed_token);
+	}
 	else if(rule == 6){
 		// <i
 		Token* processed_token = Stack->last->token;
@@ -195,7 +260,7 @@ void handle_precedence(int precedence, List* Stack, List* input){
 		// we are active on last nonterminal symbol, we want to push < and token behind it 
 		Token* shifttoken;
 		Token* transitionToken; 
-		init_token("0", shifttoken, 1);
+		init_token("0", T_RIGHTSHIFTLIST, 1);
 		List_insertL(Stack, shifttoken);
 		List_last_val(input, &transitionToken);
 		List_insertL(Stack, transitionToken);
@@ -229,4 +294,5 @@ AST_Node* parse_expression(List* input) {
 		precendence_operation = precedence_table[precedence_stack][precendence_input];
 		handle_precedence(precendence_operation, Stack, input);
 	}
+	return Stack->last->token->node; // returning last contain of stack that should be Stack: $E(which is ID that is processed)
 }

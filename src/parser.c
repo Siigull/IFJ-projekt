@@ -144,14 +144,14 @@ AST_Node* _if() {
 
     consume(T_LPAR);
 
-    if (check(T_BAR)) {
+    if (check(T_VBAR)) {
         advance();
 
         consume(T_ID);
         AST_Node* var = node_init(NNULL_VAR_DECL);
         arr_append(node->as.arr, (size_t)node);
 
-        consume(T_BAR);        
+        consume(T_VBAR);        
     }
 
     consume(T_CUYRBRACKET);
@@ -363,8 +363,8 @@ void parse(char* orig_input) {
                          {T_LPAR, ")", 1},        {T_SEMI, ";", 1},
                          {T_IF, "if", 2},         {T_RPAR, "(", 1}, 
                          {T_ID, "a", 1},          {T_LPAR, ")", 1},
-                         {T_BAR, "|", 1},         {T_ID, "A", 1},
-                         {T_BAR, "|", 1},         {T_CUYRBRACKET, "{", 1}, 
+                         {T_VBAR, "|", 1},         {T_ID, "A", 1},
+                         {T_VBAR, "|", 1},         {T_CUYRBRACKET, "{", 1}, 
                          {T_CUYLBRACKET, "}", 1}, {T_CUYLBRACKET, "}", 1},
                          {T_EOF, "\0", 1}};
 

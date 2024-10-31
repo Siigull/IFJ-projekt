@@ -101,76 +101,7 @@ bool is_id_token(Token* token) {
 	return false;
 }
 
-bool is_float_token(Token* token) {
-	int i = 0;
-	int prefix_match = 0;
-	while (token->value[i] == '-') {
-		i++;
-	}
-	if (is_num(token->value[i])) {
-		i++;
-		prefix_match++;
-		while (is_num(token->value[i]) && token->value[i] != '0') {
-			if (token->value[i - 1] == '0') {
-				return false;
-			} // cant read another number if 0 was read, need .
-			i++;
-		}
-	}
-	if (prefix_match == 0) {
-		return false;
-	}
-	if (token->value[i] == '.') {
-		i++;
-		int mistake_check = 0;
-		while (is_num(token->value[i])) {
-			i++;
-			mistake_check++;
-		}
-		if (mistake_check == 0) {
-			return false;
-		}
-	}
-	if (token->value[i] == 'e' || token->value[i] == 'E') {
-		i++;
-		if (token->value[i] == '+' || token->value[i] == '-') {
-			i++;
-		}
-		int must_match = 0;
-		while (is_num(token->value[i])) {
-			i++;
-			must_match++;
-		}
-		if (must_match == 0) {
-			return false;
-		}
-	}
-	if (token->length == i) {
-		return true;
-	}
-	return false;
-};
 
-bool is_id_token(Token* token) {
-	int i = 0;
-	int match_undr = 0;
-	while (token->value[i] == '_' || isalpha(token->value[i]) != 0) {
-		if (token->value[i] == '_') {
-			match_undr++;
-		}
-		i++;
-		while (token->value[i] == '_' || isalpha(token->value[i]) != 0 || is_num(token->value[i])) {
-			i++;
-		}
-	}
-	if (token->length == 1 && match_undr != 0) {
-		return false;
-
-	} else if (i == token->length) {
-		return true;
-	}
-	return false;
-}
 
 bool is_float_token(Token* token) {
 	int i = 0;

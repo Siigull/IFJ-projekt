@@ -56,11 +56,10 @@ typedef enum {
 	T_RPAR , // (
 	T_LPAR,      // )
 	T_DOLLARLIST,
+	T_DDEQ,
 	T_LEFTSHIFTLIST,
 	T_RIGHTSHIFTLIST,
-	T_DDEQ, // ==
 	T_EQUAL,
-	T_DDEQ, // ==
 	T_NEQUAL,
 	T_GTHAN,
 	T_GETHAN,
