@@ -1,13 +1,22 @@
 import os
 import re
+import glob
 
 def generate_hh_file(h_file_path):
     with open(h_file_path, 'r') as file:
         h_content = file.readlines()
     
-    hh_file_path = h_file_path.replace('.h', '.hhh')
+    hh_file_path = h_file_path.replace('.h', '.hh')
     
     found = 0
+
+    includes = ""
+
+    for line in h_content:
+        if re.search(r'#include "\w+\.h"', line):
+            line = line[:-1]
+            line = line.rstrip()
+            includes += line[:-1] + "h\"\n"
 
     with open(hh_file_path, 'w') as hh_file:
         for line in h_content:
@@ -16,6 +25,7 @@ def generate_hh_file(h_file_path):
                 found += 1
             else:
                 if found == 2:
+                    hh_file.write(includes)
                     found += 1
                     hh_file.write('extern "C" {\n')
 
@@ -23,10 +33,11 @@ def generate_hh_file(h_file_path):
                     hh_file.write("\n}\n")
                 
                 if re.search(r'#include "\w+\.h"', line):
-                    line = line[:-1]
-                    line = line.rstrip()
-                    hh_file.write(line[:-1] + "h\"\n")
+                    pass
                 else: 
                     hh_file.write(line)
 
-generate_hh_file("expressionparser.h")
+header_files = glob.glob(os.path.join(".", '*.h'))
+
+for file_path in header_files:
+    generate_hh_file(file_path)

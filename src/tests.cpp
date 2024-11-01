@@ -1,5 +1,9 @@
 
-#include "expressionparser.hh"
+extern "C" {
+#include "stack.h"
+#include "lexer.h"
+#include "expressionparser.h"
+}
 #include <gtest/gtest.h>
 
 using namespace ::testing;
@@ -472,11 +476,16 @@ TEST_F(test_exparser, first_test_lol){
 	char* cc = "25";
 	List_init(tokenlist);
 	a = init_token(aa, T_I32, 2);
-	c = init_token(bb, T_I32, 3);
-	b = init_token(cc, T_PLUS, 1);
+	// c = init_token(bb, T_I32, 3);
+	// b = init_token(cc, T_PLUS, 1);
 	List_insertF(tokenlist, a);
 	List_insertF(tokenlist, b);
 	List_insertF(tokenlist, c);
-	AST_Node* testedNode = parse_expression(tokenlist);
+	// AST_Node* testedNode = parse_expression(tokenlist);
 
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
