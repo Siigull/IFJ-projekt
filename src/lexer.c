@@ -57,6 +57,14 @@ void lexer_skip_whitespace(Lexer* lexer) {
 	}
 }
 
+void lexer_skip_space(Lexer* lexer) {
+	char c = lexer->input[lexer->idr];
+	while(c == ' ') {
+		lexer_advance(lexer);
+		c = lexer->input[lexer->idr];
+	}
+}
+
 bool is_operator(char c) {
 	return (c == '+' || c == '-' || c == '*' || c == '/' || c == '<' || c == '>' || c == '=' ||
 			c == '!');
@@ -256,7 +264,18 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	}
 
 	if (type == T_BUILDIN) {
-		// error TODO handling of buildin function that do not exist
+		int last_space = -1;
+		for(int i=3; i < len; i++) {
+			if(value[i] == ' ') {
+				last_space = i;
+
+			} else if(last_space != -1 && value[i] != ' ') {
+				memmove(value + last_space, value + i, len - (i - 1));
+				i = last_space;
+				last_space = -1;
+			}
+		}
+		
 		return token;
 	};
 
@@ -299,18 +318,24 @@ Token* get_next_token(Lexer* lexer) {
 			return find_token_value(lexer, T_STRING);
 		}//multiline*/
 
+		int index_before = lexer->idr;
 		if (lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' &&
-			lexer->input[lexer->idr + 2] == 'j' && lexer->input[lexer->idr + 3] == '.') {
-			for (int i = 0; i < 4; i++) {
+			lexer->input[lexer->idr + 2] == 'j') {
+			for (int i = 0; i < 3; i++) {
 				lexer_advance(lexer);
 			}
-			// now scanning inbuild function
-
-			while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr])) {
+			lexer_skip_space(lexer);
+			if(lexer->input[lexer->idr] == '.') {
 				lexer_advance(lexer);
+				lexer_skip_space(lexer);
+				// now scanning inbuild function
+				while (is_num(lexer->input[lexer->idr]) || isalpha(lexer->input[lexer->idr])) {
+					lexer_advance(lexer);
+				}
+				return find_token_value(lexer, T_BUILDIN);
 			}
-			return find_token_value(lexer, T_BUILDIN);
 		}
+		lexer->idr = index_before;
 
 		if (isalpha(lexer->input[lexer->idr]) || lexer->input[lexer->idr] == '_' ||
 			lexer->input[lexer->idr] == '@' || is_num(lexer->input[lexer->idr])) {
@@ -415,7 +440,14 @@ Token* get_next_token(Lexer* lexer) {
 	}
 } // end of get_next_token
 
-void print_token(Token* token, FILE* out) {
+char* print_token(Token* token, FILE* out, bool string) {
+	char* buffer;
+
+	if(string) {
+		buffer = calloc(30, sizeof(char));
+		out = fmemopen(buffer, 30, "w");
+	}
+
 	switch (token->type) {
 	case T_ID:
 		fprintf(out, "T_ID");
@@ -568,4 +600,10 @@ void print_token(Token* token, FILE* out) {
 		fprintf(out, "Unknown token");
 		break;
 	}
+
+	if(string) {
+		fclose(out);
+	}
+
+	return buffer;
 }

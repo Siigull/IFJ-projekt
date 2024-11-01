@@ -9,11 +9,52 @@ void test_input(char* input, char* expected_result) {
 	Token* token = get_next_token(lexer);
 	while (token->type != T_EOF) {
 		fprintf(stderr, "Token type: ");
-		print_token(token, stderr);
+		print_token(token, stderr, false);
 		fprintf(stderr, "\t %s\n", token->value);
 		token = get_next_token(lexer);
 	}
 };
+
+void generate_debug_token_arr() {
+	FILE* f = fopen("src/input.ifj", "r");
+	if(f == NULL) {
+		return;
+	}
+
+	char temp;
+	int len = 0;
+	while(fscanf(f, "%c", &temp) == 1) {
+		len++;
+	}
+	rewind(f);
+
+	char* input = calloc(len + 10,sizeof(char));
+
+	for(int i=0; fscanf(f, "%c", input + i) == 1; i++);
+
+	Lexer* lexer = init_lexer(input);
+
+	int count = 1;
+	Token* token;
+
+	printf("{");
+	while((token = get_next_token(lexer))->type != T_EOF) {
+		FILE* f;
+
+		char* val = print_token(token, f, true);
+		printf("{%s, \"%s\", %d},", print_token(token, f, true), 
+									token->value, 
+									token->length);
+
+		if(count % 3 == 0) {
+			printf("\n");
+		}
+		
+		count++;
+	}
+
+	printf("}\n");
+}
 
 int main() {
 	// const ifj = @import("ifj24.zig"); jeden token
@@ -21,8 +62,9 @@ int main() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	char* temp = "";
+	generate_debug_token_arr();
 
-	parse(temp);	
+	// char* temp = "";
+	// parse(temp);	
 	return 0;
 };

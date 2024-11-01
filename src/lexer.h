@@ -56,6 +56,7 @@ typedef enum {
 	T_DIV,
 	T_RPAR , // (
 	T_LPAR,      // )
+	T_BAR,
 	T_DOLLARLIST,
 	T_LEFTSHIFTLIST,
 	T_RIGHTSHIFTLIST,
@@ -102,5 +103,5 @@ typedef struct {
 Lexer* init_lexer(char* input);
 Token* get_next_token(Lexer* lexer);
 Token* init_token(char* value, T_Type type, unsigned int length);
-void print_token(Token* token, FILE* out);
+char* print_token(Token* token, FILE* out, bool string);
 #endif

@@ -25,26 +25,29 @@ typedef enum {
     ID,
     PLUS,
     ISEQ,
+    MINUS,
+    MUL,
+    DIV,
 } AST_Type;
 
-typedef enum {
-    F64,
-    I32,
-    STRING,
-    NIL,
-} Literal_Type;
+// typedef enum {
+//     F64,
+//     I32,
+//     STRING,
+//     NIL,
+// } Literal_Type;
 
-typedef struct {
-    Literal_Type type;
+// typedef struct {
+//     Literal_Type type;
 
-} Literal_value;
+// } Literal_value;
 
-typedef enum {
-    PLUS, MINUS, MUL, DIV,
-    EQUAL, NOT_EQUAL,
-    SMALLER, LARGER,
-    SMALLER_EQUAL, LARGER_EQUAL
-} Operator_Type;
+// typedef enum {
+//     PLUS, MINUS, MUL, DIV,
+//     EQUAL, NOT_EQUAL,
+//     SMALLER, LARGER,
+//     SMALLER_EQUAL, LARGER_EQUAL
+// } Operator_Type;
 
 // typedef struct {
 //     Arr* 

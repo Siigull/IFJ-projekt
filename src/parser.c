@@ -102,7 +102,7 @@ AST_Node* expr() {
     while(List_is_active(token_list)){
         Token* temp;
         List_get_val(token_list, &temp);
-        print_token(temp, stdout);
+        print_token(temp, stdout, false);
         printf(" ");
         List_active_next(token_list);
     }

@@ -260,7 +260,7 @@ void handle_precedence(int precedence, List* Stack, List* input){
 		// we are active on last nonterminal symbol, we want to push < and token behind it 
 		Token* shifttoken;
 		Token* transitionToken; 
-		init_token("0", shifttoken, 1);
+		shifttoken =  init_token("0", T_LEFTSHIFTLIST, 1);
 		List_insertL(Stack, shifttoken);
 		List_last_val(input, &transitionToken);
 		List_insertL(Stack, transitionToken);
