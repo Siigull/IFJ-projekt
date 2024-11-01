@@ -455,3 +455,11 @@ TEST_F(test_lexer, strings_multi_line_code_like_content){
     EXPECT_FALSE(strcmp(get_next_token(lexer)->value, "#include <stdio.h>\nint main() { return 0; }"));
     EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
+
+TEST_F(test_lexer, string_newline){
+    char input[] = "\"\\\"\"";
+    lexer = init_lexer(input);
+	Token* token = get_next_token(lexer);
+    EXPECT_EQ(token->type, T_STRING);
+    EXPECT_EQ(0, strcmp(token->value, "\\\""));
+}

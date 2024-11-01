@@ -250,7 +250,7 @@ Token* find_token_value(Lexer* lexer, T_TYPE type) {
 	}
 
 	if (type == T_STRING) {
-		if(value[0] == '\\') {
+		if(value[0] == '\\' && value[1] == '\\') {
 			int last_newline = -1;
 			
 			for(int i=0; i < len; i++) {
