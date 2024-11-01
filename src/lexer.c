@@ -259,7 +259,31 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	}
 
 	if (type == T_STRING) {
-		lexer_advance(lexer);
+		if(value[0] == '\\' && value[1] == '\\') {
+			int last_newline = -1;
+			
+			for(int i=0; i < len; i++) {
+				if (value[i] == '\n' && last_newline == -1) {
+					last_newline = i;
+
+				} else if (value[i] == '\\' && 
+						   value[i+1] == '\\' &&
+						   last_newline != -1) {
+
+					memmove(value + last_newline + 1, value + i + 2, len - (i + 1));
+					last_newline = -1;
+				}
+			}
+
+			if(last_newline != -1) {
+				value[last_newline] = '\0';
+			}
+			
+			memmove(value, value + 2, len - 1);
+
+		} else {
+			lexer_advance(lexer);
+		}
 		return token;
 	}
 
@@ -291,13 +315,33 @@ Token* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
-		// normal strings
+		
+		//multiline strings
+		if (lexer->input[lexer->idr]     == '\\' &&
+			lexer->input[lexer->idr + 1] == '\\') {
+
+			while(lexer->input[lexer->idr]     == '\\' &&
+				  lexer->input[lexer->idr + 1] == '\\') {
+
+				while(lexer->input[lexer->idr] != '\n' && 
+					  lexer->input[lexer->idr] != '\0') {
+
+					lexer_advance(lexer);
+				}
+
+				lexer_skip_whitespace(lexer);
+			}
+			
+			return find_token_value(lexer, T_STRING);
+		}
+
+		//normal strings
 		if (lexer->input[lexer->idr] == '"') {
 			lexer->idl++;
 			lexer_advance(lexer);
-			while (lexer->input[lexer->idr] != '"') {
-				if (lexer->input[lexer->idr] == BACKSLASH) {
-					if (lexer->input[lexer->idr + 1] == '"') {
+			while (lexer->input[lexer->idr] != '"') { 
+				if (lexer->input[lexer->idr] == '\\') {
+					if (lexer->input[lexer->idr+1] == '"') {
 						lexer_advance(lexer);
 					}
 				}
@@ -305,18 +349,6 @@ Token* get_next_token(Lexer* lexer) {
 			}
 			return find_token_value(lexer, T_STRING);
 		} // normal strings
-
-		/*//multiline strings
-		if(lexer->input[lexer->idr] == BACKSLASH && lexer->input[lexer->idr+1] == BACKSLASH){
-			lexer->idl+=2;
-			lexer_advance(lexer);
-			lexer_advance(lexer);
-			bool not_continuing = true;
-			while(lexer->input[lexer->idr] != '\n' && not_continuing){
-
-			}
-			return find_token_value(lexer, T_STRING);
-		}//multiline*/
 
 		int index_before = lexer->idr;
 		if (lexer->input[lexer->idr] == 'i' && lexer->input[lexer->idr + 1] == 'f' &&
@@ -380,17 +412,17 @@ Token* get_next_token(Lexer* lexer) {
 		// handling brackets
 		char brackets[6] = {'(', ')', '[', ']', '{', '}'};
 		char* string_brackets[6] = {"(", ")", "[", "]", "{", "}"};
-		T_Type brackeT_Types[6] =
+		T_Type bracket_types[6] =
 			{T_RPAR, T_LPAR, T_SQRBRACKET, T_SQLBRACKET, T_CUYRBRACKET, T_CUYLBRACKET};
 		for (int i = 0; i < 6; i++) {
 			if (lexer->input[lexer->idr] == brackets[i]) {
 				lexer_advance(lexer);
-				return init_token(string_brackets[i], brackeT_Types[i], 1);
+				return init_token(string_brackets[i], bracket_types[i], 1);
 			}
 		}
 		if (lexer->input[lexer->idr] == '|') {
 			lexer_advance(lexer);
-			Token* token = init_token("|", T_VBAR, 1);
+			Token* token = init_token("|", T_BAR, 1);
 			return token;
 		};
 		if (lexer->input[lexer->idr] == '?') {

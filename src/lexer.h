@@ -16,6 +16,7 @@
 
 #define BACKSLASH 92
 
+/// \todo ’\"’, ’\n’, ’\r’, ’\t’
 typedef enum {
 	
 	T_F64,
@@ -30,11 +31,13 @@ typedef enum {
 	T_STRING,
 	T_COMMENT,
 	T_BUILDIN,
-	T_SQRBRACKET = 20,
+	T_RPAR = 20, // (
+	T_LPAR,      // )
+	T_SQRBRACKET,
 	T_SQLBRACKET,
 	T_CUYRBRACKET, // {
 	T_CUYLBRACKET, // }
-	T_VBAR, // |
+	T_BAR, // |
 	T_CONST = 30,
 	T_IF,
 	T_ELSE,
@@ -54,9 +57,6 @@ typedef enum {
 	T_MINUS,
 	T_MUL,
 	T_DIV,
-	T_RPAR , // (
-	T_LPAR,      // )
-	T_BAR,
 	T_DOLLARLIST,
 	T_LEFTSHIFTLIST,
 	T_RIGHTSHIFTLIST,
