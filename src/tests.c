@@ -38,11 +38,12 @@ void generate_debug_token_arr() {
 	Token* token;
 
 	printf("{");
-	while((token = get_next_token(lexer))->type != T_EOF) {
-		FILE* f;
+	do {
+		token = get_next_token(lexer);
+		FILE* placeholder_file;
 
-		char* val = print_token(token, f, true);
-		printf("{%s, \"%s\", %d},", print_token(token, f, true), 
+		char* val = print_token(token, placeholder_file, true);
+		printf("{%s, \"%s\", %d},", print_token(token, placeholder_file, true), 
 									token->value, 
 									token->length);
 
@@ -51,7 +52,7 @@ void generate_debug_token_arr() {
 		}
 		
 		count++;
-	}
+	} while(token->type != T_EOF);
 
 	printf("}\n");
 }
@@ -62,9 +63,9 @@ int main() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	generate_debug_token_arr();
+	// generate_debug_token_arr();
 
-	// char* temp = "";
-	// parse(temp);	
+	char* temp = "";
+	parse(temp);	
 	return 0;
 };

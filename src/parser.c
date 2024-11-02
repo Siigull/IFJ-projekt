@@ -7,6 +7,11 @@ Parser* parser;
 Token* debug_token_array;
 int token_index = 0;
 
+AST_Node* binary_load(List* tl);
+AST_Node* func_call();
+AST_Node* stmt();
+Ret_Type get_ret_type();
+
 Parser* init_parser() {
     Parser* parser = malloc(sizeof(Parser));
 
@@ -40,9 +45,7 @@ bool check(T_Type type) {
     return parser->next->type == type;
 }
 
-void binary_load(List* tl);
-
-void literal_load(List* tl) {
+AST_Node* literal_load(List* tl) {
     Token* token = malloc(sizeof(Token));
     memcpy(token, parser->next, sizeof(Token));
     List_insertF(tl, token);
@@ -51,7 +54,8 @@ void literal_load(List* tl) {
         advance();
 
     } else if (check(T_I32) || check(T_F64) || 
-               check(T_U8)  || check(T_STRING)) {
+               check(T_U8)  || check(T_STRING) ||
+               check(T_NULL)) {
         advance();
 
     } else if (check(T_RPAR)) {
@@ -62,13 +66,20 @@ void literal_load(List* tl) {
         memcpy(token, parser->prev, sizeof(Token));
         List_insertF(tl, token);
 
+    } else if(check(T_BUILDIN)){
+        advance();
+        AST_Node* node = func_call();
+        return node;
+
     } else {
         exit(ERR_PARSE);
-    } 
+    }
+
+    return NULL;
 }
 
 bool check_operator() {
-    T_Type operator_types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_EQUAL, T_EXCLEMARK, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+    T_Type operator_types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
     int len = sizeof(operator_types) / sizeof(T_Type);
     for (int i=0; i < len; i++) {
         if (check(operator_types[i])){
@@ -79,8 +90,11 @@ bool check_operator() {
     return false;
 }
 
-void binary_load(List* tl) {
-    literal_load(tl);
+AST_Node* binary_load(List* tl) {
+    AST_Node* node = literal_load(tl);
+    if (node != NULL) {
+        return node;
+    }
 
     while(check_operator()) {
         advance();
@@ -89,6 +103,8 @@ void binary_load(List* tl) {
         List_insertF(tl, token);
         literal_load(tl);
     }
+
+    return NULL;
 }
 
 // Expression parser
@@ -96,36 +112,71 @@ AST_Node* expr() {
     List* token_list = malloc(sizeof(List));
     List_init(token_list);
 
-    binary_load(token_list);
+    AST_Node* node = binary_load(token_list);
+    if (node == NULL) {
+        List_activeF(token_list);
+        while(List_is_active(token_list)){
+            Token* temp;
+            List_get_val(token_list, &temp);
+            print_token(temp, stdout, false);
+            printf(" ");
+            List_active_next(token_list);
+        }
 
-    List_activeF(token_list);
-    while(List_is_active(token_list)){
-        Token* temp;
-        List_get_val(token_list, &temp);
-        print_token(temp, stdout, false);
-        printf(" ");
-        List_active_next(token_list);
-    }
-
-    // printf("expr parser takes over\n");
-    printf("\n");
-    return NULL;
+        // printf("expr parser takes over\n");
+        printf("\n");
+    } 
+    
+    return node;
 }
 
 // Normal parser
-AST_Node* stmt();
-Ret_Type get_ret_type();
+void block(Arr* stmts) {
+    consume(T_CUYRBRACKET);
+
+    while(!check(T_CUYLBRACKET)) {
+        arr_append(stmts, (size_t)stmt());
+    }
+
+    consume(T_CUYLBRACKET);
+}
 
 AST_Node* _else() {
     AST_Node* node = node_init(ELSE);
 
-    consume(T_CUYRBRACKET);
+    consume(T_ELSE);
 
-    while(!check(T_CUYLBRACKET)) {
-        arr_append(node->as.arr, (size_t)stmt());
+    block(node->as.arr);
+
+    return node;
+}
+
+AST_Node* _while() {
+    AST_Node* node = node_init(WHILE);
+
+    consume(T_WHILE);
+    consume(T_RPAR);
+
+    if (!check(T_LPAR)) {
+        node->left = expr();
+
+    } else {
+        exit(ERR_PARSE);
     }
 
-    consume(T_CUYLBRACKET);
+    consume(T_LPAR);
+
+    if (check(T_BAR)) {
+        advance();
+
+        consume(T_ID);
+        AST_Node* var = node_init(NNULL_VAR_DECL);
+        arr_append(node->as.arr, (size_t)node);
+
+        consume(T_BAR);
+    }
+
+    block(node->as.arr);
 
     return node;
 }
@@ -154,13 +205,7 @@ AST_Node* _if() {
         consume(T_BAR);        
     }
 
-    consume(T_CUYRBRACKET);
-
-    while(!check(T_CUYLBRACKET)) {
-        arr_append(node->as.arr, (size_t)stmt());
-    }
-
-    consume(T_CUYLBRACKET);
+    block(node->as.arr);
 
     if (check(T_ELSE)) {
         node->right = _else();
@@ -214,8 +259,8 @@ AST_Node* func_call() {
 
     consume(T_RPAR);
 
-    while(check(T_ID)) {
-        advance();
+    while(!check(T_LPAR)) {
+        expr();
 
         if (!check(T_COMMA)) {
             break;
@@ -225,17 +270,11 @@ AST_Node* func_call() {
     }
 
     consume(T_LPAR);
-    consume(T_SEMI);
 
     return node;
 }
 
 AST_Node* assignment() {
-    advance();
-    if (check(T_RPAR)) {
-        return func_call();
-    }
-
     AST_Node* node;
 
     if (parser->prev->type == T_UNDER) {
@@ -274,10 +313,31 @@ AST_Node* stmt() {
             return var_decl();
 
         case T_ID:
-            return func_call();
+            advance();
+            if(check(T_EQUAL)) {
+                return assignment();
+
+            } else if(check(T_RPAR)){
+                AST_Node* node = func_call();
+                consume(T_SEMI);
+                return node;
+
+            } else {
+                exit(ERR_PARSE);
+            }
+
+        case T_BUILDIN:
+            advance();
+            AST_Node* node = func_call();
+            consume(T_SEMI);
+            return node;
+            
 
         case T_RETURN:
             return _return();
+
+        case T_WHILE:
+            return _while();
 
         default:
             // TODO(Sigull) Add error message
@@ -329,19 +389,30 @@ AST_Node* func_decl() {
     Entry* entry = entry_init(func_name, E_FUNC, get_ret_type(), false, false);
     tree_insert(parser->s_table, entry);
 
-    consume(T_CUYRBRACKET);
-    
-    while(!check(T_CUYLBRACKET)) {
-        arr_append(node->as.arr, (size_t)stmt());
-    }
-
-    consume(T_CUYLBRACKET);
+    block(node->as.arr);
 
     return node;
 }
 
 AST_Node* decl() {
     return func_decl();
+}
+
+void prolog() {
+    consume(T_CONST);
+    consume(T_ID);
+    if(strcmp(parser->prev->value, "ifj")) {
+        exit(ERR_PARSE);
+    }
+
+    consume(T_EQUAL);
+    consume(T_IMPORT);
+    consume(T_RPAR);
+    consume(T_STRING);
+    char* prolog_file = parser->prev->value;
+
+    consume(T_LPAR);
+    consume(T_SEMI);
 }
 
 void parse(char* orig_input) {
@@ -352,27 +423,82 @@ void parse(char* orig_input) {
     lexer = init_lexer(input);
     parser = init_parser();
 
-    Token token_arr[] = {{T_PUB, "pub", 3},       {T_FN, "fn", 2}, 
-                         {T_ID, "main", 4},       {T_RPAR, "(", 1},
-                         {T_LPAR, ")", 1},        {T_VOID, "void", 4},
-                         {T_CUYRBRACKET, "{", 1}, {T_CONST, "const", 5}, 
-                         {T_ID, "a", 1},          {T_EQUAL, "=", 1},
-                         {T_I32, "10", 2},        {T_PLUS, "+", 1},
-                         {T_RPAR, "(", 1},        {T_I32, "69", 2},
-                         {T_DIV, "/", 1},         {T_I32, "420", 2},
-                         {T_LPAR, ")", 1},        {T_SEMI, ";", 1},
-                         {T_IF, "if", 2},         {T_RPAR, "(", 1}, 
-                         {T_ID, "a", 1},          {T_LPAR, ")", 1},
-                         {T_BAR, "|", 1},         {T_ID, "A", 1},
-                         {T_BAR, "|", 1},         {T_CUYRBRACKET, "{", 1}, 
-                         {T_CUYLBRACKET, "}", 1}, {T_CUYLBRACKET, "}", 1},
-                         {T_EOF, "\0", 1}};
+
+
+    Token token_arr[] = {{T_CONST, "const", 5},{T_ID, "ifj", 3},{T_EQUAL, "=", 1},
+                        {T_IMPORT, "@import", 7},{T_RPAR, "(", 1},{T_STRING, "ifj24.zig", 9},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_PUB, "pub", 3},
+                        {T_FN, "fn", 2},{T_ID, "main", 4},{T_RPAR, "(", 1},
+                        {T_LPAR, ")", 1},{T_VOID, "void", 4},{T_CUYRBRACKET, "{", 1},
+                        {T_CONST, "const", 5},{T_ID, "str1", 4},{T_EQUAL, "=", 1},
+                        {T_BUILDIN, "ifj.string", 10},{T_RPAR, "(", 1},{T_STRING, "Toto je text v programu jazyka IFJ24", 36},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_VAR, "var", 3},
+                        {T_ID, "str2", 4},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.string", 10},
+                        {T_RPAR, "(", 1},{T_STRING, ", ktery jeste trochu obohatime", 30},{T_LPAR, ")", 1},
+                        {T_SEMI, ";", 1},{T_ID, "str2", 4},{T_EQUAL, "=", 1},
+                        {T_BUILDIN, "ifj.concat", 10},{T_RPAR, "(", 1},{T_ID, "str1", 4},
+                        {T_COMMA, ",", 1},{T_ID, "str2", 4},{T_LPAR, ")", 1},
+                        {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 10},{T_RPAR, "(", 1},
+                        {T_ID, "str1", 4},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_BUILDIN, "ifj.write", 11},{T_RPAR, "(", 1},{T_STRING, "\n", 2},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 10},
+                        {T_RPAR, "(", 1},{T_ID, "str2", 4},{T_LPAR, ")", 1},
+                        {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
+                        {T_STRING, "\n", 2},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte serazenou posloupnost malych pismen a-h:\n", 50},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_VAR, "var", 3},
+                        {T_ID, "newInput", 8},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readstr", 11},
+                        {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_VAR, "var", 3},{T_ID, "all", 3},{T_DDOT, ":", 1},
+                        {T_DTYPE, "[]u8", 4},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.string", 10},
+                        {T_RPAR, "(", 1},{T_STRING, "", 0},{T_LPAR, ")", 1},
+                        {T_SEMI, ";", 1},{T_WHILE, "while", 5},{T_RPAR, "(", 1},
+                        {T_ID, "newInput", 8},{T_LPAR, ")", 1},{T_BAR, "|", 1},
+                        {T_ID, "inpOK", 5},{T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},
+                        {T_CONST, "const", 5},{T_ID, "abcdefgh", 8},{T_EQUAL, "=", 1},
+                        {T_BUILDIN, "ifj.string", 10},{T_RPAR, "(", 1},{T_STRING, "abcdefgh", 8},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CONST, "const", 5},
+                        {T_ID, "strcmpResult", 12},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.strcmp", 10},
+                        {T_RPAR, "(", 1},{T_ID, "inpOK", 5},{T_COMMA, ",", 1},
+                        {T_ID, "abcdefgh", 8},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "strcmpResult", 12},
+                        {T_DDEQ, "==", 2},{T_I32, "0", 1},{T_LPAR, ")", 1},
+                        {T_CUYRBRACKET, "{", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
+                        {T_STRING, "Spravne zadano!\n", 17},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "all", 3},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_ID, "newInput", 8},
+                        {T_EQUAL, "=", 1},{T_NULL, "null", 4},{T_SEMI, ";", 1},
+                        {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Spatne zadana posloupnost, zkuste znovu:\n", 42},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_ID, "all", 3},
+                        {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.concat", 10},{T_RPAR, "(", 1},
+                        {T_ID, "all", 3},{T_COMMA, ",", 1},{T_ID, "inpOK", 5},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_ID, "newInput", 8},
+                        {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readstr", 11},{T_RPAR, "(", 1},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},
+                        {T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},{T_EOF, "\0", 1}};
+
+    // Token token_arr[] = {{T_PUB, "pub", 3},       {T_FN, "fn", 2}, 
+    //                      {T_ID, "main", 4},       {T_RPAR, "(", 1},
+    //                      {T_LPAR, ")", 1},        {T_VOID, "void", 4},
+    //                      {T_CUYRBRACKET, "{", 1}, {T_CONST, "const", 5}, 
+    //                      {T_ID, "a", 1},          {T_EQUAL, "=", 1},
+    //                      {T_I32, "10", 2},        {T_PLUS, "+", 1},
+    //                      {T_RPAR, "(", 1},        {T_I32, "69", 2},
+    //                      {T_DIV, "/", 1},         {T_I32, "420", 2},
+    //                      {T_LPAR, ")", 1},        {T_SEMI, ";", 1},
+    //                      {T_IF, "if", 2},         {T_RPAR, "(", 1}, 
+    //                      {T_ID, "a", 1},          {T_LPAR, ")", 1},
+    //                      {T_BAR, "|", 1},         {T_ID, "A", 1},
+    //                      {T_BAR, "|", 1},         {T_CUYRBRACKET, "{", 1}, 
+    //                      {T_CUYLBRACKET, "}", 1}, {T_CUYLBRACKET, "}", 1},
+    //                      {T_EOF, "\0", 1}};
 
     debug_token_array = token_arr;
 
     advance();
 
-    // TODO(Sigull) Přidat prolog
+    prolog();
 
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();

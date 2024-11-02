@@ -16,6 +16,8 @@ AST_Node* node_init(AST_Type type) {
     switch(type) {
         case FUNCTION_DECL:
         case IF:
+        case WHILE:
+        case ELSE:
             node->as.arr = arr_init();
             break;
         case VAR_DECL:

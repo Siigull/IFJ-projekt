@@ -17,6 +17,7 @@ typedef enum {
     VAR_DECL,
     VAR_ASSIGNMENT,
     IF,
+    WHILE,
     ELSE,
     NNULL_VAR_DECL,
     RETURN,
