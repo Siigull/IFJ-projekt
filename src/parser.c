@@ -239,7 +239,7 @@ AST_Node* var_decl() {
     }
 
     Entry* entry = entry_init(node->as.var_name, E_VAR,
-                              ret_type, false, can_mut);
+                              ret_type, can_mut);
 
     if(tree_find(parser->s_table, node->as.var_name) != NULL) {
         exit(ERR_SEM_NOT_DEF_FNC_VAR);
@@ -366,12 +366,21 @@ AST_Node* func_decl() {
     consume(T_ID);
 
     const char* func_name = parser->prev->value;
+    node->as.func_data->var_name = func_name;
+
+    Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);
 
     consume(T_RPAR);
     while(check(T_ID)) {
         advance();
+        Function_Arg* arg = malloc(sizeof(Function_Arg));
+        arg->arg_name = parser->prev->value;
+
         consume(T_DDOT);
+
         consume(T_DTYPE);
+        arg->type = get_ret_type();
+        arr_append(entry->as.function_args, (size_t)arg);
 
         if (!check(T_COMMA)) {
             break;
@@ -386,10 +395,11 @@ AST_Node* func_decl() {
     } 
     advance();
 
-    Entry* entry = entry_init(func_name, E_FUNC, get_ret_type(), false, false);
+    entry->ret_type = get_ret_type();
+
     tree_insert(parser->s_table, entry);
 
-    block(node->as.arr);
+    block(node->as.func_data->arr);
 
     return node;
 }

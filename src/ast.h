@@ -56,17 +56,49 @@ typedef enum {
 //     AST_Node* without_null;
 // } If_Data;
 
+typedef struct {
+    const char* var_name;
+    Arr* arr;
+} Func_Data;
+
 /**
+ *  ------- Normal Parser -------
  *  - If statement
- *      - left child is expr.
+ *      - left child is expression.
  *      - right child is else.
  *      - as is arr, first el in arr can be NNUL_VAR_DECL
  *        which should be initialized from expr and has 
  *        the same type as expr but without null
  *  
+ *  - Else statement
+ *      - no children
+ *      - as is arr
+ * 
+ *  - Assignment statement
+ *      - left child is expression
+ *      - as is var_name
+ *      - If var_name is '_'. only expression is returned.
+ * 
+ *  - Return statement
+ *      - left child is expression
+ *      - nothing in as
+ * 
+ *  - While statement (almost the same as If)
+ *      - left child is expression
+ *      - right child is empty, but if we add extension its else
+ *      - as is arr first el can be NNUL_VAR_DECL
+ * 
  *  - Var declaration
- *      - left child is init expr
+ *      - left child is expression
  *      - as is var_name, var details in bvs
+ * 
+ *  - Func declaration
+ *      - no children
+ *      - as is func_data, arr is staments in block
+ *      - entry has function args in as
+ * 
+ *  ------- Expression parser -------
+ * 
  */
 typedef struct AST_Node {
     AST_Type type;
@@ -77,7 +109,7 @@ typedef struct AST_Node {
         const char* var_name;
         Arr* arr;
         Ret_Type expr_type;
-        // size_t data;
+        Func_Data* func_data;
     } as;
 
 } AST_Node;
