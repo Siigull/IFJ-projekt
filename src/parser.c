@@ -255,12 +255,13 @@ AST_Node* var_decl() {
 
 AST_Node* func_call() {
     AST_Node* node = node_init(FUNC_CALL);
-    node->as.var_name = parser->prev->value;
+    node->as.func_data->var_name = parser->prev->value;
 
     consume(T_RPAR);
 
     while(!check(T_LPAR)) {
-        expr();
+        AST_Node* param = expr();
+        array_append(node->as.func_data->arr, (size_t)param);
 
         if (!check(T_COMMA)) {
             break;

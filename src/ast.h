@@ -97,6 +97,10 @@ typedef struct {
  *      - as is func_data, arr is staments in block
  *      - entry has function args in as
  * 
+ *  - Function call
+ *      - no children
+ *      - as is func_data, params are an array of expressions
+ * 
  *  ------- Expression parser -------
  * 
  */
