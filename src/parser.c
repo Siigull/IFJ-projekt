@@ -261,7 +261,7 @@ AST_Node* func_call() {
 
     while(!check(T_LPAR)) {
         AST_Node* param = expr();
-        array_append(node->as.func_data->arr, (size_t)param);
+        arr_append(node->as.func_data->arr, (size_t)param);
 
         if (!check(T_COMMA)) {
             break;
