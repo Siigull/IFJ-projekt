@@ -467,22 +467,18 @@ TEST_F(test_lexer, strings_multi_line_code_like_content){
 }
 
 TEST_F(test_exparser, first_test_lol){
-	List* tokenlist;
-	Token* a;
-	Token* b; 
-	Token* c;
-	char* aa = "25";
-	char* bb = "25";
-	char* cc = "25";
-	List_init(tokenlist);
-	a = init_token(aa, T_I32, 2);
-	// c = init_token(bb, T_I32, 3);
-	// b = init_token(cc, T_PLUS, 1);
-	List_insertF(tokenlist, a);
-	List_insertF(tokenlist, b);
-	List_insertF(tokenlist, c);
-	// AST_Node* testedNode = parse_expression(tokenlist);
+	List* token_list = (List*)malloc(sizeof(List));
+	Token token_arr[] = {{T_I32, "69", 2}, {T_PLUS, "*", 1}, {T_I32, "420", 3}};
 
+	List_init(token_list);
+	for(int i=0; i < 3; i++){
+		List_insertF(token_list, &token_arr[i]);
+	}
+
+	AST_Node* testedNode = parse_expression(token_list);
+	EXPECT_EQ(testedNode->type, PLUS);
+	EXPECT_EQ(testedNode->left->type, I32);
+	EXPECT_EQ(testedNode->right->type, I32);
 }
 
 int main(int argc, char **argv) {

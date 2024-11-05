@@ -73,9 +73,6 @@ int find_precedence_index(List* list){
 	// error checking 
 }
 
-
-
-
 void init_stack(List* Stack){
 	List_init(Stack);
 	Token* dollartemp = init_token("", T_DOLLARLIST, 1);
@@ -275,7 +272,7 @@ void handle_precedence(int precedence, List* Stack, List* input){
 
 
 AST_Node* parse_expression(List* input) {
-	List* Stack;
+	List* Stack = malloc(sizeof(List));
 	init_stack(Stack);
 	insert_dollar(input); // inserts first because input looks like $i*i+i  
 	// now we have one list that works like stack, and one normal list that is input 

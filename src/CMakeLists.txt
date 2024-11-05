@@ -19,7 +19,6 @@ include(GoogleTest)
 add_executable(IFJapp main.c)
 target_link_libraries(IFJapp ifj_lib)
 
-
 add_executable(IFJtest tests.cpp)
 target_link_libraries(IFJtest ifj_test gtest_main ifj_lib)
 gtest_discover_tests(IFJtest)

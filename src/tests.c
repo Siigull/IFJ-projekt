@@ -65,7 +65,17 @@ int main() {
 
 	// generate_debug_token_arr();
 
-	char* temp = "";
-	parse(temp);	
+	List* token_list = (List*)malloc(sizeof(List));
+	Token token_arr[] = {{T_I32, "69", 2}, {T_PLUS, "*", 1}, {T_I32, "420", 3}};
+
+	List_init(token_list);
+	for(int i=0; i < 3; i++){
+		List_insertF(token_list, &token_arr[i]);
+	}
+
+	AST_Node* testedNode = parse_expression(token_list);
+
+	// char* temp = "";
+	// parse(temp);	
 	return 0;
 };
