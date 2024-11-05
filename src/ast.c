@@ -15,12 +15,16 @@ AST_Node* node_init(AST_Type type) {
 
     switch(type) {
         case FUNCTION_DECL:
+        case FUNC_CALL:
+            node->as.func_data = malloc(sizeof(Func_Data));
+            node->as.func_data->arr = arr_init();
+            break;
         case IF:
+        case WHILE:
+        case ELSE:
             node->as.arr = arr_init();
             break;
         case VAR_DECL:
-        case FUNC_CALL:
-            node->as.var_name = NULL;
             break;
     }
 

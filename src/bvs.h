@@ -27,6 +27,11 @@ typedef enum {
 	IMPLICIT,
 } Ret_Type;
 
+typedef struct {
+	const char* arg_name;
+	Ret_Type type;
+} Function_Arg;
+
 typedef struct Entry {
 	Entry_Type type;
 	
@@ -53,9 +58,9 @@ typedef struct Tree {
 	Node* root;
 } Tree;
 
+
 Entry* entry_init(const char* key, Entry_Type type,
-				  Ret_Type ret_type, bool has_null,
-				  bool can_mut);
+				  Ret_Type ret_type, bool can_mut);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);
