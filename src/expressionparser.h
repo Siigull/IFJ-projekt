@@ -11,7 +11,7 @@
 
 #ifndef EXPRESSIONPARSER_H
 #define EXPRESSIONPARSER_H
-#include "ast.h"   
+#include "ast.h"
 #include "lexer.h"
 #include "stack.h"
 #include <stdbool.h>
@@ -33,7 +33,7 @@ Rules: E  → E + E
 		E → E == E
 		E  → (E)
 		E  → id
-		
+
 */
 
 void init_stack(List* Stack);
@@ -45,4 +45,5 @@ int find_reduction_rule(List* Stack);
 int find_precedence_index(List* list);
 bool is_nonTerm(T_Type type, bool isProcessed);
 bool is_id(T_Type type);
+const char* type_to_string(T_Type type);
 #endif

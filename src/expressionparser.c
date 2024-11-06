@@ -192,13 +192,14 @@ void insert_dollar(List* input) {
 }
 
 void handle_rule(int rule, List* Stack) {
+	fprintf(stderr, "\nHANDLED RULE IS %d\n", rule);
 	if (rule == 0) {
 		// handling <E+E rule
 		AST_Node* firstNode = Stack->last->token->node;
 		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* plusnode = node_init(PLUS);
-		plusnode->left = firstNode;
-		plusnode->right = secondeNode;
+		plusnode->right = firstNode;
+		plusnode->left = secondeNode;
 		List_removeL(Stack);
 		List_removeL(Stack);
 		List_removeL(Stack);
@@ -212,8 +213,8 @@ void handle_rule(int rule, List* Stack) {
 		AST_Node* firstNode = Stack->last->token->node;
 		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* minusnode = node_init(MINUS);
-		minusnode->left = firstNode;
-		minusnode->right = secondeNode;
+		minusnode->right = firstNode;
+		minusnode->left = secondeNode;
 		List_removeL(Stack);
 		List_removeL(Stack);
 		List_removeL(Stack);
@@ -222,20 +223,20 @@ void handle_rule(int rule, List* Stack) {
 		minustoken->node = minusnode;
 		minustoken->isProcessed = true;
 		List_insertL(Stack, minustoken);
-
 	} else if (rule == 2) {
 		// handling <E*E rule
 		AST_Node* firstNode = Stack->last->token->node;
 		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* mulnode = node_init(MUL);
-		mulnode->left = firstNode;
-		mulnode->right = secondeNode;
+
 		List_removeL(Stack);
 		List_removeL(Stack);
 		List_removeL(Stack);
 		List_removeL(Stack);
 		Token* multoken = init_token("0", T_ID, 1); // has to be ID, plus is in node
 		multoken->node = mulnode;
+		mulnode->right = firstNode;
+		mulnode->left = secondeNode;
 		multoken->isProcessed = true;
 		List_insertL(Stack, multoken);
 	} else if (rule == 3) {
@@ -243,8 +244,8 @@ void handle_rule(int rule, List* Stack) {
 		AST_Node* firstNode = Stack->last->token->node;
 		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* divnode = node_init(DIV);
-		divnode->left = firstNode;
-		divnode->right = secondeNode;
+		divnode->right = firstNode;
+		divnode->left = secondeNode;
 		List_removeL(Stack);
 		List_removeL(Stack);
 		List_removeL(Stack);
@@ -259,8 +260,8 @@ void handle_rule(int rule, List* Stack) {
 		AST_Node* firstNode = Stack->last->token->node;
 		AST_Node* secondeNode = Stack->last->previousElement->previousElement->token->node;
 		AST_Node* minusnode = node_init(ISEQ);
-		minusnode->left = firstNode;
-		minusnode->right = secondeNode;
+		minusnode->right = firstNode;
+		minusnode->left = secondeNode;
 		List_removeL(Stack);
 		List_removeL(Stack);
 		List_removeL(Stack);

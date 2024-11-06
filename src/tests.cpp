@@ -481,7 +481,92 @@ TEST_F(test_exparser, first_test_lol){
 	EXPECT_EQ(testedNode->right->type, I32);
 }
 
+
+
+
+
+const char* getASTTypeName(AST_Type type) {
+    switch(type) {
+        case FUNC_CALL: return "FUNC_CALL";
+        case FUNCTION_DECL: return "FUNCTION_DECL";
+        case VAR_DECL: return "VAR_DECL";
+        case VAR_ASSIGNMENT: return "VAR_ASSIGNMENT";
+        case IF: return "IF";
+        case WHILE: return "WHILE";
+        case ELSE: return "ELSE";
+        case NNULL_VAR_DECL: return "NNULL_VAR_DECL";
+        case RETURN: return "RETURN";
+        case ISEQ: return "ISEQ";
+        case ID: return "ID";
+        case F64: return "F64";
+        case F32: return "F32";
+        case I32: return "I32";
+        case PLUS: return "PLUS";
+        case MINUS: return "MINUS";
+        case MUL: return "MUL";
+        case DIV: return "DIV";
+        default: return "UNKNOWN";
+    }
+}
+
+
+void preorder_printAST(AST_Node* node) {
+        if (node == NULL) return;
+
+        // Print the current node
+        fprintf(stderr, "Node Type: %s\n", getASTTypeName(node->type));
+
+        // Traverse the left and right subtrees
+        preorder_printAST(node->left);
+        preorder_printAST(node->right);
+    }
+
+
+TEST_F(test_exparser, second_test_lol){
+	List* token_list = (List*)malloc(sizeof(List));
+	Token token_arr[] = {{T_I32, "423", 2}, {T_MUL, "*", 1}, {T_ID, "x", 1}};
+
+	List_init(token_list);
+	for(int i=0; i < 3; i++){
+		List_insertF(token_list, &token_arr[i]);
+	}
+
+	AST_Node* testedNode = parse_expression(token_list);
+	EXPECT_EQ(testedNode->type, MUL);
+	EXPECT_EQ(testedNode->right->type, ID);
+	EXPECT_EQ(testedNode->left->type, I32);
+	preorder_printAST(testedNode);
+	free(token_list);
+}
+
+TEST_F(test_exparser, precedence_works_test){
+	List* token_list = (List*)malloc(sizeof(List));
+	Token token_arr[] = {{T_I32, "423", 3}, {T_PLUS, "+", 1}, {T_I32, "1", 1}, {T_MUL, "*", 1}, {T_ID, "y", 1}};
+
+	List_init(token_list);
+	for(int i=0; i < 5; i++){
+		List_insertF(token_list, &token_arr[i]);
+	}
+
+	AST_Node* testedNode = parse_expression(token_list);
+	EXPECT_EQ(testedNode->type, PLUS);
+	
+
+    // Perform the pre-order traversal starting from the root
+    fprintf(stderr, "\nPre-order Traversal:\n");
+    preorder_printAST(testedNode);
+
+    // Free allocated memory for the list
+    free(token_list);
+}
+
+    
+
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+
+
