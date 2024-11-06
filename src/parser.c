@@ -427,19 +427,7 @@ void prolog() {
     consume(T_SEMI);
 }
 
-void parse() {
-    char buffer[100];
-    char* input = malloc(100*sizeof(char));
-    if(input == NULL) ERROR_RET(ERR_INTERN);
-    size_t curr_size = 100;
-    while(fgets(buffer, 100, stdin) != NULL){
-        if(strlen(input) + strlen(buffer) >= curr_size){
-            curr_size *= 2;
-            input = realloc(input, curr_size * sizeof(char));
-            if(input == NULL) ERROR_RET(ERR_INTERN);
-        }
-        strcat(input, buffer);
-    }
+void parse(char* input) {
     //printf("%s\n", input);
 
     lexer = init_lexer(input);
@@ -525,7 +513,7 @@ void parse() {
     }
 }
 
-int compile(){
-    parse();
+int compile(char* input){
+    parse(input);
     return 0;
 }
