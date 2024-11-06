@@ -8,7 +8,12 @@
  * @date 2024-09-15
  *
  */
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "parser.h"
+#include "helper.h"
 
-int main3232() {
-	return 0;
+int main123123() {
+	return compile();
 }

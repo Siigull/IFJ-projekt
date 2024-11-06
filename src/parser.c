@@ -24,12 +24,12 @@ Parser* init_parser() {
 }
 
 void advance() {
-    // free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
-    // parser->prev = parser->next;
-    // parser->next = get_next_token(lexer);
-
+    free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
     parser->prev = parser->next;
-    parser->next = &(debug_token_array[token_index++]);
+    parser->next = get_next_token(lexer);
+
+    //parser->prev = parser->next;
+    //parser->next = &(debug_token_array[token_index++]);
 }
 
 void consume(T_Type type) {
@@ -37,7 +37,8 @@ void consume(T_Type type) {
         advance();
 
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
+        
     }
 }
 
@@ -72,7 +73,7 @@ AST_Node* literal_load(List* tl) {
         return node;
 
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     return NULL;
@@ -118,13 +119,13 @@ AST_Node* expr() {
         while(List_is_active(token_list)){
             Token* temp;
             List_get_val(token_list, &temp);
-            print_token(temp, stdout, false);
-            printf(" ");
+            //print_token(temp, stdout, false);
+            //printf(" ");
             List_active_next(token_list);
         }
 
         // printf("expr parser takes over\n");
-        printf("\n");
+        //printf("\n");
     } 
     
     return node;
@@ -161,7 +162,7 @@ AST_Node* _while() {
         node->left = expr();
 
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_LPAR);
@@ -190,7 +191,7 @@ AST_Node* _if() {
     if (!check(T_LPAR)) {
         node->left = expr();
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_LPAR);
@@ -242,7 +243,7 @@ AST_Node* var_decl() {
                               ret_type, can_mut);
 
     if(tree_find(parser->s_table, node->as.var_name) != NULL) {
-        exit(ERR_SEM_NOT_DEF_FNC_VAR);
+        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
     }
     tree_insert(parser->s_table, entry);
 
@@ -324,7 +325,7 @@ AST_Node* stmt() {
                 return node;
 
             } else {
-                exit(ERR_PARSE);
+                ERROR_RET(ERR_PARSE);
             }
 
         case T_BUILDIN:
@@ -342,7 +343,7 @@ AST_Node* stmt() {
 
         default:
             // TODO(Sigull) Add error message
-            exit(ERR_PARSE);
+            ERROR_RET(ERR_PARSE);
     }
 }
 
@@ -357,7 +358,7 @@ Ret_Type get_ret_type() {
         return R_U8;
     }
 
-    exit(ERR_SEM_RET_TYPE_DISCARD);
+    ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
 }
 
 AST_Node* func_decl() {
@@ -392,7 +393,7 @@ AST_Node* func_decl() {
     consume(T_LPAR);
 
     if (!check(T_DTYPE) && !check(T_VOID)) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     } 
     advance();
 
@@ -413,7 +414,7 @@ void prolog() {
     consume(T_CONST);
     consume(T_ID);
     if(strcmp(parser->prev->value, "ifj")) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_EQUAL);
@@ -426,10 +427,20 @@ void prolog() {
     consume(T_SEMI);
 }
 
-void parse(char* orig_input) {
-    size_t len = strlen(orig_input) + 1;
-    char* input = malloc(sizeof(char) * (len + 10));
-    memcpy(input, orig_input, len * sizeof(char));
+void parse() {
+    char buffer[100];
+    char* input = malloc(100*sizeof(char));
+    if(input == NULL) ERROR_RET(ERR_INTERN);
+    size_t curr_size = 100;
+    while(fgets(buffer, 100, stdin) != NULL){
+        if(strlen(input) + strlen(buffer) >= curr_size){
+            curr_size *= 2;
+            input = realloc(input, curr_size * sizeof(char));
+            if(input == NULL) ERROR_RET(ERR_INTERN);
+        }
+        strcat(input, buffer);
+    }
+    //printf("%s\n", input);
 
     lexer = init_lexer(input);
     parser = init_parser();
@@ -512,4 +523,9 @@ void parse(char* orig_input) {
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
     }
+}
+
+int compile(){
+    parse();
+    return 0;
 }

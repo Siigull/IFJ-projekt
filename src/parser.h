@@ -21,6 +21,6 @@ typedef struct Parser {
     Tree* s_table;
 } Parser;
 
-void parse(char* input);
+int compile();
 
 #endif
