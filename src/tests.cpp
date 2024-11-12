@@ -466,6 +466,20 @@ TEST_F(test_lexer, strings_multi_line_code_like_content){
     EXPECT_EQ(get_next_token(lexer)->type, T_EOF);
 }
 
+TEST_F(test_lexer, comment_skip){
+    char input[] = "//Hello mister. How is your day going. My day is going delightfully, thanks for asking.\nconst x = 10;";
+    lexer = init_lexer(input);
+    EXPECT_EQ(get_next_token(lexer)->type, T_CONST);
+}
+
+TEST_F(test_lexer, comment_skip2){
+    char input[] = "const x//But sir I would appreciate if you didnt talk to me while Im pissing.\n= 10;";
+    lexer = init_lexer(input);
+    EXPECT_EQ(get_next_token(lexer)->type, T_CONST);
+    EXPECT_EQ(get_next_token(lexer)->type, T_ID);
+    EXPECT_EQ(get_next_token(lexer)->type, T_EQUAL);
+}
+
 TEST_F(test_exparser, first_test_lol){
 	List* token_list = (List*)malloc(sizeof(List));
 	Token token_arr[] = {{T_I32, "69", 2}, {T_PLUS, "*", 1}, {T_I32, "420", 3}};
