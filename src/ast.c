@@ -25,6 +25,7 @@ AST_Node* node_init(AST_Type type) {
             node->as.arr = arr_init();
             break;
         case VAR_DECL:
+            break;
     }
 
     return node;

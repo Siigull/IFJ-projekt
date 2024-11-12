@@ -52,6 +52,10 @@ AST_Node* literal_load(List* tl) {
 
     if (check(T_ID)) {
         advance();
+        if(check(T_RPAR)) {
+            AST_Node* node = func_call();
+            return node;
+        }
 
     } else if (check(T_I32) || check(T_F64) || 
                check(T_U8)  || check(T_STRING) ||
@@ -301,6 +305,8 @@ AST_Node* _return() {
         node->left = expr();
     }
 
+    consume(T_SEMI);
+
     return node;
 }
 
@@ -434,60 +440,60 @@ void parse(char* orig_input) {
     lexer = init_lexer(input);
     parser = init_parser();
 
-
-
     Token token_arr[] = {{T_CONST, "const", 5},{T_ID, "ifj", 3},{T_EQUAL, "=", 1},
                         {T_IMPORT, "@import", 7},{T_RPAR, "(", 1},{T_STRING, "ifj24.zig", 9},
                         {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_PUB, "pub", 3},
                         {T_FN, "fn", 2},{T_ID, "main", 4},{T_RPAR, "(", 1},
                         {T_LPAR, ")", 1},{T_VOID, "void", 4},{T_CUYRBRACKET, "{", 1},
-                        {T_CONST, "const", 5},{T_ID, "str1", 4},{T_EQUAL, "=", 1},
-                        {T_BUILDIN, "ifj.string", 10},{T_RPAR, "(", 1},{T_STRING, "Toto je text v programu jazyka IFJ24", 36},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_VAR, "var", 3},
-                        {T_ID, "str2", 4},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.string", 10},
-                        {T_RPAR, "(", 1},{T_STRING, ", ktery jeste trochu obohatime", 30},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_ID, "str2", 4},{T_EQUAL, "=", 1},
-                        {T_BUILDIN, "ifj.concat", 10},{T_RPAR, "(", 1},{T_ID, "str1", 4},
-                        {T_COMMA, ",", 1},{T_ID, "str2", 4},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 10},{T_RPAR, "(", 1},
-                        {T_ID, "str1", 4},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_BUILDIN, "ifj.write", 11},{T_RPAR, "(", 1},{T_STRING, "\n", 2},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 10},
-                        {T_RPAR, "(", 1},{T_ID, "str2", 4},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-                        {T_STRING, "\n", 2},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte serazenou posloupnost malych pismen a-h:\n", 50},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_VAR, "var", 3},
-                        {T_ID, "newInput", 8},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readstr", 11},
-                        {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_VAR, "var", 3},{T_ID, "all", 3},{T_DDOT, ":", 1},
-                        {T_DTYPE, "[]u8", 4},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.string", 10},
-                        {T_RPAR, "(", 1},{T_STRING, "", 0},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_WHILE, "while", 5},{T_RPAR, "(", 1},
-                        {T_ID, "newInput", 8},{T_LPAR, ")", 1},{T_BAR, "|", 1},
-                        {T_ID, "inpOK", 5},{T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},
-                        {T_CONST, "const", 5},{T_ID, "abcdefgh", 8},{T_EQUAL, "=", 1},
-                        {T_BUILDIN, "ifj.string", 10},{T_RPAR, "(", 1},{T_STRING, "abcdefgh", 8},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte cislo pro vypocet faktorialu: ", 38},
                         {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CONST, "const", 5},
-                        {T_ID, "strcmpResult", 12},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.strcmp", 10},
-                        {T_RPAR, "(", 1},{T_ID, "inpOK", 5},{T_COMMA, ",", 1},
-                        {T_ID, "abcdefgh", 8},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "strcmpResult", 12},
-                        {T_DDEQ, "==", 2},{T_I32, "0", 1},{T_LPAR, ")", 1},
-                        {T_CUYRBRACKET, "{", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-                        {T_STRING, "Spravne zadano!\n", 17},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "all", 3},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_ID, "newInput", 8},
-                        {T_EQUAL, "=", 1},{T_NULL, "null", 4},{T_SEMI, ";", 1},
-                        {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Spatne zadana posloupnost, zkuste znovu:\n", 42},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_ID, "all", 3},
-                        {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.concat", 10},{T_RPAR, "(", 1},
-                        {T_ID, "all", 3},{T_COMMA, ",", 1},{T_ID, "inpOK", 5},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_ID, "newInput", 8},
-                        {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readstr", 11},{T_RPAR, "(", 1},
+                        {T_ID, "inp", 3},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readi32", 11},
+                        {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "inp", 3},
+                        {T_LPAR, ")", 1},{T_BAR, "|", 1},{T_ID, "INP", 3},
+                        {T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},{T_IF, "if", 2},
+                        {T_RPAR, "(", 1},{T_ID, "INP", 3},{T_STHAN, "<", 1},
+                        {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Faktorial nelze spocitat!\n", 27},
                         {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},
-                        {T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},{T_EOF, "\0", 1}};
+                        {T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},{T_CONST, "const", 5},
+                        {T_ID, "vysl", 4},{T_EQUAL, "=", 1},{T_ID, "factorial", 9},
+                        {T_RPAR, "(", 1},{T_ID, "INP", 3},{T_LPAR, ")", 1},
+                        {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
+                        {T_STRING, "Vysledek: ", 10},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl", 4},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},
+                        {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
+                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Chyba pri nacitani celeho cisla!\n", 34},
+                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},
+                        {T_CUYLBRACKET, "}", 1},{T_PUB, "pub", 3},{T_FN, "fn", 2},
+                        {T_ID, "decrement", 9},{T_RPAR, "(", 1},{T_ID, "n", 1},
+                        {T_DDOT, ":", 1},{T_DTYPE, "i32", 3},{T_COMMA, ",", 1},
+                        {T_ID, "m", 1},{T_DDOT, ":", 1},{T_DTYPE, "i32", 3},
+                        {T_LPAR, ")", 1},{T_DTYPE, "i32", 3},{T_CUYRBRACKET, "{", 1},
+                        {T_RETURN, "return", 6},{T_ID, "n", 1},{T_MINUS, "-", 1},
+                        {T_ID, "m", 1},{T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},
+                        {T_PUB, "pub", 3},{T_FN, "fn", 2},{T_ID, "factorial", 9},
+                        {T_RPAR, "(", 1},{T_ID, "n", 1},{T_DDOT, ":", 1},
+                        {T_DTYPE, "i32", 3},{T_LPAR, ")", 1},{T_DTYPE, "i32", 3},
+                        {T_CUYRBRACKET, "{", 1},{T_VAR, "var", 3},{T_ID, "result", 6},
+                        {T_DDOT, ":", 1},{T_DTYPE, "i32", 3},{T_EQUAL, "=", 1},
+                        {T_I32, "0", 1},{T_MINUS, "-", 1},{T_I32, "1", 1},
+                        {T_SEMI, ";", 1},{T_IF, "if", 2},{T_RPAR, "(", 1},
+                        {T_ID, "n", 1},{T_STHAN, "<", 1},{T_I32, "2", 1},
+                        {T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},{T_ID, "result", 6},
+                        {T_EQUAL, "=", 1},{T_I32, "1", 1},{T_SEMI, ";", 1},
+                        {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
+                        {T_CONST, "const", 5},{T_ID, "decremented_n", 13},{T_EQUAL, "=", 1},
+                        {T_ID, "decrement", 9},{T_RPAR, "(", 1},{T_ID, "n", 1},
+                        {T_COMMA, ",", 1},{T_I32, "1", 1},{T_LPAR, ")", 1},
+                        {T_SEMI, ";", 1},{T_CONST, "const", 5},{T_ID, "temp_result", 11},
+                        {T_EQUAL, "=", 1},{T_ID, "factorial", 9},{T_RPAR, "(", 1},
+                        {T_ID, "decremented_n", 13},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+                        {T_ID, "result", 6},{T_EQUAL, "=", 1},{T_ID, "n", 1},
+                        {T_MUL, "*", 1},{T_ID, "temp_result", 11},{T_SEMI, ";", 1},
+                        {T_CUYLBRACKET, "}", 1},{T_RETURN, "return", 6},{T_ID, "result", 6},
+                        {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_EOF, "0", 0}};
 
     // Token token_arr[] = {{T_PUB, "pub", 3},       {T_FN, "fn", 2}, 
     //                      {T_ID, "main", 4},       {T_RPAR, "(", 1},
