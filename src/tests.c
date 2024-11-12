@@ -16,7 +16,7 @@ void test_input(char* input, char* expected_result) {
 };
 
 void generate_debug_token_arr() {
-	FILE* f = fopen("src/input8.2.ifj", "r");
+	FILE* f = fopen("src/input8.1.ifj", "r");
 	if(f == NULL) {
 		return;
 	}
