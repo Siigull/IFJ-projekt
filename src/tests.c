@@ -84,7 +84,7 @@ int main() {
 
 	// generate_debug_token_arr();
 
-	char* temp = load_input("src/input8.3.ifj");
+	char* temp = load_input("src/input8.2.ifj");
 	parse(temp);	
 	return 0;
 };

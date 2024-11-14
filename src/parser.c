@@ -140,6 +140,7 @@ AST_Node* expr() {
             printf(" ");
             List_active_next(token_list);
         }
+        
         node = parse_expression(token_list);
         printf("\n");
     } 
