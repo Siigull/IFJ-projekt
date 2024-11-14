@@ -3,6 +3,7 @@
 #include "stack.h"
 #include "string.h"
 #include "test_generate_graph.h"
+#include "expressionparser.h"
 
 Lexer* lexer;
 Parser* parser;
@@ -47,6 +48,13 @@ bool check(T_Type type) {
     return parser->next->type == type;
 }
 
+AST_Node* string() {
+    AST_Node* node = node_init(STRING);
+    node->as.string = parser->prev->value;
+
+    return node;
+}
+
 AST_Node* literal_load(List* tl) {
     Token* token = malloc(sizeof(Token));
     memcpy(token, parser->next, sizeof(Token));
@@ -59,9 +67,13 @@ AST_Node* literal_load(List* tl) {
             return node;
         }
 
+    } else if (check(T_STRING)) {
+        advance();
+        AST_Node* node = string();
+        return node;
+
     } else if (check(T_I32) || check(T_F64) || 
-               check(T_U8)  || check(T_STRING) ||
-               check(T_NULL)) {
+               check(T_U8)  || check(T_NULL)) {
         advance();
 
     } else if (check(T_RPAR)) {
@@ -128,8 +140,7 @@ AST_Node* expr() {
             printf(" ");
             List_active_next(token_list);
         }
-
-        // printf("expr parser takes over\n");
+        node = parse_expression(token_list);
         printf("\n");
     } 
     

@@ -24,6 +24,7 @@ typedef enum {
     I32,
     F64, 
     ID,
+    STRING,
     PLUS,
     ISEQ,
     MINUS,
@@ -110,6 +111,7 @@ typedef struct AST_Node {
     struct AST_Node* right;
 
     union {
+        const char* string;
         const char* var_name;
         Arr* arr;
         Ret_Type expr_type;
