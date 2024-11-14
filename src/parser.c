@@ -177,7 +177,7 @@ AST_Node* _while() {
 
         consume(T_ID);
         AST_Node* var = node_init(NNULL_VAR_DECL);
-        arr_append(node->as.arr, (size_t)node);
+        arr_append(node->as.arr, (size_t)var);
 
         consume(T_BAR);
     }
