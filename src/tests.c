@@ -15,6 +15,25 @@ void test_input(char* input, char* expected_result) {
 	}
 };
 
+char* load_input(const char* filepath) {
+	char* input;
+	FILE* f = fopen(filepath, "r");
+	if(f == NULL) return input;
+
+	char temp;
+	int len = 0;
+	while(fscanf(f, "%c", &temp) == 1) {
+		len++;
+	}
+	rewind(f);
+
+	input = calloc(len + 10,sizeof(char));
+
+	for(int i=0; fscanf(f, "%c", input + i) == 1; i++);
+
+	return input;
+}
+
 void generate_debug_token_arr() {
 	FILE* f = fopen("src/input8.1.ifj", "r");
 	if(f == NULL) {
@@ -65,7 +84,7 @@ int mainxbcvxcvb() {
 
 	// generate_debug_token_arr();
 
-	char* temp = "";
+	char* temp = load_input("src/input8.2.ifj");
 	parse(temp);	
 	return 0;
 };

@@ -1,35 +1,44 @@
 
 #include "codegen.h"
 
+
 void generate_prolog(){
     fprintf(stdout, PROG_START);
     return;
 }
 
 
-
-
 void generate_builtins(){
+    fprintf(stdout, "LABEL *ifj*write\n");
+    fprintf(stdout, "\tDEFVAR LF@*to*write\n");
+    fprintf(stdout, "\tPOPS LF@*to*write\n");
+    fprintf(stdout, "\tWRITE LF@*to*write\n");
+    fprintf(stdout, "\tRETURN\n\n");
+    //todo
+
+    fprintf(stdout, "LABEL *ifj*length\n");
+    fprintf(stdout, "\tDEFVAR LF@*strlen\n");
+    fprintf(stdout, "\tPOPS LF@*strlen\n");
+    fprintf(stdout, "\tSTRLEN GF@*expression*result LF@*strlen\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    fprintf(stdout, "LABEL *ifj*string\n");
 }
 
 void eval_exp(AST_Node* curr){
-
+    //todo
     return;
 }
 
 //value of return of fnc, value to assign into var -> GF@__expression__result global variable
 //maybe change this
 void generate_expression(AST_Node* curr, Tree* symtable){
-    //printf(stdout, "DEFVAR LF@__res_left\n");
-    //printf(stdout, "DEFVAR LF@__res_right\n");   
-    //eval_exp(curr);
-
-    //printf(stdout, "MOVE GF@__expression__result LF@res\n");
+    //todo
     return;
 }
 
 void generate_if(AST_Node* curr, Tree* symtable){
-
+    //todo
 }
 
 void generate_return(AST_Node* curr, Tree* symtable){
@@ -40,7 +49,7 @@ void generate_return(AST_Node* curr, Tree* symtable){
 }
 
 void generate_while(AST_Node* curr, Tree* symtable){
-
+    //todo
 }
 
 void generate_func_call(AST_Node* curr, Tree* symtable){
@@ -50,16 +59,18 @@ void generate_func_call(AST_Node* curr, Tree* symtable){
     for(int i = 0; i < params->length; i++){
         AST_Node* param = (AST_Node*)((params->data)[i]);
         generate_expression(param, symtable);
-        fprintf(stdout, "\tPUSHS GF@__expression__result\n");
+        fprintf(stdout, "\tPUSHS GF@*expression*result\n");
     }
 
     fprintf(stdout, "\tPUSHFRAME\n");
-    fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "\tCALL *%s\n", curr->as.func_data->var_name);
     fprintf(stdout, "\tPOPFRAME\n");
 }
 
 void generate_var_decl(AST_Node* curr, Tree* symtable){
-
+    fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
+    generate_expression(curr->left, symtable);
+    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", curr->as.var_name);
 }
 
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
@@ -72,8 +83,7 @@ void generate_var_assignment(AST_Node* curr, Tree* symtable){
     //add variable that will store from global frame into the variable
     //case when var is _ 
     generate_expression(curr->left, symtable);
-    if(curr->as.var_name != NULL)
-        fprintf(stdout, "MOVE LF@%s \n ", curr->as.var_name);
+    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", curr->as.var_name);
 }
 
 void generate_statement(AST_Node* curr, Tree* symtable){
@@ -101,7 +111,7 @@ void generate_statement(AST_Node* curr, Tree* symtable){
 }
 
 void generate_function_decl(AST_Node* curr, Tree* symtable){
-    fprintf(stdout, "LABEL __func_%s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "LABEL *func*%s\n", curr->as.func_data->var_name);
     bool main = (!strcmp(curr->as.func_data->var_name, "main"));
     if(main){
         fprintf(stdout, "\tCREATEFRAME\n");
