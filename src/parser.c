@@ -537,12 +537,6 @@ void parse(char* orig_input) {
     if(f == NULL) return;
     fclose(f);
 
-    char graph_filename[] = "graph.txt";
-
-    FILE* f = fopen(graph_filename, "w");
-    if(f == NULL) return;
-    fclose(f);
-
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();

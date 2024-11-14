@@ -9,20 +9,21 @@ void generate_prolog(){
 
 
 void generate_builtins(){
-    fprintf(stdout, "LABEL *ifj*write\n");
+    fprintf(stdout, "LABEL *write\n");
     fprintf(stdout, "\tDEFVAR LF@*to*write\n");
     fprintf(stdout, "\tPOPS LF@*to*write\n");
     fprintf(stdout, "\tWRITE LF@*to*write\n");
     fprintf(stdout, "\tRETURN\n\n");
     //todo
 
-    fprintf(stdout, "LABEL *ifj*length\n");
+    fprintf(stdout, "LABEL *length\n");
     fprintf(stdout, "\tDEFVAR LF@*strlen\n");
     fprintf(stdout, "\tPOPS LF@*strlen\n");
     fprintf(stdout, "\tSTRLEN GF@*expression*result LF@*strlen\n");
     fprintf(stdout, "\tRETURN\n\n");
 
-    fprintf(stdout, "LABEL *ifj*string\n");
+    //fprintf(stdout, "LABEL *string\n");
+    //todo add all builtin functions
 }
 
 void eval_exp(AST_Node* curr){
@@ -41,15 +42,15 @@ void generate_if(AST_Node* curr, Tree* symtable){
     //todo
 }
 
+void generate_while(AST_Node* curr, Tree* symtable){
+    //todo
+}
+
 void generate_return(AST_Node* curr, Tree* symtable){
     if(curr->left != NULL){
         generate_expression(curr->left, symtable);
     }
     fprintf(stdout, "\tRETURN\n\n");
-}
-
-void generate_while(AST_Node* curr, Tree* symtable){
-    //todo
 }
 
 void generate_func_call(AST_Node* curr, Tree* symtable){
@@ -63,7 +64,7 @@ void generate_func_call(AST_Node* curr, Tree* symtable){
     }
 
     fprintf(stdout, "\tPUSHFRAME\n");
-    fprintf(stdout, "\tCALL *%s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
     fprintf(stdout, "\tPOPFRAME\n");
 }
 
@@ -74,12 +75,6 @@ void generate_var_decl(AST_Node* curr, Tree* symtable){
 }
 
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
-    // var x = f(y, z);
-    // push params
-    // push frame
-    // move x,
-
-
     //add variable that will store from global frame into the variable
     //case when var is _ 
     generate_expression(curr->left, symtable);
@@ -111,7 +106,7 @@ void generate_statement(AST_Node* curr, Tree* symtable){
 }
 
 void generate_function_decl(AST_Node* curr, Tree* symtable){
-    fprintf(stdout, "LABEL *func*%s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "LABEL *%s\n", curr->as.func_data->var_name);
     bool main = (!strcmp(curr->as.func_data->var_name, "main"));
     if(main){
         fprintf(stdout, "\tCREATEFRAME\n");

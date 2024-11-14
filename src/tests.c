@@ -15,7 +15,7 @@ void test_input(char* input, char* expected_result) {
 	}
 };
 
-char* load_input(const char* filepath) {
+char* load_inputos(const char* filepath) {
 	char* input;
 	FILE* f = fopen(filepath, "r");
 	if(f == NULL) return input;
