@@ -82,9 +82,9 @@ int mainxbcvxcvb() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	// generate_debug_token_arr();
+	generate_debug_token_arr();
 
-	char* temp = load_input("src/input8.2.ifj");
-	parse(temp);	
+	// char* temp = load_input("src/input8.2.ifj");
+	// parse(temp);	
 	return 0;
 };

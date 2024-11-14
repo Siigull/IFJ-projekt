@@ -306,6 +306,12 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 		}
 		
 		token->length = strlen(token->value);
+
+		memmove(value, value + 3, len - 3);
+		token->length -= 3;
+
+		token->value[0] = '*';
+		token->value[token->length] = '\0';
 		return token;
 	};
 

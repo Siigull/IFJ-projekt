@@ -48,9 +48,15 @@ bool check(T_Type type) {
     return parser->next->type == type;
 }
 
+char* parse_string_value() {
+    
+}
+
 AST_Node* string() {
     AST_Node* node = node_init(STRING);
     node->as.string = parser->prev->value;
+
+    parse_string_value(node->as.string);
 
     return node;
 }
@@ -140,7 +146,7 @@ AST_Node* expr() {
             //printf(" ");
             List_active_next(token_list);
         }
-        
+
         node = parse_expression(token_list);
         printf("\n");
     } 
