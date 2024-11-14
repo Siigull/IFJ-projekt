@@ -6,6 +6,12 @@ void generate_prolog(){
     return;
 }
 
+
+
+
+void generate_builtins(){
+}
+
 void eval_exp(AST_Node* curr){
 
     return;
@@ -30,7 +36,6 @@ void generate_return(AST_Node* curr, Tree* symtable){
     if(curr->left != NULL){
         generate_expression(curr->left, symtable);
     }
-    fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 }
 
@@ -39,7 +44,18 @@ void generate_while(AST_Node* curr, Tree* symtable){
 }
 
 void generate_func_call(AST_Node* curr, Tree* symtable){
+    fprintf(stdout, "\tCREATEFRAME\n");
+    //push all parameters here
+    Arr* params = curr->as.func_data->arr;
+    for(int i = 0; i < params->length; i++){
+        AST_Node* param = (AST_Node*)((params->data)[i]);
+        generate_expression(param, symtable);
+        fprintf(stdout, "\tPUSHS GF@__expression__result\n");
+    }
 
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "\tPOPFRAME\n");
 }
 
 void generate_var_decl(AST_Node* curr, Tree* symtable){
@@ -86,8 +102,11 @@ void generate_statement(AST_Node* curr, Tree* symtable){
 
 void generate_function_decl(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "LABEL __func_%s\n", curr->as.func_data->var_name);
-    fprintf(stdout, "\tCREATEFRAME\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    bool main = (!strcmp(curr->as.func_data->var_name, "main"));
+    if(main){
+        fprintf(stdout, "\tCREATEFRAME\n");
+        fprintf(stdout, "\tPUSHFRAME\n");
+    }
 
     Entry* arg_entry = tree_find(symtable, curr->as.func_data->var_name);
     Arr* args = arg_entry->as.function_args;
@@ -108,8 +127,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
         generate_statement(stmt, symtable);
     }
 
-    if(!strcmp(curr->as.func_data->var_name, "main")){
-        fprintf(stdout, "\tPOPFRAME\n");
+    if(main){
         fprintf(stdout, PROG_END);
     }
     return;
@@ -119,6 +137,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
 void generate_code(Arr* input, Tree* symtable){
     generate_prolog();
     //start on main
+    generate_builtins();
     for(int i = 0; i < input->length; i++){
         AST_Node* curr = (AST_Node*)((input->data)[i]);
         generate_function_decl(curr, symtable);
