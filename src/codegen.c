@@ -10,16 +10,20 @@ void generate_prolog(){
 
 void generate_builtins(){
     fprintf(stdout, "LABEL *write\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*to*write\n");
-    fprintf(stdout, "\tPOPS LF@*to*write\n");
+    fprintf(stdout, "\tMOVE LF@*to*write LF@*param0\n");
     fprintf(stdout, "\tWRITE LF@*to*write\n");
+    fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
     //todo
 
     fprintf(stdout, "LABEL *length\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*strlen\n");
-    fprintf(stdout, "\tPOPS LF@*strlen\n");
-    fprintf(stdout, "\tSTRLEN GF@*expression*result LF@*strlen\n");
+    fprintf(stdout, "\tMOVE LF@*strlen LF@*param0\n");
+    fprintf(stdout, "\tSTRLEN GF@*return*val LF@*strlen\n");
+    fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 
     //fprintf(stdout, "LABEL *string\n");
@@ -50,6 +54,7 @@ void generate_return(AST_Node* curr, Tree* symtable){
     if(curr->left != NULL){
         generate_expression(curr->left, symtable);
     }
+    fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 }
 
@@ -59,26 +64,28 @@ void generate_func_call(AST_Node* curr, Tree* symtable){
     Arr* params = curr->as.func_data->arr;
     for(int i = 0; i < params->length; i++){
         AST_Node* param = (AST_Node*)((params->data)[i]);
+        fprintf(stdout, "\tDEFVAR TF@*param%d\n", i);
         generate_expression(param, symtable);
-        fprintf(stdout, "\tPUSHS GF@*expression*result\n");
+        fprintf(stdout, "\tMOVE TF@*param%d GF@*expression*result\n", i);
+        //fprintf(stdout, "\tPUSHS GF@*expression*result\n");
     }
 
-    fprintf(stdout, "\tPUSHFRAME\n");
+    //fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
-    fprintf(stdout, "\tPOPFRAME\n");
+    //fprintf(stdout, "\tPOPFRAME\n\n");
 }
 
 void generate_var_decl(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
     generate_expression(curr->left, symtable);
-    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", curr->as.var_name);
+    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
 }
 
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
     //add variable that will store from global frame into the variable
     //case when var is _ 
     generate_expression(curr->left, symtable);
-    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", curr->as.var_name);
+    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
 }
 
 void generate_statement(AST_Node* curr, Tree* symtable){
@@ -112,6 +119,11 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
         fprintf(stdout, "\tCREATEFRAME\n");
         fprintf(stdout, "\tPUSHFRAME\n");
     }
+    else{
+        fprintf(stdout, "\tPUSHFRAME\n");
+        fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+        fprintf(stdout, "\tMOVE LF@*return*value nil@nil\n");
+    }
 
     Entry* arg_entry = tree_find(symtable, curr->as.func_data->var_name);
     Arr* args = arg_entry->as.function_args;
@@ -120,7 +132,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     for(int i = 0; i < args->length; i++){
         Function_Arg* argument = (Function_Arg*)((args->data)[i]);
         fprintf(stdout, "\tDEFVAR LF@%s\n", argument->arg_name); 
-        fprintf(stdout, "\tPOPS LF@%s\n", argument->arg_name);
+        fprintf(stdout, "\tMOVE LF@%s LF@%s*param\n", argument->arg_name, argument->arg_name);
     }
 
     // statements in as->func_data as an array
