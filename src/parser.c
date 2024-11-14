@@ -2,6 +2,8 @@
 #include "ast.h"
 #include "stack.h"
 #include "string.h"
+#include "test_generate_graph.h"
+
 Lexer* lexer;
 Parser* parser;
 Token* debug_token_array;
@@ -24,12 +26,12 @@ Parser* init_parser() {
 }
 
 void advance() {
-    // free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
-    // parser->prev = parser->next;
-    // parser->next = get_next_token(lexer);
-
+    free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
     parser->prev = parser->next;
-    parser->next = &(debug_token_array[token_index++]);
+    parser->next = get_next_token(lexer);
+
+    // parser->prev = parser->next;
+    // parser->next = &(debug_token_array[token_index++]);
 }
 
 void consume(T_Type type) {
@@ -204,7 +206,7 @@ AST_Node* _if() {
 
         consume(T_ID);
         AST_Node* var = node_init(NNULL_VAR_DECL);
-        arr_append(node->as.arr, (size_t)node);
+        arr_append(node->as.arr, (size_t)var);
 
         consume(T_BAR);        
     }
@@ -440,54 +442,54 @@ void parse(char* orig_input) {
     lexer = init_lexer(input);
     parser = init_parser();
 
-    Token token_arr[] = {{T_CONST, "const", 5},{T_ID, "ifj", 3},{T_EQUAL, "=", 1},
-                        {T_IMPORT, "@import", 7},{T_RPAR, "(", 1},{T_STRING, "ifj24.zig", 9},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_PUB, "pub", 3},
-                        {T_FN, "fn", 2},{T_ID, "main", 4},{T_RPAR, "(", 1},
-                        {T_LPAR, ")", 1},{T_VOID, "void", 4},{T_CUYRBRACKET, "{", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte cislo pro vypocet faktorialu\n", 38},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CONST, "const", 5},
-                        {T_ID, "a", 1},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readi32", 11},
-                        {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "a", 1},
-                        {T_LPAR, ")", 1},{T_BAR, "|", 1},{T_ID, "val", 3},
-                        {T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},{T_IF, "if", 2},
-                        {T_RPAR, "(", 1},{T_ID, "val", 3},{T_STHAN, "<", 1},
-                        {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Faktorial ", 10},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-                        {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-                        {T_STRING, " nelze spocitat\n", 17},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
-                        {T_VAR, "var", 3},{T_ID, "d", 1},{T_DDOT, ":", 1},
-                        {T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.i2f", 7},
-                        {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_VAR, "var", 3},{T_ID, "vysl", 4},
-                        {T_DDOT, ":", 1},{T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},
-                        {T_F64, "1.0", 3},{T_SEMI, ";", 1},{T_WHILE, "while", 5},
-                        {T_RPAR, "(", 1},{T_ID, "d", 1},{T_GTHAN, ">", 1},
-                        {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
-                        {T_ID, "vysl", 4},{T_EQUAL, "=", 1},{T_ID, "vysl", 4},
-                        {T_MUL, "*", 1},{T_ID, "d", 1},{T_SEMI, ";", 1},
-                        {T_ID, "d", 1},{T_EQUAL, "=", 1},{T_ID, "d", 1},
-                        {T_MINUS, "-", 1},{T_F64, "1.0", 3},{T_SEMI, ";", 1},
-                        {T_CUYLBRACKET, "}", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-                        {T_STRING, "Vysledek: ", 10},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl", 4},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-                        {T_RPAR, "(", 1},{T_STRING, " = ", 3},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_CONST, "const", 5},{T_ID, "vysl_i32", 8},
-                        {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.f2i", 7},{T_RPAR, "(", 1},
-                        {T_ID, "vysl", 4},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-                        {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl_i32", 8},
-                        {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-                        {T_RPAR, "(", 1},{T_STRING, "\n", 2},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
-                        {T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},{T_BUILDIN, "ifj.write", 9},
-                        {T_RPAR, "(", 1},{T_STRING, "Faktorial pro null nelze spocitat\n", 35},{T_LPAR, ")", 1},
-                        {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
-                        {T_EOF, "0", 0},};
+    // Token token_arr[] = {{T_CONST, "const", 5},{T_ID, "ifj", 3},{T_EQUAL, "=", 1},
+    //                     {T_IMPORT, "@import", 7},{T_RPAR, "(", 1},{T_STRING, "ifj24.zig", 9},
+    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_PUB, "pub", 3},
+    //                     {T_FN, "fn", 2},{T_ID, "main", 4},{T_RPAR, "(", 1},
+    //                     {T_LPAR, ")", 1},{T_VOID, "void", 4},{T_CUYRBRACKET, "{", 1},
+    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte cislo pro vypocet faktorialu\n", 38},
+    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CONST, "const", 5},
+    //                     {T_ID, "a", 1},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readi32", 11},
+    //                     {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+    //                     {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "a", 1},
+    //                     {T_LPAR, ")", 1},{T_BAR, "|", 1},{T_ID, "val", 3},
+    //                     {T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},{T_IF, "if", 2},
+    //                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_STHAN, "<", 1},
+    //                     {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
+    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Faktorial ", 10},
+    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
+    //                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
+    //                     {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
+    //                     {T_STRING, " nelze spocitat\n", 17},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+    //                     {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
+    //                     {T_VAR, "var", 3},{T_ID, "d", 1},{T_DDOT, ":", 1},
+    //                     {T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.i2f", 7},
+    //                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
+    //                     {T_SEMI, ";", 1},{T_VAR, "var", 3},{T_ID, "vysl", 4},
+    //                     {T_DDOT, ":", 1},{T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},
+    //                     {T_F64, "1.0", 3},{T_SEMI, ";", 1},{T_WHILE, "while", 5},
+    //                     {T_RPAR, "(", 1},{T_ID, "d", 1},{T_GTHAN, ">", 1},
+    //                     {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
+    //                     {T_ID, "vysl", 4},{T_EQUAL, "=", 1},{T_ID, "vysl", 4},
+    //                     {T_MUL, "*", 1},{T_ID, "d", 1},{T_SEMI, ";", 1},
+    //                     {T_ID, "d", 1},{T_EQUAL, "=", 1},{T_ID, "d", 1},
+    //                     {T_MINUS, "-", 1},{T_F64, "1.0", 3},{T_SEMI, ";", 1},
+    //                     {T_CUYLBRACKET, "}", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
+    //                     {T_STRING, "Vysledek: ", 10},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl", 4},
+    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
+    //                     {T_RPAR, "(", 1},{T_STRING, " = ", 3},{T_LPAR, ")", 1},
+    //                     {T_SEMI, ";", 1},{T_CONST, "const", 5},{T_ID, "vysl_i32", 8},
+    //                     {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.f2i", 7},{T_RPAR, "(", 1},
+    //                     {T_ID, "vysl", 4},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
+    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl_i32", 8},
+    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
+    //                     {T_RPAR, "(", 1},{T_STRING, "\n", 2},{T_LPAR, ")", 1},
+    //                     {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
+    //                     {T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},{T_BUILDIN, "ifj.write", 9},
+    //                     {T_RPAR, "(", 1},{T_STRING, "Faktorial pro null nelze spocitat\n", 35},{T_LPAR, ")", 1},
+    //                     {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
+    //                     {T_EOF, "0", 0},};
 
     // Token token_arr[] = {{T_PUB, "pub", 3},       {T_FN, "fn", 2}, 
     //                      {T_ID, "main", 4},       {T_RPAR, "(", 1},
@@ -505,13 +507,20 @@ void parse(char* orig_input) {
     //                      {T_CUYLBRACKET, "}", 1}, {T_CUYLBRACKET, "}", 1},
     //                      {T_EOF, "\0", 1}};
 
-    debug_token_array = token_arr;
+    // debug_token_array = token_arr;
 
     advance();
 
     prolog();
 
+    char graph_filename[] = "graph.txt";
+
+    FILE* f = fopen(graph_filename, "w");
+    if(f == NULL) return;
+    fclose(f);
+
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
+        generate_graph(node, graph_filename);
     }
 }
