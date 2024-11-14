@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "helper.h"
 
-enum { BLACK = 0, RED = 1 } Node_Color;
+typedef enum { BLACK = 0, RED = 1 } Node_Color;
 
 typedef enum {
 	E_FUNC,
@@ -28,7 +28,7 @@ typedef enum {
 } Ret_Type;
 
 typedef struct {
-	const char* arg_name;
+	char* arg_name;
 	Ret_Type type;
 } Function_Arg;
 

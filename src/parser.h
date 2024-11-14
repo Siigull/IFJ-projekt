@@ -13,6 +13,7 @@
 #include "ast.h"
 #include "error.h"
 #include "string.h"
+#include "codegen.h"
 
 typedef struct Parser {
     Token* next;
@@ -22,5 +23,6 @@ typedef struct Parser {
 } Parser;
 
 void parse(char* input);
+int compile(char* input);
 
 #endif

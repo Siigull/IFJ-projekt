@@ -25,11 +25,11 @@ Parser* init_parser() {
 
 void advance() {
     // free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
-    // parser->prev = parser->next;
-    // parser->next = get_next_token(lexer);
-
     parser->prev = parser->next;
-    parser->next = &(debug_token_array[token_index++]);
+    parser->next = get_next_token(lexer);
+
+    //parser->prev = parser->next;
+    //parser->next = &(debug_token_array[token_index++]);
 }
 
 void consume(T_Type type) {
@@ -122,13 +122,13 @@ AST_Node* expr() {
         while(List_is_active(token_list)){
             Token* temp;
             List_get_val(token_list, &temp);
-            print_token(temp, stdout, false);
-            printf(" ");
+            //print_token(temp, stdout, false);
+            //printf(" ");
             List_active_next(token_list);
         }
 
         // printf("expr parser takes over\n");
-        printf("\n");
+        //printf("\n");
     } 
     
     return node;
@@ -511,7 +511,15 @@ void parse(char* orig_input) {
 
     prolog();
 
+    Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
+        arr_append(nodes, (size_t)node);
     }
+    generate_code(nodes, parser->s_table);
+}
+
+int compile(char* input) {
+    parse(input);
+    return 0;
 }
