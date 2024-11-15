@@ -1,55 +1,55 @@
-root -> FUNC_DECL0
-FUNC_DECL0 -> FUNC_CALL0
-FUNC_CALL0 -> STRING0
-FUNC_DECL0 -> VAR_DECL0
-VAR_DECL0 -> FUNC_CALL1
-FUNC_DECL0 -> IF0
-IF0 -> ID0
-IF0 -> ELSE0
-ELSE0 -> FUNC_CALL2
-FUNC_CALL2 -> STRING1
-IF0 -> NNUL0
-IF0 -> IF1
-IF1 -> LESS0
-LESS0 -> ID1
-LESS0 -> I320
-IF1 -> ELSE1
-ELSE1 -> VAR_DECL1
-VAR_DECL1 -> FUNC_CALL3
-FUNC_CALL3 -> ID2
-ELSE1 -> FUNC_CALL4
-FUNC_CALL4 -> STRING2
-ELSE1 -> FUNC_CALL5
-FUNC_CALL5 -> ID3
-IF1 -> FUNC_CALL6
-FUNC_CALL6 -> STRING3
-root -> FUNC_DECL1
-FUNC_DECL1 -> RETURN0
-RETURN0 -> -0
--0 -> ID4
--0 -> ID5
-root -> FUNC_DECL2
-FUNC_DECL2 -> VAR_DECL2
-VAR_DECL2 -> -1
--1 -> I321
--1 -> I322
-FUNC_DECL2 -> IF2
-IF2 -> LESS1
-LESS1 -> ID6
-LESS1 -> I323
-IF2 -> ELSE2
-ELSE2 -> VAR_DECL3
-VAR_DECL3 -> FUNC_CALL7
-FUNC_CALL7 -> ID7
-FUNC_CALL7 -> I324
-ELSE2 -> VAR_DECL4
-VAR_DECL4 -> FUNC_CALL8
-FUNC_CALL8 -> ID8
-ELSE2 -> VAR_ASSIGNMENT0
-VAR_ASSIGNMENT0 -> *0
-*0 -> ID9
-*0 -> ID10
-IF2 -> VAR_ASSIGNMENT1
-VAR_ASSIGNMENT1 -> I325
-FUNC_DECL2 -> RETURN1
-RETURN1 -> ID11
+root -> FUNC_DECL(0) : functions
+FUNC_DECL(0) -> FUNC_CALL(0) : body
+FUNC_CALL(0) -> STRING(0) : args
+FUNC_DECL(0) -> VAR_DECL(0) : body
+VAR_DECL(0) -> FUNC_CALL(1) : expr
+FUNC_DECL(0) -> IF(0) : body
+IF(0) -> ID(0) : expr
+IF(0) -> ELSE(0) : else
+ELSE(0) -> FUNC_CALL(2) : body
+FUNC_CALL(2) -> STRING(1) : args
+IF(0) -> NNUL(0) : body
+IF(0) -> IF(1) : body
+IF(1) -> LESS(0) : expr
+LESS(0) -> ID(1) : left
+LESS(0) -> I32(0) : right
+IF(1) -> ELSE(1) : else
+ELSE(1) -> VAR_DECL(1) : body
+VAR_DECL(1) -> FUNC_CALL(3) : expr
+FUNC_CALL(3) -> ID(2) : args
+ELSE(1) -> FUNC_CALL(4) : body
+FUNC_CALL(4) -> STRING(2) : args
+ELSE(1) -> FUNC_CALL(5) : body
+FUNC_CALL(5) -> ID(3) : args
+IF(1) -> FUNC_CALL(6) : body
+FUNC_CALL(6) -> STRING(3) : args
+root -> FUNC_DECL(1) : functions
+FUNC_DECL(1) -> RETURN(0) : body
+RETURN(0) -> -(0) : expr
+-(0) -> ID(4) : left
+-(0) -> ID(5) : right
+root -> FUNC_DECL(2) : functions
+FUNC_DECL(2) -> VAR_DECL(2) : body
+VAR_DECL(2) -> -(1) : expr
+-(1) -> I32(1) : left
+-(1) -> I32(2) : right
+FUNC_DECL(2) -> IF(2) : body
+IF(2) -> LESS(1) : expr
+LESS(1) -> ID(6) : left
+LESS(1) -> I32(3) : right
+IF(2) -> ELSE(2) : else
+ELSE(2) -> VAR_DECL(3) : body
+VAR_DECL(3) -> FUNC_CALL(7) : expr
+FUNC_CALL(7) -> ID(7) : args
+FUNC_CALL(7) -> I32(4) : args
+ELSE(2) -> VAR_DECL(4) : body
+VAR_DECL(4) -> FUNC_CALL(8) : expr
+FUNC_CALL(8) -> ID(8) : args
+ELSE(2) -> VAR_ASSIGNMENT(0) : body
+VAR_ASSIGNMENT(0) -> !(0) : expr
+!(0) -> ID(9) : left
+!(0) -> ID(10) : right
+IF(2) -> VAR_ASSIGNMENT(1) : body
+VAR_ASSIGNMENT(1) -> I32(5) : expr
+FUNC_DECL(2) -> RETURN(1) : body
+RETURN(1) -> ID(11) : expr

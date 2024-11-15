@@ -37,6 +37,9 @@ Node* bvs_node_init(Entry* entry, Node* parent) {
 	node->entry = entry;
 	node->color = RED;
 
+	node->left = NULL;
+	node->right = NULL;
+
 	return node;
 }
 
