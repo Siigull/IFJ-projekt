@@ -9,6 +9,8 @@ void generate_prolog(){
 
 
 void generate_builtins(){
+
+    //WRITE
     fprintf(stdout, "LABEL *write\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*to*write\n");
@@ -16,18 +18,75 @@ void generate_builtins(){
     fprintf(stdout, "\tWRITE LF@*to*write\n");
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
-    //todo
 
+    //i2f
+    fprintf(stdout, "LABEL *i2f\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tINT2FLOAT LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //f2i
+    fprintf(stdout, "LABEL *f2i\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tFLOAT2INT LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //LENGTH
     fprintf(stdout, "LABEL *length\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*strlen\n");
     fprintf(stdout, "\tMOVE LF@*strlen LF@*param0\n");
-    fprintf(stdout, "\tSTRLEN GF@*return*val LF@*strlen\n");
+    fprintf(stdout, "\tSTRLEN LF@*strlen LF@*strlen\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*strlen\n");
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 
-    //fprintf(stdout, "LABEL *string\n");
+    //CONCATENATE
+    fprintf(stdout, "LABEL *concat\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tDEFVAR LF@*first\n");
+    fprintf(stdout, "\tMOVE LF@*first LF@*param0\n");
+    fprintf(stdout, "\tDEFVAR LF@*second\n");
+    fprintf(stdout, "\tMOVE LF@*second LF@*param1\n");
+    fprintf(stdout, "\tCONCAT LF@*return*value LF@*first LF@*second\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
     //todo add all builtin functions
+
+    //readstr
+    fprintf(stdout, "LABEL *readstr\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tREAD LF@*return*value string\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //readi32
+    fprintf(stdout, "LABEL *readstr\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tREAD LF@*return*value int\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //readf64
+    fprintf(stdout, "LABEL *readstr\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tREAD LF@*return*value float\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
 }
 
 void eval_exp(AST_Node* curr){
