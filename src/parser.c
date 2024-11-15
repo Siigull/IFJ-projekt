@@ -263,7 +263,7 @@ AST_Node* literal() {
         advance();
         errno = 0;
         char* end;
-        AST_Node* node = node_init(T_I32);
+        AST_Node* node = node_init(I32);
         node->as.i32 = strtol(parser->prev->value, &end, 10);
         if(errno == ERANGE || *end != '\0' || 
            node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
@@ -275,7 +275,7 @@ AST_Node* literal() {
         advance();
         errno = 0;
         char* end;
-        AST_Node* node = node_init(T_F64);
+        AST_Node* node = node_init(F64);
         node->as.f64 = strtof(parser->prev->value, &end);
         if(errno == ERANGE || *end != '\0') {
             exit(ERR_SEM_OTHER);
@@ -314,7 +314,7 @@ AST_Node* scaling() {
             node->left = left;
             node->right = right;
 
-        } else if(check(T_DIV)) {\
+        } else if(check(T_DIV)) {
             advance();
             AST_Node* right = scaling();
             AST_Node* node = node_init(DIV);
@@ -798,7 +798,7 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
-        // generate_graph(node, graph_filename);
+        generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }
     generate_code(nodes, parser->s_table);
