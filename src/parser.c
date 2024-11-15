@@ -166,9 +166,7 @@ char* string_to_assembly(const char* string) {
 
 AST_Node* string() {
     AST_Node* node = node_init(STRING);
-    node->as.string = parser->prev->value;
-
-    parse_string_value(node->as.string);
+    node->as.string = parse_string_value(parser->prev->value);
 
     return node;
 }
