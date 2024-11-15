@@ -13,6 +13,7 @@
 #include "bvs.h"
 
 #define PROG_START ".IFJcode24\nDEFVAR GF@*expression*result\nDEFVAR GF@*return*val\nJUMP *main\n\n"
+#define CONDITION_VARS "DEFVAR GF@*rhs\n DEFVAR GF@*lhs\n\n"
 #define PROG_END "\tPOPFRAME\n\tEXIT int@0\n\n"
 
 
@@ -62,7 +63,7 @@ bool is_data_type(AST_Type type);
  * 
  * @param curr 
  */
-void eval_condition(AST_Node* curr);
+void eval_condition(AST_Node* curr, Tree* symtable);
 
 
 
