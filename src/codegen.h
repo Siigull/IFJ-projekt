@@ -24,7 +24,27 @@
  */
 void generate_prolog();
 
+/**
+ * @brief generates start of a builtin function based on its name
+ * 
+ * @param func_name name of builtin function
+ */
+void builtin_start(char* func_name);
 
+/**
+ * @brief generates end of a builtin function
+ * 
+ */
+void builtin_end();
+
+/**
+ * @brief generates function that reads from stdin
+ * it can be string, integer or a float value
+ * 
+ * @param func_name name of the function - readstr, readi32, readf64
+ * @param type string, int or float
+ */
+void builtin_reads(char* func_name, char* type);
 
 /**
  * @brief Generates list of builtins functions in IFJ24
@@ -59,9 +79,14 @@ bool is_data_type(AST_Type type);
 
 
 /**
- * @brief TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ * @brief Evaluates condition of if statement or while loop condition,
+ * uses temporary GF@*lhs and GF@*rhs to evaluate equality of left and right sides
+ * these are computed using generate_expression for left and right child of the root
  * 
- * @param curr 
+ * root can be relation operator or a string
+ * in case of a string, it compares it will null
+ * 
+ * @param curr expression to evaluate
  */
 void eval_condition(AST_Node* curr, Tree* symtable);
 
