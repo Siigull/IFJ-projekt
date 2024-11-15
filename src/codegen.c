@@ -9,7 +9,6 @@ void generate_prolog(){
 
 
 void generate_builtins(){
-
     //WRITE
     fprintf(stdout, "LABEL *write\n");
     fprintf(stdout, "\tPUSHFRAME\n");

@@ -4,6 +4,7 @@
 #include "string.h"
 #include "test_generate_graph.h"
 #include "expressionparser.h"
+#include <ctype.h>
 
 Lexer* lexer;
 Parser* parser;
@@ -48,8 +49,119 @@ bool check(T_Type type) {
     return parser->next->type == type;
 }
 
-char* parse_string_value() {
-    
+bool is_hexa(char x) {
+    return isdigit(x) || (x >= 'A' && x <= 'F') || (x >= 'a' && x <= 'f');
+}
+
+int parse_escape(const char* in, char* out) {
+    int x;
+    if(is_hexa(in[2]) && is_hexa(in[3])) {
+        sscanf(in + 2, "%2x", &x);
+
+    } else {
+        exit(ERR_LEX);
+    }
+
+    return x;
+}
+
+char* parse_string_value(const char* string) {
+    int len = strlen(string);
+    int new_len = len;
+
+    for(int i=0; i < len; i++) {
+        if(string[i] == '\\') {
+            switch(string[i+1]) {
+                case 'x':
+                    if(i+3 >= len) {
+                        exit(ERR_LEX);
+                    }
+                    break;
+                case 'n':
+                case 'r':
+                case 't':
+                case '"':
+                    new_len--;
+                    break;
+                case '\\':
+                    new_len--;
+                    i++;
+                    break;
+                default:
+                    exit(ERR_LEX);
+                    break;
+            }
+        }
+    }
+
+    char* new_string = malloc(sizeof(char) * new_len + 1);
+    char* out = new_string;
+
+    for(int i=0; i < len; i++) {
+        if(string[i] == '\\') {
+            switch(string[i+1]) {
+                case 'x':
+                {
+                    int x = parse_escape(string + i, new_string);
+                    new_string[0] = (char)(x);
+                    i += 2;
+                    break;
+                }
+                case 'n':
+                    new_string[0] = '\n';
+                    break;
+                case '\\':
+                    new_string[0] = '\\';
+                    break;
+                case '"':
+                    new_string[0] = '"';
+                    break;
+                case 'r':
+                    new_string[0] = '\r';
+                    break;
+                case 't':
+                    new_string[0] = '\t';
+                    break;
+            }
+            i++;
+            new_string++;
+
+        } else {
+            new_string[0] = string[i];
+            new_string += 1;
+        }
+    }
+    new_string[0] = '\0';
+
+    return out;
+}
+
+char* string_to_assembly(const char* string) {
+    int len = strlen(string);
+    int new_len = len;
+
+    for(int i=0; i < len; i++) {
+        if(string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
+            new_len += 3;
+        }
+    }
+
+    char* new_string = malloc(sizeof(char) * new_len + 1);
+    char* out = new_string;
+
+    for(int i=0; i < len; i++) {
+        if(string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
+            sprintf(new_string, "\\%03d", string[i]);
+            new_string += 4;
+
+        } else {
+            new_string[0] = string[i];
+            new_string += 1;
+        }
+    }
+    new_string[0] = '\0';
+
+    return out;
 }
 
 AST_Node* string() {
@@ -148,7 +260,7 @@ AST_Node* expr() {
         }
 
         node = parse_expression(token_list);
-        printf("\n");
+        //printf("\n");
     } 
     
     return node;
@@ -435,11 +547,12 @@ AST_Node* decl() {
     return func_decl();
 }
 
+
 void prolog() {
     consume(T_CONST);
     consume(T_ID);
     if(strcmp(parser->prev->value, "ifj")) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_EQUAL);
