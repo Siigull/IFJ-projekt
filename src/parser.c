@@ -313,6 +313,7 @@ AST_Node* scaling() {
             AST_Node* node = node_init(MUL);
             node->left = left;
             node->right = right;
+            left = node;
 
         } else if(check(T_DIV)) {
             advance();
@@ -320,6 +321,7 @@ AST_Node* scaling() {
             AST_Node* node = node_init(DIV);
             node->left = left;
             node->right = right;
+            left = node;
         
         } else {
             break;
@@ -339,6 +341,7 @@ AST_Node* linear() {
             AST_Node* node = node_init(PLUS);
             node->left = left;
             node->right = right;
+            left = node;
 
         } else if(check(T_MINUS)) {
             advance();
@@ -346,6 +349,7 @@ AST_Node* linear() {
             AST_Node* node = node_init(MINUS);
             node->left = left;
             node->right = right;
+            left = node;
 
         } else {
             break;
@@ -376,7 +380,7 @@ AST_Node* binary() {
             AST_Node* node = node_init(type);
             node->right = right;
             node->left = left;
-            return node;
+            left = node;
 
         } else {
             break;

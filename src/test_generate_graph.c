@@ -39,6 +39,11 @@ void generate_graph_func_call(AST_Node* node, const char* last_node) {
     sprintf(current_node, "%s%d", "FUNC_CALL", func_call_count++);
 
     write_connection(last_node, current_node);
+
+    Arr* arr = node->as.func_data->arr;
+    for(int i=0; i < arr->length; i++) {
+        generate_graph_node((AST_Node*)arr->data[i], current_node);
+    }
 }
 
 void generate_graph_function_decl(AST_Node* node, const char* last_node) {
@@ -211,7 +216,7 @@ void generate_graph_isneq(AST_Node* node, const char* last_node) {
 
 void generate_graph_isless(AST_Node* node, const char* last_node) {
     char current_node[30];
-    sprintf(current_node, "%s%d", "<", ISLESS_count++);
+    sprintf(current_node, "%s%d", "LESS", ISLESS_count++);
 
     write_connection(last_node, current_node);
 
@@ -221,7 +226,7 @@ void generate_graph_isless(AST_Node* node, const char* last_node) {
 
 void generate_graph_ismore(AST_Node* node, const char* last_node) {
     char current_node[30];
-    sprintf(current_node, "%s%d", ">", ISMORE_count++);
+    sprintf(current_node, "%s%d", "MORE", ISMORE_count++);
 
     write_connection(last_node, current_node);
 
@@ -231,7 +236,7 @@ void generate_graph_ismore(AST_Node* node, const char* last_node) {
 
 void generate_graph_islesseq(AST_Node* node, const char* last_node) {
     char current_node[30];
-    sprintf(current_node, "%s%d", "<=", ISLESSEQ_count++);
+    sprintf(current_node, "%s%d", "LESS_EQ", ISLESSEQ_count++);
 
     write_connection(last_node, current_node);
 
@@ -241,7 +246,7 @@ void generate_graph_islesseq(AST_Node* node, const char* last_node) {
 
 void generate_graph_ismoreeq(AST_Node* node, const char* last_node) {
     char current_node[30];
-    sprintf(current_node, "%s%d", ">=", ISMOREEQ_count++);
+    sprintf(current_node, "%s%d", "MORE_EQ", ISMOREEQ_count++);
 
     write_connection(last_node, current_node);
 
