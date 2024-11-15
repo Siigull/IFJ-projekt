@@ -5,6 +5,8 @@
 #include "test_generate_graph.h"
 #include "expressionparser.h"
 #include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 
 Lexer* lexer;
 Parser* parser;
@@ -12,6 +14,7 @@ Token* debug_token_array;
 int token_index = 0;
 
 AST_Node* binary_load(List* tl);
+AST_Node* binary();
 AST_Node* func_call();
 AST_Node* stmt();
 Ret_Type get_ret_type();
@@ -171,34 +174,124 @@ AST_Node* string() {
     return node;
 }
 
-AST_Node* literal_load(List* tl) {
-    Token* token = malloc(sizeof(Token));
-    memcpy(token, parser->next, sizeof(Token));
-    List_insertF(tl, token);
+// AST_Node* literal_load(List* tl) {
+//     Token* token = malloc(sizeof(Token));
+//     memcpy(token, parser->next, sizeof(Token));
+//     List_insertF(tl, token);
 
+//     if (check(T_ID)) {
+//         advance();
+//         if(check(T_RPAR)) {
+//             AST_Node* node = func_call();
+//             return node;
+//         }
+
+//     } else if (check(T_STRING)) {
+//         advance();
+//         AST_Node* node = string();
+//         return node;
+
+//     } else if (check(T_I32) || check(T_F64) || 
+//                check(T_U8)  || check(T_NULL)) {
+//         advance();
+
+//     } else if (check(T_RPAR)) {
+//         advance();
+//         binary_load(tl);
+//         consume(T_LPAR);
+//         Token* token = malloc(sizeof(Token));
+//         memcpy(token, parser->prev, sizeof(Token));
+//         List_insertF(tl, token);
+
+//     } else if(check(T_BUILDIN)){
+//         advance();
+//         AST_Node* node = func_call();
+//         return node;
+
+//     } else {
+//         exit(ERR_PARSE);
+//     }
+
+//     return NULL;
+// }
+
+// bool check_operator() {
+//     T_Type operator_types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+//     int len = sizeof(operator_types) / sizeof(T_Type);
+//     for (int i=0; i < len; i++) {
+//         if (check(operator_types[i])){
+//             return true;
+//         }
+//     }
+    
+//     return false;
+// }
+
+// AST_Node* binary_load(List* tl) {
+//     AST_Node* node = literal_load(tl);
+//     if (node != NULL) {
+//         return node;
+//     }
+
+//     while(check_operator()) {
+//         advance();
+//         Token* token = malloc(sizeof(Token));
+//         memcpy(token, parser->prev, sizeof(Token));
+//         List_insertF(tl, token);
+//         literal_load(tl);
+//     }
+
+//     return NULL;
+// }
+
+AST_Node* literal() {
     if (check(T_ID)) {
         advance();
         if(check(T_RPAR)) {
             AST_Node* node = func_call();
             return node;
         }
+        AST_Node* node = node_init(ID);
+        node->as.var_name = parser->prev->value;
+        return node;
 
     } else if (check(T_STRING)) {
         advance();
-        AST_Node* node = string();
+        return string();
+
+    } else if (check(T_I32)) {
+        advance();
+        errno = 0;
+        char* end;
+        AST_Node* node = node_init(T_I32);
+        node->as.i32 = strtol(parser->prev->value, &end, 10);
+        if(errno == ERANGE || *end != '\0' || 
+           node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
+            exit(ERR_SEM_OTHER);
+        }
         return node;
 
-    } else if (check(T_I32) || check(T_F64) || 
-               check(T_U8)  || check(T_NULL)) {
+    } else if (check(T_F64)) {
         advance();
+        errno = 0;
+        char* end;
+        AST_Node* node = node_init(T_F64);
+        node->as.f64 = strtof(parser->prev->value, &end);
+        if(errno == ERANGE || *end != '\0') {
+            exit(ERR_SEM_OTHER);
+        }
+        return node;
+    
+    } else if (check(T_NULL)) {
+        advance();
+        AST_Node* node = node_init(NIL);
+        return node;
 
     } else if (check(T_RPAR)) {
         advance();
-        binary_load(tl);
+        AST_Node* node = binary();
         consume(T_LPAR);
-        Token* token = malloc(sizeof(Token));
-        memcpy(token, parser->prev, sizeof(Token));
-        List_insertF(tl, token);
+        return node;
 
     } else if(check(T_BUILDIN)){
         advance();
@@ -208,60 +301,114 @@ AST_Node* literal_load(List* tl) {
     } else {
         exit(ERR_PARSE);
     }
-
-    return NULL;
 }
 
-bool check_operator() {
-    T_Type operator_types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
-    int len = sizeof(operator_types) / sizeof(T_Type);
-    for (int i=0; i < len; i++) {
-        if (check(operator_types[i])){
-            return true;
+AST_Node* scaling() {
+    AST_Node* left = literal();
+
+    while(true) {
+        if(check(T_MUL)) {
+            advance();
+            AST_Node* right = scaling();
+            AST_Node* node = node_init(MUL);
+            node->left = left;
+            node->right = right;
+
+        } else if(check(T_DIV)) {\
+            advance();
+            AST_Node* right = scaling();
+            AST_Node* node = node_init(DIV);
+            node->left = left;
+            node->right = right;
+        
+        } else {
+            break;
         }
     }
-    
-    return false;
+
+    return left;
 }
 
-AST_Node* binary_load(List* tl) {
-    AST_Node* node = literal_load(tl);
-    if (node != NULL) {
-        return node;
+AST_Node* linear() {
+    AST_Node* left = scaling();
+
+    while(true) {
+        if(check(T_PLUS)) {
+            advance();
+            AST_Node* right = scaling();
+            AST_Node* node = node_init(PLUS);
+            node->left = left;
+            node->right = right;
+
+        } else if(check(T_MINUS)) {
+            advance();
+            AST_Node* right = scaling();
+            AST_Node* node = node_init(MINUS);
+            node->left = left;
+            node->right = right;
+
+        } else {
+            break;
+        }
     }
 
-    while(check_operator()) {
-        advance();
-        Token* token = malloc(sizeof(Token));
-        memcpy(token, parser->prev, sizeof(Token));
-        List_insertF(tl, token);
-        literal_load(tl);
+    return left;
+}
+
+AST_Type get_3_type() {
+    T_Type ops[] = {T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+    AST_Type types[] = {ISEQ, ISNEQ, ISLESS, ISMORE, ISLESSEQ, ISMOREEQ};
+    for(int i=0; i < 6; i++) {
+        if(check(ops[i])) return types[i];
     }
 
-    return NULL;
+    return -1;
+}
+
+AST_Node* binary() {
+    AST_Node* left = linear();
+
+    while(true) {
+        AST_Type type = get_3_type();
+        if((int)type != -1) {
+            advance();
+            AST_Node* right = linear();
+            AST_Node* node = node_init(type);
+            node->right = right;
+            node->left = left;
+            return node;
+
+        } else {
+            break;
+        }
+    }
+
+    return left;
 }
 
 // Expression parser
 AST_Node* expr() {
-    List* token_list = malloc(sizeof(List));
-    List_init(token_list);
+    // List* token_list = malloc(sizeof(List));
+    // List_init(token_list);
 
-    AST_Node* node = binary_load(token_list);
-    if (node == NULL) {
-        List_activeF(token_list);
-        while(List_is_active(token_list)){
-            Token* temp;
-            List_get_val(token_list, &temp);
-            //print_token(temp, stdout, false);
-            //printf(" ");
-            List_active_next(token_list);
-        }
+    // AST_Node* node = binary_load(token_list);
+    // if (node == NULL) {
+    //     List_activeF(token_list);
+    //     while(List_is_active(token_list)){
+    //         Token* temp;
+    //         List_get_val(token_list, &temp);
+    //         //print_token(temp, stdout, false);
+    //         //printf(" ");
+    //         List_active_next(token_list);
+    //     }
 
-        node = parse_expression(token_list);
-        //printf("\n");
-    } 
-    
-    return node;
+    //     node = parse_expression(token_list);
+    //     //printf("\n");
+    // } 
+
+    // return node;
+
+    return binary();
 }
 
 // Normal parser
@@ -638,9 +785,9 @@ void parse(char* orig_input) {
 
     // debug_token_array = token_arr;
 
-    // advance();
+    advance();
 
-    // prolog();
+    prolog();
 
     char graph_filename[] = "graph.txt";
 
@@ -651,7 +798,7 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
-        generate_graph(node, graph_filename);
+        // generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }
     generate_code(nodes, parser->s_table);

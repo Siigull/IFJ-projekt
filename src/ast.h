@@ -21,12 +21,18 @@ typedef enum {
     ELSE,
     NNULL_VAR_DECL,
     RETURN,
+    NIL,
     I32,
     F64, 
     ID,
     STRING,
     PLUS,
     ISEQ,
+    ISNEQ,
+    ISLESS,
+    ISMORE,
+    ISLESSEQ,
+    ISMOREEQ,
     MINUS,
     MUL,
     DIV,
@@ -116,6 +122,8 @@ typedef struct AST_Node {
         Arr* arr;
         Ret_Type expr_type;
         Func_Data* func_data;
+        int i32;
+        double f64;
     } as;
 
 } AST_Node;
