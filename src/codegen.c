@@ -81,7 +81,7 @@ void generate_builtins(){
     fprintf(stdout, "\tRETURN\n\n");
 
     //readi32
-    fprintf(stdout, "LABEL *readstr\n");
+    fprintf(stdout, "LABEL *readi32\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
     fprintf(stdout, "\tREAD LF@*return*value int\n");
@@ -90,7 +90,7 @@ void generate_builtins(){
     fprintf(stdout, "\tRETURN\n\n");
 
     //readf64
-    fprintf(stdout, "LABEL *readstr\n");
+    fprintf(stdout, "LABEL *readf64\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
     fprintf(stdout, "\tREAD LF@*return*value float\n");
@@ -102,16 +102,67 @@ void generate_builtins(){
     fprintf(stdout, "LABEL *ord\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tSTRI2INT LF@*return*value LF@param0 LF@param1\n");
+    fprintf(stdout, "\tSTRI2INT LF@*return*value LF@*param0 LF@*param1\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 
     //chr
-    fprintf(stdout, "LABEL *ord\n");
+    fprintf(stdout, "LABEL *chr\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tINT2CHAR LF@*return*value LF@param0\n");
+    fprintf(stdout, "\tINT2CHAR LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    fprintf(stdout, "LABEL *string\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tMOVE LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //strcmp
+    fprintf(stdout, "LABEL *strcmp\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tDEFVAR LF@*res\n");
+    fprintf(stdout, "\tEQ LF@*res LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tJUMPIFEQ *strcmp*skipeq LF@*res bool@false\n");
+    fprintf(stdout, "\tMOVE LF@*return*value int@0\n");
+    fprintf(stdout, "\tJUMP *strcmp*end\n");
+    fprintf(stdout, "\tLABEL *strcmp*skipeq\n");
+    fprintf(stdout, "\tLT LF@*res LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tJUMPIFEQ *strcmp*skiplt LF@*res bool@false\n");
+    fprintf(stdout, "\tMOVE LF@*return*value int@-1\n");
+    fprintf(stdout, "\tJUMP *strcmp*end\n");
+    fprintf(stdout, "\tLABEL *strcmp*skiplt\n");
+    fprintf(stdout, "\tMOVE LF@*return*value int@1\n");
+    fprintf(stdout, "\tLABEL *strcmp*end\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //substring
+    fprintf(stdout, "LABEL *substring\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tMOVE LF@*return*value string@\n");
+    fprintf(stdout, "\tDEFVAR LF@*start*index\n");
+    fprintf(stdout, "\tDEFVAR LF@*res\n");
+    fprintf(stdout, "\tMOVE LF@*start*index LF@*param1\n");
+    fprintf(stdout, "\tLABEL *substring*while\n");
+    fprintf(stdout, "\tEQ LF@*res LF@*start*index LF@*param2\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*loop*end LF@*res bool@true\n");
+
+    fprintf(stdout, "\tGETCHAR LF@*res LF@*param0 LF@*start*index\n");
+    fprintf(stdout, "\tCONCAT LF@*return*value LF@*return*value LF@*res\n");
+
+    fprintf(stdout, "\tADD LF@*start*index LF@*start*index int@1\n");
+    fprintf(stdout, "\tJUMP *substring*while\n");
+    fprintf(stdout, "\tLABEL *substring*loop*end\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
@@ -143,12 +194,16 @@ void eval_exp(AST_Node* curr, Tree* symtable){
         switch(curr->type){
             case PLUS:
                 fprintf(stdout, "ADDS\n");
+                break;
             case MINUS:
                 fprintf(stdout, "SUBS\n");
+                break;
             case MUL:
                 fprintf(stdout, "MULS\n");
+                break;
             case DIV:
                 fprintf(stdout, "DIVS\n");
+                break;
         }
     }
     else if(curr->type == FUNC_CALL){
@@ -160,10 +215,13 @@ void eval_exp(AST_Node* curr, Tree* symtable){
             //ast_node union doesnt have correct values TODO TODO TODO
             case I32:
                 fprintf(stdout, "\tPUSHS int@%d\n", curr->as.i32);
+                break;
             case F64:
                 fprintf(stdout, "\tPUSHS float@%a\n", curr->as.f64);
+                break;
             case STRING:
                 fprintf(stdout, "\tPUSHS string@%s\n", string_to_assembly(curr->as.string));
+                break;
         }
     }
     else if(curr->type == ID){

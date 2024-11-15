@@ -12,7 +12,7 @@
 #include "ast.h"
 #include "bvs.h"
 
-#define PROG_START ".IFJcode24\nDEFVAR GF@*expression*result\nDEFVAR GF@*return*val\nJUMP *main\n\n"
+#define PROG_START ".IFJcode24\nDEFVAR GF@*expression*result\nDEFVAR GF@*return*val\nJUMP main\n\n"
 #define CONDITION_VARS "DEFVAR GF@*rhs\n DEFVAR GF@*lhs\n DEFVAR GF@*tmp*res\n\n"
 #define PROG_END "\tPOPFRAME\n\tEXIT int@0\n\n"
 
