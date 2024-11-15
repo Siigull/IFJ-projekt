@@ -16,6 +16,7 @@
 #include "stack.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include "error.h"
 #define TABLE_SIZE 8
 
 typedef enum {
@@ -35,6 +36,16 @@ Rules: E  → E + E
 		E  → id
 		
 */
+
+typedef enum{
+	E_PLUS_E,
+	E_MINUS_E,
+	E_TIMES_E,
+	E_DIV_E,
+	E_EQ_E,
+	E_E,
+	E_ID,
+}rules;
 
 void init_stack(List* Stack);
 AST_Node* parse_expression(List* list);

@@ -15,7 +15,7 @@ void test_input(char* input, char* expected_result) {
 	}
 };
 
-char* load_input(const char* filepath) {
+char* load_inputos(const char* filepath) {
 	char* input;
 	FILE* f = fopen(filepath, "r");
 	if(f == NULL) return input;
@@ -84,7 +84,7 @@ int main() {
 
 	generate_debug_token_arr();
 
-	// char* temp = load_input("src/input8.2.ifj");
+	// char* temp = load_inputos("src/input8.2.ifj");
 	// parse(temp);	
 	return 0;
 };

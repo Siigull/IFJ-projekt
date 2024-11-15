@@ -252,13 +252,13 @@ AST_Node* expr() {
         while(List_is_active(token_list)){
             Token* temp;
             List_get_val(token_list, &temp);
-            print_token(temp, stdout, false);
-            printf(" ");
+            //print_token(temp, stdout, false);
+            //printf(" ");
             List_active_next(token_list);
         }
 
         node = parse_expression(token_list);
-        printf("\n");
+        //printf("\n");
     } 
     
     return node;
@@ -545,11 +545,12 @@ AST_Node* decl() {
     return func_decl();
 }
 
+
 void prolog() {
     consume(T_CONST);
     consume(T_ID);
     if(strcmp(parser->prev->value, "ifj")) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_EQUAL);
@@ -647,8 +648,16 @@ void parse(char* orig_input) {
     if(f == NULL) return;
     fclose(f);
 
+    Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
         generate_graph(node, graph_filename);
+        arr_append(nodes, (size_t)node);
     }
+    generate_code(nodes, parser->s_table);
+}
+
+int compile(char* input) {
+    parse(input);
+    return 0;
 }
