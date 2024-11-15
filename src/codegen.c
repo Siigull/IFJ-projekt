@@ -1,3 +1,13 @@
+/**
+ * @file codegen.c
+ * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
+ * @brief Implementation of IFJ24 code generator, generates from given AST
+ * 
+ * @todo remove symtable where not needed, add/revamp builtins, add evaluation of conditions of loops and ifs
+ * 
+ * @date 2024-11-15
+ * 
+ */
 
 #include "codegen.h"
 
@@ -86,9 +96,78 @@ void generate_builtins(){
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
+
+    //ord
+    fprintf(stdout, "LABEL *ord\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tSTRI2INT LF@*return*value LF@param0 LF@param1\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+
+    //chr
+    fprintf(stdout, "LABEL *ord\n");
+    fprintf(stdout, "\tPUSHFRAME\n");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tINT2CHAR LF@*return*value LF@param0\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
 }
 
-void eval_exp(AST_Node* curr){
+bool is_operator_arithmetic(AST_Type type){
+    if(type == PLUS || type == MINUS || type == MUL || type == DIV){
+        return true;
+    }
+
+    return false;
+}
+
+bool is_data_type(AST_Type type){
+    if(type == I32 || type == F64 ||type == STRING){
+        return true;
+    }
+
+    return false;
+}
+
+//postorder traversal through the expression tree
+void eval_exp(AST_Node* curr, Tree* symtable){
+    eval_exp(curr->left, symtable);
+    eval_exp(curr->right, symtable);
+
+    //here current instruction can be processed
+    if(is_operator_arithmetic(curr->type)){
+        switch(curr->type){
+            case PLUS:
+                fprintf(stdout, "ADDS\n");
+            case MINUS:
+                fprintf(stdout, "SUBS\n");
+            case MUL:
+                fprintf(stdout, "MULS\n");
+            case DIV:
+                fprintf(stdout, "DIVS\n");
+        }
+    }
+    else if(curr->type == FUNC_CALL){
+        generate_func_call(curr, symtable);
+        fprintf(stdout, "PUSHS GF@*return*val\n");
+    }
+    else if(is_data_type(curr->type)){
+        switch(curr->type){
+            //ast_node union doesnt have correct values TODO TODO TODO
+            case I32:
+                fprintf(stdout, "PUSHS int@%d\n", curr->as.i32);
+            case F64:
+                fprintf(stdout, "PUSHS float@%a\n", curr->as.f64);
+            case STRING:
+                fprintf(stdout, "PUSHS string@%s\n", string_to_assembly(curr->as.string));
+        }
+    }
+    else if(curr->type == ID){
+        fprintf(stdout, "PUSHS LF@%s\n", curr->as.var_name);
+    }
     //todo
     return;
 }
@@ -98,12 +177,15 @@ void eval_condition(AST_Node* curr){
     return;
 }
 
+
 //value of return of fnc, value to assign into var -> GF@*expression*result global variable
 //maybe change this
 void generate_expression(AST_Node* curr, Tree* symtable){
-    //todo
+    eval_exp(curr, symtable);
+    fprintf(stdout, "\tPOPS GF@*expression*result\n");
     return;
 }
+
 
 void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
     Arr* statements = curr->as.arr;
@@ -113,6 +195,7 @@ void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int st
     }
     return;
 }
+
 
 void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
     eval_condition(curr->left);
@@ -131,12 +214,14 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
         generate_statement(stmt, symtable, curr->as.func_data->var_name, i, nest+1);
     }
-    //todo
+    fprintf(stdout, "\tJUMP *end*of*if*%s*%d*%d\n", func_name, stmt_index, nest);
 
     fprintf(stdout, "\tLABEL *else*%s*%d*%d\n", func_name, stmt_index, nest);
     generate_else(curr->right, symtable, func_name, stmt_index, nest);
+    fprintf(stdout, "\tLABEL *end*of*if*%s*%d*%d\n", func_name, stmt_index, nest);
     return;
 }
+
 
 void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
     fprintf(stdout, "\tLABEL *while*%s*%d*%d\n", func_name, stmt_index, nest);
@@ -162,13 +247,16 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
     return;
 }
 
+
 void generate_return(AST_Node* curr, Tree* symtable){
     if(curr->left != NULL){
         generate_expression(curr->left, symtable);
+        fprintf(stdout, "\tMOVE GF@*return*val GF@*expression*result\n");
     }
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 }
+
 
 void generate_func_call(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tCREATEFRAME\n");
@@ -181,7 +269,9 @@ void generate_func_call(AST_Node* curr, Tree* symtable){
         fprintf(stdout, "\tMOVE TF@*param%d GF@*expression*result\n", i);
     }
     fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "\tMOVE GF@*expression*result, GF@*return*val\n");
 }
+
 
 void generate_var_decl(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
@@ -189,41 +279,16 @@ void generate_var_decl(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
 }
 
+
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
-    //add variable that will store from global frame into the variable
-    //case when var is _ 
+    //based on evaluated expression, save its value into the variable
     generate_expression(curr->left, symtable);
     fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
-}
+}//generate_var_assignment
 
-// function name and statement index and nesting numbers will be used
-// to distinguish labels in while and if statements, otherwise its not used
-void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
-    switch(curr->type){
-        case IF:
-            generate_if(curr, symtable, func_name, stmt_index, nest);
-            return;
-        case RETURN:
-            generate_return(curr, symtable);
-            return;
-        case WHILE:
-            generate_while(curr, symtable, func_name, stmt_index, nest);
-            return;
-        case FUNC_CALL:
-            generate_func_call(curr, symtable);
-            return;
-        case VAR_DECL:
-            generate_var_decl(curr, symtable);
-            return;
-        case VAR_ASSIGNMENT:
-            generate_var_assignment(curr, symtable);
-            return;
-    }
-    return;
-}
 
 void generate_function_decl(AST_Node* curr, Tree* symtable){
-    fprintf(stdout, "LABEL *%s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "LABEL %s\n", curr->as.func_data->var_name);
     bool main = (!strcmp(curr->as.func_data->var_name, "main"));
     if(main){
         fprintf(stdout, "\tCREATEFRAME\n");
@@ -258,15 +323,45 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
         fprintf(stdout, PROG_END);
     }
     return;
-}
+}//generate_function_decl
+
+
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
+    //choose which type of statement to generate
+    switch(curr->type){
+        case IF:
+            generate_if(curr, symtable, func_name, stmt_index, nest);
+            return;
+        case RETURN:
+            generate_return(curr, symtable);
+            return;
+        case WHILE:
+            generate_while(curr, symtable, func_name, stmt_index, nest);
+            return;
+        case FUNC_CALL:
+            generate_func_call(curr, symtable);
+            return;
+        case VAR_DECL:
+            generate_var_decl(curr, symtable);
+            return;
+        case VAR_ASSIGNMENT:
+            generate_var_assignment(curr, symtable);
+            return;
+    }
+    return;
+}//generate_statement
 
 
 void generate_code(Arr* input, Tree* symtable){
+    //program start ensures we jump into main function directly
     generate_prolog();
-    //start on main
+
+    //generate all builtin functions
     generate_builtins();
+
+    //generate all user defined functions
     for(int i = 0; i < input->length; i++){
         AST_Node* curr = (AST_Node*)((input->data)[i]);
         generate_function_decl(curr, symtable);
     }
-}
+}//generate_code

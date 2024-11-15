@@ -24,5 +24,6 @@ typedef struct Parser {
 
 void parse(char* input);
 int compile(char* input);
+char* string_to_assembly(const char* string);
 
 #endif
