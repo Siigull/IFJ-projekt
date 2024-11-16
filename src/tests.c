@@ -85,6 +85,6 @@ int main() {
 	// generate_debug_token_arr();
 
 	char* temp = load_inputos("examples/fun.ifj");
-	parse(temp);	
+	compile(temp);	
 	return 0;
 };

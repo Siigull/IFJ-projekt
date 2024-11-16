@@ -19,6 +19,11 @@ AST_Node* func_call();
 AST_Node* stmt();
 Ret_Type get_ret_type();
 
+void parser_reset() {
+    parser->next = NULL;
+    parser->prev = NULL;
+}
+
 Parser* init_parser() {
 	Parser* parser = malloc(sizeof(Parser));
 
@@ -644,22 +649,14 @@ AST_Node* func_decl() {
 	consume(T_FN);
 	consume(T_ID);
 
-	const char* func_name = parser->prev->value;
-	node->as.func_data->var_name = func_name;
+    const char* func_name = parser->prev->value;
+    node->as.func_data->var_name = func_name;
 
-	Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);
-
-	consume(T_RPAR);
-	while (check(T_ID)) {
-		advance();
-		Function_Arg* arg = malloc(sizeof(Function_Arg));
-		arg->arg_name = parser->prev->value;
-
-		consume(T_DDOT);
-
-		consume(T_DTYPE);
-		arg->type = get_ret_type();
-		arr_append(entry->as.function_args, (size_t) arg);
+    consume(T_RPAR);
+    while(check(T_ID)) {
+        advance();
+        consume(T_DDOT);
+        consume(T_DTYPE);
 
 		if (!check(T_COMMA)) {
 			break;
@@ -669,14 +666,10 @@ AST_Node* func_decl() {
 	}
 	consume(T_LPAR);
 
-	if (!check(T_DTYPE) && !check(T_VOID)) {
-		exit(ERR_PARSE);
-	}
-	advance();
-
-	entry->ret_type = get_ret_type();
-
-	tree_insert(parser->s_table, entry);
+    if (!check(T_DTYPE) && !check(T_VOID)) {
+        exit(ERR_PARSE);
+    }
+    advance();
 
 	block(node->as.func_data->arr);
 
@@ -704,102 +697,92 @@ void prolog() {
 	consume(T_SEMI);
 }
 
-void parse(char* orig_input) {
-	size_t len = strlen(orig_input) + 1;
-	char* input = malloc(sizeof(char) * (len + 10));
-	memcpy(input, orig_input, len * sizeof(char));
+void func_head() {
+    consume(T_PUB);
+    consume(T_FN);
+    consume(T_ID);
 
-	lexer = init_lexer(input);
-	parser = init_parser();
+    const char* func_name = parser->prev->value;
+    if(tree_find(parser->s_table, func_name) != NULL) {
+        exit(ERR_SEM_REDEF);
+    }
 
-	// Token token_arr[] = {{T_CONST, "const", 5},{T_ID, "ifj", 3},{T_EQUAL, "=", 1},
-	//                     {T_IMPORT, "@import", 7},{T_RPAR, "(", 1},{T_STRING, "ifj24.zig", 9},
-	//                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_PUB, "pub", 3},
-	//                     {T_FN, "fn", 2},{T_ID, "main", 4},{T_RPAR, "(", 1},
-	//                     {T_LPAR, ")", 1},{T_VOID, "void", 4},{T_CUYRBRACKET, "{", 1},
-	//                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte cislo
-	//                     pro vypocet faktorialu\n", 38}, {T_LPAR, ")", 1},{T_SEMI, ";",
-	//                     1},{T_CONST, "const", 5}, {T_ID, "a", 1},{T_EQUAL, "=", 1},{T_BUILDIN,
-	//                     "ifj.readi32", 11}, {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-	//                     {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "a", 1},
-	//                     {T_LPAR, ")", 1},{T_BAR, "|", 1},{T_ID, "val", 3},
-	//                     {T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},{T_IF, "if", 2},
-	//                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_STHAN, "<", 1},
-	//                     {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
-	//                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Faktorial ",
-	//                     10}, {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-	//                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
-	//                     {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-	//                     {T_STRING, " nelze spocitat\n", 17},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-	//                     {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
-	//                     {T_VAR, "var", 3},{T_ID, "d", 1},{T_DDOT, ":", 1},
-	//                     {T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.i2f", 7},
-	//                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
-	//                     {T_SEMI, ";", 1},{T_VAR, "var", 3},{T_ID, "vysl", 4},
-	//                     {T_DDOT, ":", 1},{T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},
-	//                     {T_F64, "1.0", 3},{T_SEMI, ";", 1},{T_WHILE, "while", 5},
-	//                     {T_RPAR, "(", 1},{T_ID, "d", 1},{T_GTHAN, ">", 1},
-	//                     {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
-	//                     {T_ID, "vysl", 4},{T_EQUAL, "=", 1},{T_ID, "vysl", 4},
-	//                     {T_MUL, "*", 1},{T_ID, "d", 1},{T_SEMI, ";", 1},
-	//                     {T_ID, "d", 1},{T_EQUAL, "=", 1},{T_ID, "d", 1},
-	//                     {T_MINUS, "-", 1},{T_F64, "1.0", 3},{T_SEMI, ";", 1},
-	//                     {T_CUYLBRACKET, "}", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-	//                     {T_STRING, "Vysledek: ", 10},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-	//                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl", 4},
-	//                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-	//                     {T_RPAR, "(", 1},{T_STRING, " = ", 3},{T_LPAR, ")", 1},
-	//                     {T_SEMI, ";", 1},{T_CONST, "const", 5},{T_ID, "vysl_i32", 8},
-	//                     {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.f2i", 7},{T_RPAR, "(", 1},
-	//                     {T_ID, "vysl", 4},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-	//                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl_i32", 8},
-	//                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-	//                     {T_RPAR, "(", 1},{T_STRING, "\n", 2},{T_LPAR, ")", 1},
-	//                     {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
-	//                     {T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},{T_BUILDIN, "ifj.write", 9},
-	//                     {T_RPAR, "(", 1},{T_STRING, "Faktorial pro null nelze spocitat\n",
-	//                     35},{T_LPAR, ")", 1}, {T_SEMI, ";", 1},{T_CUYLBRACKET, "}",
-	//                     1},{T_CUYLBRACKET, "}", 1}, {T_EOF, "0", 0},};
+    Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);
 
-	// Token token_arr[] = {{T_PUB, "pub", 3},       {T_FN, "fn", 2},
-	//                      {T_ID, "main", 4},       {T_RPAR, "(", 1},
-	//                      {T_LPAR, ")", 1},        {T_VOID, "void", 4},
-	//                      {T_CUYRBRACKET, "{", 1}, {T_CONST, "const", 5},
-	//                      {T_ID, "a", 1},          {T_EQUAL, "=", 1},
-	//                      {T_I32, "10", 2},        {T_PLUS, "+", 1},
-	//                      {T_RPAR, "(", 1},        {T_I32, "69", 2},
-	//                      {T_DIV, "/", 1},         {T_I32, "420", 2},
-	//                      {T_LPAR, ")", 1},        {T_SEMI, ";", 1},
-	//                      {T_IF, "if", 2},         {T_RPAR, "(", 1},
-	//                      {T_ID, "a", 1},          {T_LPAR, ")", 1},
-	//                      {T_BAR, "|", 1},         {T_ID, "A", 1},
-	//                      {T_BAR, "|", 1},         {T_CUYRBRACKET, "{", 1},
-	//                      {T_CUYLBRACKET, "}", 1}, {T_CUYLBRACKET, "}", 1},
-	//                      {T_EOF, "\0", 1}};
+    consume(T_RPAR);
+    while(check(T_ID)) {
+        advance();
+        Function_Arg* arg = malloc(sizeof(Function_Arg));
+        arg->arg_name = parser->prev->value;
 
-	// debug_token_array = token_arr;
+        consume(T_DDOT);
 
-	advance();
+        consume(T_DTYPE);
+        arg->type = get_ret_type();
+        arr_append(entry->as.function_args, (size_t)arg);
 
-	prolog();
+        if (!check(T_COMMA)) {
+            break;
+        }
+
+        consume(T_COMMA);
+    }
+    consume(T_LPAR);
+
+    if (!check(T_DTYPE) && !check(T_VOID)) {
+        exit(ERR_PARSE);
+    } 
+    advance();
+
+    entry->ret_type = get_ret_type();
+
+    tree_insert(parser->s_table, entry);
+}
+
+Arr* parse(char* orig_input) {
+    size_t len = strlen(orig_input) + 1;
+    char* input = malloc(sizeof(char) * (len + 10));
+    memcpy(input, orig_input, len * sizeof(char));
+
+    // First pass
+    // Load function heads
+    lexer = init_lexer(input);
+    parser = init_parser();
+
+    advance();
+    while(parser->next->type != T_EOF) {
+        if(parser->next->type == T_PUB) {
+            func_head();
+        }
+        advance();
+    }
+
+
+    // Second pass
+    // Normal parsing
+    lexer = init_lexer(input);
+    parser_reset();
+
+    advance();
+
+    prolog();
 
 	char graph_filename[] = "graph.txt";
 
-	FILE* f = fopen(graph_filename, "w");
-	if (f == NULL)
-		return;
-	fclose(f);
+    FILE* f = fopen(graph_filename, "w");
+    if(f == NULL) return;
+    fclose(f);
 
-	Arr* nodes = arr_init();
-	while (parser->next->type != T_EOF) {
-		AST_Node* node = decl();
-		generate_graph(node, graph_filename);
-		arr_append(nodes, (size_t) node);
-	}
-	generate_code(nodes, parser->s_table);
+    Arr* nodes = arr_init();
+    while(parser->next->type != T_EOF) {
+        AST_Node* node = decl();
+        generate_graph(node, graph_filename);
+        arr_append(nodes, (size_t)node);
+    }
+    generate_code(nodes, parser->s_table);
 }
 
 int compile(char* input) {
-	parse(input);
-	return 0;
+    parse(input);
+    return 0;
 }

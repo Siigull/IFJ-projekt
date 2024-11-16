@@ -1,6 +1,6 @@
 const ifj = @import("ifj24.zig");
 
-pub fn f (x : i32) i32    // seznam parametru
+pub fn f(x : i32) i32    // seznam parametru
 { //deklarace funkce; v IFJ24 nejsou blokove komentare
     if(x<10){return x-1;}else{const y = x - 1; // cannot redefine x (shadowing is forbidden)
       ifj.write("calling g with "); ifj.write(y); ifj.write("\n");
