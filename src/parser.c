@@ -44,7 +44,7 @@ void consume(T_Type type) {
         advance();
 
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 }
 
@@ -62,7 +62,7 @@ int parse_escape(const char* in, char* out) {
         sscanf(in + 2, "%2x", &x);
 
     } else {
-        exit(ERR_LEX);
+        ERROR_RET(ERR_LEX);
     }
 
     return x;
@@ -77,7 +77,7 @@ char* parse_string_value(const char* string) {
             switch(string[i+1]) {
                 case 'x':
                     if(i+3 >= len) {
-                        exit(ERR_LEX);
+                        ERROR_RET(ERR_LEX);
                     }
                     break;
                 case 'n':
@@ -91,7 +91,7 @@ char* parse_string_value(const char* string) {
                     i++;
                     break;
                 default:
-                    exit(ERR_LEX);
+                    ERROR_RET(ERR_LEX);
                     break;
             }
         }
@@ -267,7 +267,7 @@ AST_Node* literal() {
         node->as.i32 = strtol(parser->prev->value, &end, 10);
         if(errno == ERANGE || *end != '\0' || 
            node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
-            exit(ERR_SEM_OTHER);
+            ERROR_RET(ERR_SEM_OTHER);
         }
         return node;
 
@@ -278,7 +278,7 @@ AST_Node* literal() {
         AST_Node* node = node_init(F64);
         node->as.f64 = strtof(parser->prev->value, &end);
         if(errno == ERANGE || *end != '\0') {
-            exit(ERR_SEM_OTHER);
+            ERROR_RET(ERR_SEM_OTHER);
         }
         return node;
     
@@ -299,7 +299,7 @@ AST_Node* literal() {
         return node;
 
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 }
 
@@ -446,7 +446,7 @@ AST_Node* _while() {
         node->left = expr();
 
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_LPAR);
@@ -475,7 +475,7 @@ AST_Node* _if() {
     if (!check(T_LPAR)) {
         node->left = expr();
     } else {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
 
     consume(T_LPAR);
@@ -527,7 +527,7 @@ AST_Node* var_decl() {
                               ret_type, can_mut);
 
     if(tree_find(parser->s_table, node->as.var_name) != NULL) {
-        exit(ERR_SEM_NOT_DEF_FNC_VAR);
+        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
     }
     tree_insert(parser->s_table, entry);
 
@@ -611,7 +611,7 @@ AST_Node* stmt() {
                 return node;
 
             } else {
-                exit(ERR_PARSE);
+                ERROR_RET(ERR_PARSE);
             }
 
         case T_BUILDIN:
@@ -629,7 +629,7 @@ AST_Node* stmt() {
 
         default:
             // TODO(Sigull) Add error message
-            exit(ERR_PARSE);
+            ERROR_RET(ERR_PARSE);
     }
 }
 
@@ -644,7 +644,7 @@ Ret_Type get_ret_type() {
         return R_U8;
     }
 
-    exit(ERR_SEM_RET_TYPE_DISCARD);
+    ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
 }
 
 AST_Node* func_decl() {
@@ -679,7 +679,7 @@ AST_Node* func_decl() {
     consume(T_LPAR);
 
     if (!check(T_DTYPE) && !check(T_VOID)) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     } 
     advance();
 
