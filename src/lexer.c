@@ -47,14 +47,16 @@ bool is_whitespace(char c) {
 
 void lexer_skip_whitespace(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	if (c == '/' && lexer->input[lexer->idr + 1] == '/') {
+	while (c == '/' && lexer->input[lexer->idr + 1] == '/') {
 		lexer_skip_line(lexer);
+		c = lexer->input[lexer->idr];
 	}
 	while (is_whitespace(c)) {
 		lexer_advance(lexer);
 		c = lexer->input[lexer->idr];
-		if (c == '/' && lexer->input[lexer->idr + 1] == '/') {
+		while (c == '/' && lexer->input[lexer->idr + 1] == '/') {
 			lexer_skip_line(lexer);
+			c = lexer->input[lexer->idr];
 		}
 		c = lexer->input[lexer->idr];
 	}
@@ -274,6 +276,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 						   last_newline != -1) {
 
 					memmove(value + last_newline + 1, value + i + 2, len - (i + 1));
+					i = last_newline;
 					last_newline = -1;
 				}
 			}

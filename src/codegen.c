@@ -243,6 +243,7 @@ void eval_condition(AST_Node* curr, Tree* symtable){
         case STRING:
         case I32:
         case F64:
+        case ID:
             fprintf(stdout, "\tEQ GF@*expression*result LF@%s nil@nil\n", curr->as.var_name);
             fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
             break;
