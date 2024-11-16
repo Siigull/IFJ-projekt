@@ -12,6 +12,8 @@ AST_Node* node_init(AST_Type type) {
     AST_Node* node = malloc(sizeof(AST_Node));
 
     node->type = type;
+    node->left = NULL;
+    node->right = NULL;
 
     switch(type) {
         case FUNCTION_DECL:

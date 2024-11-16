@@ -201,19 +201,31 @@ void eval_exp(AST_Node* curr, Tree* symtable){
     else if(curr->type == ID){
         fprintf(stdout, "\tPUSHS LF@%s\n", curr->as.var_name);
     }
+    //else if(curr->type == NUL){
+    //    fprintf(stdout, "\tPUSHS nil@nil\n");
+    //}
     //todo
     return;
 }
 
+bool is_relation_op(AST_Type type){
+    if(type == ISEQ || type == ISNEQ || type == ISLESS || type == ISMORE || type == ISLESSEQ || type == ISMOREEQ) 
+        return true;
+
+    return false;
+}
+
 //condition structure - root is relation operator, left and right children are classic expressions
 void eval_condition(AST_Node* curr, Tree* symtable){
-    if(curr->left != NULL){
-        generate_expression(curr->left, symtable);
-        fprintf(stdout, "\tMOVE GF@*lhs GF@*expression*result\n");
-    }
-    if(curr->right != NULL){
-        generate_expression(curr->right, symtable);
-        fprintf(stdout, "\tMOVE GF@*rhs GF@*expression*result\n");
+    if(is_relation_op(curr->type)){
+        if(curr->left != NULL){
+            generate_expression(curr->left, symtable);
+            fprintf(stdout, "\tMOVE GF@*lhs GF@*expression*result\n");
+        }
+        if(curr->right != NULL){
+            generate_expression(curr->right, symtable);
+            fprintf(stdout, "\tMOVE GF@*rhs GF@*expression*result\n");
+        }
     }
 
     switch(curr->type){
