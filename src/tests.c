@@ -35,7 +35,7 @@ char* load_inputos(const char* filepath) {
 }
 
 void generate_debug_token_arr() {
-	FILE* f = fopen("src/input8.1.ifj", "r");
+	FILE* f = fopen("src/example_multiline.ifj", "r");
 	if(f == NULL) {
 		return;
 	}
@@ -82,9 +82,9 @@ int main() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	// generate_debug_token_arr();
+	generate_debug_token_arr();
 
-	char* temp = load_inputos("src/input8.2.ifj");
-	parse(temp);	
+	// char* temp = load_inputos("src/input8.2.ifj");
+	// parse(temp);	
 	return 0;
 };

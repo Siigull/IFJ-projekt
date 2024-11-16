@@ -274,6 +274,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 						   last_newline != -1) {
 
 					memmove(value + last_newline + 1, value + i + 2, len - (i + 1));
+					i = last_newline;
 					last_newline = -1;
 				}
 			}
