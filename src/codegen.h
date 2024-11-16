@@ -12,8 +12,9 @@
 #include "ast.h"
 #include "bvs.h"
 
-#define PROG_START ".IFJcode24\nDEFVAR GF@*expression*result\nDEFVAR GF@*return*val\nJUMP main\n\n"
-#define CONDITION_VARS "DEFVAR GF@*rhs\n DEFVAR GF@*lhs\n DEFVAR GF@*tmp*res\n\n"
+#define PROG_START ".IFJcode24\nDEFVAR GF@*expression*result\n\
+DEFVAR GF@*return*val\nDEFVAR GF@*rhs\nDEFVAR GF@*lhs\n\
+DEFVAR GF@*tmp*res\n\n\nJUMP main\n\n"
 #define PROG_END "\tPOPFRAME\n\tEXIT int@0\n\n"
 
 
@@ -129,7 +130,7 @@ void generate_expression(AST_Node* curr, Tree* symtable);
  * @param stmt_index number of statement the if is (index in the function statement array)
  * @param nest level of nesting of if statement
  */
-void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest);
+void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop);
 
 
 
@@ -171,7 +172,7 @@ void generate_return(AST_Node* curr, Tree* symtable);
  * @param stmt_index number of statement the loop is (index in the function statement array)
  * @param nest level of nesting of if statement
  */
-void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest);
+void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop);
 
 
 
@@ -238,7 +239,7 @@ void generate_var_assignment(AST_Node* curr, Tree* symtable);
  * @param stmt_index number of statement from array of statements in function data
  * @param nest level of nested loop or if statement
  */
-void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest);
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop);
 
 
 
