@@ -209,8 +209,10 @@ int find_precedence_index(List* list) {
 	while (1) // THIS CAN BE DONE BETTER
 	{
 		List_get_val(list, &current);
-		if ((current->type == T_ID && current->isProcessed == false) ||
-			(current->type == T_I32 && current->isProcessed == false) || current->type == T_F64) {
+		if (((current->type == T_ID && current->isProcessed == false) ||
+			 (current->type == T_I32 && current->isProcessed == false) || current->type == T_F64 ||
+			 current->type == T_ID || current->type == T_STRING) &&
+			current->isProcessed == false) {
 			return 0;
 		} else if (current->type == T_PLUS) {
 			return 1;
@@ -251,9 +253,6 @@ void handle_rule(int rule, List* Stack) {
 		AST_Type nodetype = get_type(processed_token->type);
 		AST_Node* node = node_init(nodetype);
 		// here we should add value to the nodes
-		if (nodetype == ID || nodetype == I32) {
-			node->as.var_name = processed_token->value;
-		}
 		processed_token->isProcessed = true;
 		processed_token->node = node;
 		// now the token is prepared to be pushed as an E symbol (isProcessed)
@@ -264,6 +263,8 @@ void handle_rule(int rule, List* Stack) {
 			node->as.f64 = strtof(processed_token->value, &end);
 		} else if (processed_token == T_ID) {
 			node->as.var_name = processed_token->value;
+		} else if (processed_token == T_STRING) {
+			node->as.string = processed_token->value;
 		}
 
 		adjust_stack_rule_E_ID(Stack, processed_token);
