@@ -23,11 +23,11 @@ void sem_function_decl(AST_Node* node) {
     }
 
     if (node->as.func_data->arr) {
-        for (int i = 0; i < node->as.func_data->arr->length; i++) {
-            Function_Arg* current = node->as.func_data->arr->data[i];
+        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
+            Function_Arg* current = (Function_Arg*)node->as.func_data->arr->data[i];
 
-            for (int j = i + 1; j < node->as.func_data->arr->length; j++) {
-                Function_Arg* next = node->as.func_data->arr->data[j];
+            for (size_t j = i + 1; j < node->as.func_data->arr->length; j++) {
+                Function_Arg* next = (Function_Arg*)node->as.func_data->arr->data[j];
 
                 if (!strcmp(current->arg_name, next->arg_name)) {
                     exit(ERR_SEM_PARAMS);
@@ -37,8 +37,8 @@ void sem_function_decl(AST_Node* node) {
     }
 
     if (node->as.func_data->arr) {
-        for (int i = 0; i < node->as.func_data->arr->length; i++) {
-            check_node(node->as.func_data->arr->data[i]);
+        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
+            check_node((AST_Node*)node->as.func_data->arr->data[i]);
         }
     }
 
@@ -62,15 +62,15 @@ void sem_validate_return(AST_Node* node, Ret_Type expected_type) {
 
     // check statements in nested blocks
     if (node->as.arr) {
-        for (int i = 0; i < node->as.arr->length; i++) {
-            AST_Node* child = node->as.arr->data[i];
+        for (size_t i = 0; i < node->as.arr->length; i++) {
+            AST_Node* child = (AST_Node*)node->as.arr->data[i];
             sem_validate_return(child, expected_type);
         }
     }
 
     // check both branches for if statements
-    if (node->left) validate_returns(node->left, expected_type);
-    if (node->right) validate_returns(node->right, expected_type);
+    if (node->left) sem_validate_return(node->left, expected_type);
+    if (node->right) sem_validate_return(node->right, expected_type);
 }
 
 void sem_var_decl(AST_Node* node) {
