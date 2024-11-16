@@ -137,6 +137,10 @@ AST_Type get_type(T_Type type) {
 		return F64;
 	case T_STRING:
 		return STRING;
+	case T_ID:
+		return ID;
+	case T_NULL:
+		return NUL;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;
@@ -195,7 +199,7 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 }
 
 bool is_id(T_Type type) {
-	if (type == T_ID || type == T_F64 || type == T_I32) {
+	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING) {
 		return true;
 	}
 	return false;
@@ -211,7 +215,7 @@ int find_precedence_index(List* list) {
 		List_get_val(list, &current);
 		if (((current->type == T_ID && current->isProcessed == false) ||
 			 (current->type == T_I32 && current->isProcessed == false) || current->type == T_F64 ||
-			 current->type == T_ID || current->type == T_STRING) &&
+			 current->type == T_ID || current->type == T_STRING || current->type == T_NULL) &&
 			current->isProcessed == false) {
 			return 0;
 		} else if (current->type == T_PLUS) {
@@ -257,13 +261,13 @@ void handle_rule(int rule, List* Stack) {
 		processed_token->node = node;
 		// now the token is prepared to be pushed as an E symbol (isProcessed)
 		char* end;
-		if (processed_token == T_I32) {
+		if (processed_token->type == T_I32) {
 			node->as.i32 = strtol(processed_token->value, &end, 10);
-		} else if (processed_token == T_F64) {
+		} else if (processed_token->type == T_F64) {
 			node->as.f64 = strtof(processed_token->value, &end);
-		} else if (processed_token == T_ID) {
+		} else if (processed_token->type == T_ID) {
 			node->as.var_name = processed_token->value;
-		} else if (processed_token == T_STRING) {
+		} else if (processed_token->type == T_STRING) {
 			node->as.string = processed_token->value;
 		}
 
