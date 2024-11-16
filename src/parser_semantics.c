@@ -45,6 +45,33 @@ void sem_function_decl(AST_Node* node) {
     sem_validate_return(node, node->as.expr_type);
 }
 
+void sem_var_decl(AST_Node* node) {
+    check_node(node->left);
+
+    Ret_Type declared_type = node->as.expr_type;
+    Ret_Type expression_type = node->left->as.expr_type;
+
+    if (declared_type != expression_type) {
+        if (declared_type == IMPLICIT) {
+            declared_type = expression_type;
+        } else {
+            exit(ERR_SEM_TYPE_CONTROL);
+        }
+    }
+}
+
+void sem_var_assignment(AST_Node* node) {
+    //TODO(Sigull) todo
+}
+
+void sem_else(AST_Node* node) {
+    //TODO(Sigull) todo
+}
+
+void sem_nnull_var_decl(AST_Node* node) {
+    //TODO(Sigull) todo
+}
+
 void sem_validate_return(AST_Node* node, Ret_Type expected_type) {
     if (node->type == RETURN) {
         // has return value
@@ -72,27 +99,6 @@ void sem_validate_return(AST_Node* node, Ret_Type expected_type) {
     if (node->left) sem_validate_return(node->left, expected_type);
     if (node->right) sem_validate_return(node->right, expected_type);
 }
-
-void sem_var_decl(AST_Node* node) {
-    //TODO(Sigull) todo
-}
-
-void sem_var_assignment(AST_Node* node) {
-    //TODO(Sigull) todo
-}
-
-void sem_else(AST_Node* node) {
-    //TODO(Sigull) todo
-}
-
-void sem_nnull_var_decl(AST_Node* node) {
-    //TODO(Sigull) todo
-}
-
-void sem_return(AST_Node* node) {
-    check_node(node->left);
-}
-
 
 void sem_if (AST_Node* node) {
     check_node(node->left);
@@ -124,7 +130,7 @@ void check_node(AST_Node* node) {
         case VAR_ASSIGNMENT: sem_var_assignment(node); break;
         case ELSE:           sem_else(node); break;
         case NNULL_VAR_DECL: sem_nnull_var_decl(node); break;
-        case RETURN:         sem_return(node); break;
+        case RETURN:         sem_validate_return(node, node->as.expr_type); break;
         
         default:             printf("Unknown node type!\n"); break;
     }
