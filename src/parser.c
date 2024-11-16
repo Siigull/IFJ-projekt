@@ -527,7 +527,7 @@ AST_Node* var_decl() {
                               ret_type, can_mut);
 
     if(tree_find(parser->s_table, node->as.var_name) != NULL) {
-        exit(ERR_SEM_NOT_DEF_FNC_VAR);
+        exit(ERR_SEM_REDEF);
     }
     tree_insert(parser->s_table, entry);
 
