@@ -241,8 +241,11 @@ void eval_condition(AST_Node* curr, Tree* symtable){
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
             break;
         case STRING:
-            fprintf(stdout, "\tEQ GF@*expression*result LF%s nil@nil\n", curr->as.var_name);
+        case I32:
+        case F64:
+            fprintf(stdout, "\tEQ GF@*expression*result LF@%s nil@nil\n", curr->as.var_name);
             fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
+            break;
     }
     //todo
     return;
@@ -270,7 +273,7 @@ void predefine_vars(AST_Node* curr, Tree* symtable){
         }
         if(curr->type == IF){
             predefine_vars(curr, symtable);
-            predefine_vars(curr->left, symtable);
+            predefine_vars(curr->right, symtable); //else part
         }
     }
 }
@@ -288,7 +291,7 @@ void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int st
 void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop){
     if(!inside_if_loop){
         predefine_vars(curr, symtable);
-        predefine_vars(curr->left, symtable);
+        predefine_vars(curr->right, symtable);
     }
     eval_condition(curr->left, symtable);
     // condition is false if evaluated expression is 0
@@ -402,7 +405,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     for(int i = 0; i < args->length; i++){
         Function_Arg* argument = (Function_Arg*)((args->data)[i]);
         fprintf(stdout, "\tDEFVAR LF@%s\n", argument->arg_name); 
-        fprintf(stdout, "\tMOVE LF@%s LF@%s*param\n", argument->arg_name, argument->arg_name);
+        fprintf(stdout, "\tMOVE LF@%s LF@*param%d\n", argument->arg_name, i);
     }
 
     // statements in as->func_data as an array
