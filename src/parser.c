@@ -187,7 +187,8 @@ AST_Node* string() {
          advance();
          if(check(T_RPAR)) {
              AST_Node* node = func_call();
-             return node;
+             token->node = node;
+			 token->type = T_BUILDIN;
          }
 
      } else if (check(T_STRING)) {
@@ -210,7 +211,7 @@ AST_Node* string() {
 	} else if(check(T_BUILDIN)){
 		advance();
 		AST_Node* node = func_call();
-		return node;
+		token->node = node;
 
      } else {
          ERROR_RET(ERR_PARSE);
