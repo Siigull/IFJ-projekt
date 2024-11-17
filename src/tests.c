@@ -1,7 +1,7 @@
-#include <stdbool.h>
-#include <stdio.h>
 #include "lexer.h"
 #include "parser.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 void test_input(char* input, char* expected_result) {
 	// while token blbllalblbal, compare two strings
@@ -18,38 +18,41 @@ void test_input(char* input, char* expected_result) {
 char* load_inputos(const char* filepath) {
 	char* input;
 	FILE* f = fopen(filepath, "r");
-	if(f == NULL) return input;
+	if (f == NULL)
+		return input;
 
 	char temp;
 	int len = 0;
-	while(fscanf(f, "%c", &temp) == 1) {
+	while (fscanf(f, "%c", &temp) == 1) {
 		len++;
 	}
 	rewind(f);
 
-	input = calloc(len + 10,sizeof(char));
+	input = calloc(len + 10, sizeof(char));
 
-	for(int i=0; fscanf(f, "%c", input + i) == 1; i++);
+	for (int i = 0; fscanf(f, "%c", input + i) == 1; i++)
+		;
 
 	return input;
 }
 
 void generate_debug_token_arr() {
 	FILE* f = fopen("src/example_multiline.ifj", "r");
-	if(f == NULL) {
+	if (f == NULL) {
 		return;
 	}
 
 	char temp;
 	int len = 0;
-	while(fscanf(f, "%c", &temp) == 1) {
+	while (fscanf(f, "%c", &temp) == 1) {
 		len++;
 	}
 	rewind(f);
 
-	char* input = calloc(len + 10,sizeof(char));
+	char* input = calloc(len + 10, sizeof(char));
 
-	for(int i=0; fscanf(f, "%c", input + i) == 1; i++);
+	for (int i = 0; fscanf(f, "%c", input + i) == 1; i++)
+		;
 
 	Lexer* lexer = init_lexer(input);
 
@@ -62,16 +65,17 @@ void generate_debug_token_arr() {
 		FILE* placeholder_file;
 
 		char* val = print_token(token, placeholder_file, true);
-		printf("{%s, \"%s\", %d},", print_token(token, placeholder_file, true), 
-									token->value, 
-									token->length);
+		printf("{%s, \"%s\", %d},",
+			   print_token(token, placeholder_file, true),
+			   token->value,
+			   token->length);
 
-		if(count % 3 == 0) {
+		if (count % 3 == 0) {
 			printf("\n");
 		}
-		
+
 		count++;
-	} while(token->type != T_EOF);
+	} while (token->type != T_EOF);
 
 	printf("}\n");
 }
@@ -84,7 +88,7 @@ int main() {
 
 	// generate_debug_token_arr();
 
-	char* temp = load_inputos("examples/fun.ifj");
-	compile(temp);	
+	char* temp = load_inputos("examples/funexp.ifj");
+	compile(temp);
 	return 0;
 };
