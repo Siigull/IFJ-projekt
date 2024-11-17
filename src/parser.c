@@ -178,68 +178,74 @@ AST_Node* string() {
 	return node;
 }
 
-AST_Node* literal_load(List* tl) {
-	Token* token = malloc(sizeof(Token));
-	memcpy(token, parser->next, sizeof(Token));
-	List_insertF(tl, token);
+ AST_Node* literal_load(List* tl) {
+     Token* token = malloc(sizeof(Token));
+     memcpy(token, parser->next, sizeof(Token));
+     List_insertF(tl, token);
 
-	if (check(T_ID)) {
-		advance();
-		if (check(T_RPAR)) {
-			AST_Node* node = func_call();
-			return node;
-		}
-	} else if (check(T_STRING)) {
-		advance();
-		AST_Node* node = string();
-		return node;
-	} else if (check(T_I32) || check(T_F64) || check(T_U8) || check(T_NULL)) {
-		advance();
-	} else if (check(T_RPAR)) {
-		advance();
-		binary_load(tl);
-		consume(T_LPAR);
-		Token* token = malloc(sizeof(Token));
-		memcpy(token, parser->prev, sizeof(Token));
-		List_insertF(tl, token);
-	} else if (check(T_BUILDIN)) {
-		advance();
-		AST_Node* node = func_call();
-		return node;
-	} else {
-		exit(ERR_PARSE);
-	}
+     if (check(T_ID)) {
+         advance();
+         if(check(T_RPAR)) {
+             AST_Node* node = func_call();
+             return node;
+         }
 
-	return NULL;
-}
+     } else if (check(T_STRING)) {
+         advance();
+         AST_Node* node = string();
+         return node;
+
+     } else if (check(T_I32) || check(T_F64) || 
+                check(T_U8)  || check(T_NULL)) {
+        advance();
+
+   } else if (check(T_RPAR)) {
+       advance();
+        binary_load(tl);
+        consume(T_LPAR);
+         Token* token = malloc(sizeof(Token));
+         memcpy(token, parser->prev, sizeof(Token));
+        List_insertF(tl, token);
+
+    } else if(check(T_BUILDIN)){
+         advance();
+         AST_Node* node = func_call();
+         return node;
+
+     } else {
+         ERROR_RET(ERR_PARSE);
+     }
+
+     return NULL;
+ }
 
 bool check_operator() {
-	T_Type operator_types[10] =
-		{T_PLUS, T_MINUS, T_MUL, T_DIV, T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
-	int len = sizeof(operator_types) / sizeof(T_Type);
-	for (int i = 0; i < len; i++) {
-		if (check(operator_types[i])) {
-			return true;
-		}
-	}
-	return false;
-}
+    T_Type operator_types[10] = {T_PLUS, T_MINUS, T_MUL, T_DIV, T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+    int len = sizeof(operator_types) / sizeof(T_Type);
+     for (int i=0; i < len; i++) {
+         if (check(operator_types[i])){
+             return true;
+         }
+     }
+    
+     return false;
+ }
 
-AST_Node* binary_load(List* tl) {
-	AST_Node* node = literal_load(tl);
-	if (node != NULL) {
-		return node;
-	}
+ AST_Node* binary_load(List* tl) {
+     AST_Node* node = literal_load(tl);
+     if (node != NULL) {
+        return node;
+     }
 
-	while (check_operator()) {
-		advance();
-		Token* token = malloc(sizeof(Token));
-		memcpy(token, parser->prev, sizeof(Token));
-		List_insertF(tl, token);
-		literal_load(tl);
-	}
+     while(check_operator()) {
+         advance();
+         Token* token = malloc(sizeof(Token));
+         memcpy(token, parser->prev, sizeof(Token));
+         List_insertF(tl, token);
+         literal_load(tl);
+     }
 
-	return NULL;
+     return NULL;
 }
 
 AST_Node* literal() {
@@ -391,27 +397,16 @@ AST_Node* binary() {
 
 // Expression parser
 AST_Node* expr() {
-	List* token_list = malloc(sizeof(List));
-	List_init(token_list);
+    /* List* token_list = malloc(sizeof(List));
+     List_init(token_list);
 
-	AST_Node* node = binary_load(token_list);
-	if (node == NULL) {
-		List_activeF(token_list);
-		while (List_is_active(token_list)) {
-			Token* temp;
-			List_get_val(token_list, &temp);
-			print_token(temp, stdout, false);
-			printf(" ");
-			List_active_next(token_list);
-		}
+     AST_Node* node = binary_load(token_list);
+     if (node == NULL) {
+        node = parse_expression(token_list);
+    } 
 
-		node = parse_expression(token_list);
-		printf("\n");
-	}
-
-	return node;
-
-	// return binary();
+    return node;*/
+    return binary();
 }
 
 // Normal parser
@@ -537,10 +532,10 @@ AST_Node* var_decl() {
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
 
-    if(tree_find(parser->s_table, node->as.var_name) != NULL) {
-        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
-    }
-    tree_insert(parser->s_table, entry);
+	if (tree_find(parser->s_table, node->as.var_name) != NULL) {
+		ERROR_RET(ERR_SEM_REDEF);
+	}
+	tree_insert(parser->s_table, entry);
 
 	consume(T_EQUAL);
 	node->left = expr();
@@ -638,7 +633,7 @@ AST_Node* stmt() {
 		return _return();
 
 	case T_WHILE:
-		return _while();
+		return _while();	
 
         default:
             // TODO(Sigull) Add error message
@@ -684,7 +679,7 @@ AST_Node* func_decl() {
 	consume(T_LPAR);
 
     if (!check(T_DTYPE) && !check(T_VOID)) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     }
     advance();
 
@@ -721,7 +716,7 @@ void func_head() {
 
     const char* func_name = parser->prev->value;
     if(tree_find(parser->s_table, func_name) != NULL) {
-        exit(ERR_SEM_REDEF);
+        ERROR_RET(ERR_SEM_REDEF);
     }
 
     Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);

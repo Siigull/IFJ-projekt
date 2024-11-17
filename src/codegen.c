@@ -201,19 +201,30 @@ void eval_exp(AST_Node* curr, Tree* symtable){
     else if(curr->type == ID){
         fprintf(stdout, "\tPUSHS LF@%s\n", curr->as.var_name);
     }
-    //todo
+    else if(curr->type == NUL){
+        fprintf(stdout, "\tPUSHS nil@nil\n");
+    }
     return;
+}
+
+bool is_relation_op(AST_Type type){
+    if(type == ISEQ || type == ISNEQ || type == ISLESS || type == ISMORE || type == ISLESSEQ || type == ISMOREEQ) 
+        return true;
+
+    return false;
 }
 
 //condition structure - root is relation operator, left and right children are classic expressions
 void eval_condition(AST_Node* curr, Tree* symtable){
-    if(curr->left != NULL){
-        generate_expression(curr->left, symtable);
-        fprintf(stdout, "\tMOVE GF@*lhs GF@*expression*result\n");
-    }
-    if(curr->right != NULL){
-        generate_expression(curr->right, symtable);
-        fprintf(stdout, "\tMOVE GF@*rhs GF@*expression*result\n");
+    if(is_relation_op(curr->type)){
+        if(curr->left != NULL){
+            generate_expression(curr->left, symtable);
+            fprintf(stdout, "\tMOVE GF@*lhs GF@*expression*result\n");
+        }
+        if(curr->right != NULL){
+            generate_expression(curr->right, symtable);
+            fprintf(stdout, "\tMOVE GF@*rhs GF@*expression*result\n");
+        }
     }
 
     switch(curr->type){
@@ -232,12 +243,12 @@ void eval_condition(AST_Node* curr, Tree* symtable){
             break;
         case ISLESSEQ:
             fprintf(stdout, "\tLT GF@*tmp*res GF@*lhs GF@*rhs\n");
-            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF*rhs\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
             break;
         case ISMOREEQ:
             fprintf(stdout, "\tGT GF@*tmp*res GF@*lhs GF@*rhs\n");
-            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF*rhs\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
             break;
         case STRING:
@@ -382,7 +393,9 @@ void generate_var_decl(AST_Node* curr, Tree* symtable){
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
     //based on evaluated expression, save its value into the variable
     generate_expression(curr->left, symtable);
-    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
+    if(strcmp(curr->as.var_name, "_")){
+        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
+    }
 }//generate_var_assignment
 
 
