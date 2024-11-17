@@ -1,0 +1,29 @@
+const ifj = @import("ifj24.zig");
+
+// Main function
+pub fn main() void {
+    var str1: []u8 = ifj.readstr();  // Read first string
+    var str2: []u8 = ifj.readstr();  // Read second string
+
+    var comparison: i32 = ifj.strcmp(str1, str2);  // Compare strings
+
+    ifj.write("String 1: ");
+    ifj.write(str1);
+    ifj.write("\n");
+
+    ifj.write("String 2: ");
+    ifj.write(str2);
+    ifj.write("\n");
+
+    if (comparison == 0) {
+        ifj.write("Strings are equal\n");
+    } 
+    else{ 
+        if(comparison == 0 - 1) {
+            ifj.write("String 1 is lexicographically smaller\n");
+        } 
+        else {
+            ifj.write("String 1 is lexicographically larger\n");
+        }
+    }
+}

@@ -4,13 +4,13 @@ const ifj = @import("ifj24.zig");
 pub fn main() void {
     ifj.write("Zadejte cislo pro vypocet faktorialu\n");
     const a = ifj.readi32();
-    if (a) |val| {
-        if (val < 0) {
-            ifj.write("Faktorial "); ifj.write(val);
+    if (a) {
+        if (a < 0) {
+            ifj.write("Faktorial "); ifj.write(a);
             ifj.write(" nelze spocitat\n");
             
         } else {
-            var d: f64 = ifj.i2f(val);
+            var d: f64 = ifj.i2f(a);
             var vysl: f64 = 1.0;
             while (d > 0) {
                 vysl = vysl * d;
