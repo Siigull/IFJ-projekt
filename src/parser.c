@@ -498,7 +498,7 @@ AST_Node* _if() {
 }
 
 AST_Node* under_var_decl() {
-	AST_Node* node = node_init(VAR_DECL);
+	AST_Node* node = node_init(VAR_ASSIGNMENT);
 
 	consume(T_UNDER);
 	node->as.var_name = parser->prev->value;
