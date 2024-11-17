@@ -79,7 +79,21 @@ Ret_Type sem_else(AST_Node* node) {
 }
 
 Ret_Type sem_nnull_var_decl(AST_Node* node) {
-    //TODO(Sigull) todo
+    if (!node->left) {
+        ERROR_RET(ERR_SEM_OTHER);
+    }
+
+    Ret_Type type = check_node(node->left);
+
+    if (!is_nullable(type)) {
+        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    }
+
+    Entry* new_entry = entry_init(node->as.var_name, E_VAR, type, false);
+    tree_insert(parser->s_table, new_entry);
+
+    node->as.expr_type = type;
+    return -1; 
 }
 
 Ret_Type sem_return(AST_Node* node) {

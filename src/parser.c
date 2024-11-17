@@ -462,6 +462,7 @@ AST_Node* _while() {
 
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
+		var->as.var_name = parser->prev->value;
 		arr_append(node->as.arr, (size_t) var);
 
 		consume(T_BAR);
