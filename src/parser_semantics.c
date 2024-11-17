@@ -1,3 +1,13 @@
+/**
+ * @file parser_semantics.c
+ * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
+ * @brief Implementation of IFJ24 semantic analysis
+ * 
+ * @date 2024-11-17
+ * 
+ */
+
+
 #include "parser_semantics.h"
 #include "parser.h"
 
