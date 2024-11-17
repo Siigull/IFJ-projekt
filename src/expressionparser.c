@@ -1,5 +1,6 @@
 #include "expressionparser.h"
-
+#include <errno.h>
+#include <limits.h>
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
 	//    id   +   -   *   /   (   )   $   ==  !=  <   >   <=  >=
@@ -218,7 +219,7 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 bool is_id(T_Type type) {
 	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING || type == T_DDEQ ||
 		type == T_NEQUAL || type == T_GTHAN || type == T_GETHAN || type == T_SETHAN ||
-		type == T_STHAN) {
+		type == T_STHAN || type == T_BUILDIN) {
 		return true;
 	}
 	return false;
@@ -234,7 +235,8 @@ int find_precedence_index(List* list) {
 		List_get_val(list, &current);
 		if (((current->type == T_ID && current->isProcessed == false) ||
 			 (current->type == T_I32 && current->isProcessed == false) || current->type == T_F64 ||
-			 current->type == T_ID || current->type == T_STRING || current->type == T_NULL) &&
+			 current->type == T_ID || current->type == T_STRING || current->type == T_NULL ||
+			 current->type == T_BUILDIN) &&
 			current->isProcessed == false) {
 			return 0;
 		} else if (current->type == T_PLUS) {
@@ -285,6 +287,11 @@ void handle_rule(int rule, List* Stack) {
 	if (rule == E_ID) {
 		// <i
 		Token* processed_token = Stack->last->token;
+		if (processed_token->type == T_BUILDIN) {
+			// TODOVACKO
+			processed_token->isProcessed = true;
+			return;
+		}
 		AST_Type nodetype = get_type(processed_token->type);
 		AST_Node* node = node_init(nodetype);
 		// here we should add value to the nodes
@@ -301,6 +308,12 @@ void handle_rule(int rule, List* Stack) {
 		} else if (processed_token->type == T_STRING) {
 			node->as.string = processed_token->value;
 		}
+		int errno;
+		// todo
+		if (errno == ERANGE || *end != '\0' || node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
+			ERROR_RET(ERR_SEM_OTHER);
+		}
+		return node;
 
 		adjust_stack_rule_E_ID(Stack, processed_token);
 	} else if (rule == E_E) {
