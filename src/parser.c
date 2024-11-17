@@ -199,18 +199,18 @@ AST_Node* string() {
                 check(T_U8)  || check(T_NULL)) {
         advance();
 
-   } else if (check(T_RPAR)) {
-       advance();
-        binary_load(tl);
-        consume(T_LPAR);
-         Token* token = malloc(sizeof(Token));
-         memcpy(token, parser->prev, sizeof(Token));
-        List_insertF(tl, token);
+	} else if (check(T_RPAR)) {
+		advance();
+		binary_load(tl);
+		consume(T_LPAR);
+		Token* token = malloc(sizeof(Token));
+		memcpy(token, parser->prev, sizeof(Token));
+		List_insertF(tl, token);
 
-    } else if(check(T_BUILDIN)){
-         advance();
-         AST_Node* node = func_call();
-         return node;
+	} else if(check(T_BUILDIN)){
+		advance();
+		AST_Node* node = func_call();
+		return node;
 
      } else {
          ERROR_RET(ERR_PARSE);
@@ -397,15 +397,26 @@ AST_Node* binary() {
 
 // Expression parser
 AST_Node* expr() {
-    /* List* token_list = malloc(sizeof(List));
-     List_init(token_list);
+List* token_list = malloc(sizeof(List));
+	// List_init(token_list);
 
-     AST_Node* node = binary_load(token_list);
-     if (node == NULL) {
-        node = parse_expression(token_list);
-    } 
+	// AST_Node* node = binary_load(token_list);
+	// if (node == NULL) {
+	// 	List_activeF(token_list);
+	// 	while (List_is_active(token_list)) {
+	// 		Token* temp;
+	// 		List_get_val(token_list, &temp);
+	// 		print_token(temp, stdout, false);
+	// 		printf(" ");
+	// 		List_active_next(token_list);
+	// 	}
 
-    return node;*/
+	// 	node = parse_expression(token_list);
+	// 	printf("\n");
+	// }
+
+	// return node;
+
     return binary();
 }
 
