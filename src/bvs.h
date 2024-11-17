@@ -22,8 +22,11 @@ typedef enum {
 typedef enum {
 	R_VOID,
 	R_I32,
+	N_I32,
 	R_F64,
+	N_F64,
 	R_U8,
+	N_U8,
 	IMPLICIT,
 } Ret_Type;
 
@@ -58,6 +61,16 @@ typedef struct Tree {
 	Node* root;
 } Tree;
 
+typedef struct Context {
+
+} Context;
+
+typedef struct Context_Stack {
+	int cur_nest;
+	int max_nest;
+	
+	Context* arr;
+} C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,
 				  Ret_Type ret_type, bool can_mut);

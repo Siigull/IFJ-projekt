@@ -187,7 +187,8 @@ AST_Node* string() {
          advance();
          if(check(T_RPAR)) {
              AST_Node* node = func_call();
-             return node;
+             token->node = node;
+			 token->type = T_BUILDIN;
          }
 
      } else if (check(T_STRING)) {
@@ -199,18 +200,18 @@ AST_Node* string() {
                 check(T_U8)  || check(T_NULL)) {
         advance();
 
-   } else if (check(T_RPAR)) {
-       advance();
-        binary_load(tl);
-        consume(T_LPAR);
-         Token* token = malloc(sizeof(Token));
-         memcpy(token, parser->prev, sizeof(Token));
-        List_insertF(tl, token);
+	} else if (check(T_RPAR)) {
+		advance();
+		binary_load(tl);
+		consume(T_LPAR);
+		Token* token = malloc(sizeof(Token));
+		memcpy(token, parser->prev, sizeof(Token));
+		List_insertF(tl, token);
 
-    } else if(check(T_BUILDIN)){
-         advance();
-         AST_Node* node = func_call();
-         return node;
+	} else if(check(T_BUILDIN)){
+		advance();
+		AST_Node* node = func_call();
+		token->node = node;
 
      } else {
          ERROR_RET(ERR_PARSE);
@@ -397,15 +398,26 @@ AST_Node* binary() {
 
 // Expression parser
 AST_Node* expr() {
-    /* List* token_list = malloc(sizeof(List));
-     List_init(token_list);
+List* token_list = malloc(sizeof(List));
+	// List_init(token_list);
 
-     AST_Node* node = binary_load(token_list);
-     if (node == NULL) {
-        node = parse_expression(token_list);
-    } 
+	// AST_Node* node = binary_load(token_list);
+	// if (node == NULL) {
+	// 	List_activeF(token_list);
+	// 	while (List_is_active(token_list)) {
+	// 		Token* temp;
+	// 		List_get_val(token_list, &temp);
+	// 		print_token(temp, stdout, false);
+	// 		printf(" ");
+	// 		List_active_next(token_list);
+	// 	}
 
-    return node;*/
+	// 	node = parse_expression(token_list);
+	// 	printf("\n");
+	// }
+
+	// return node;
+
     return binary();
 }
 
@@ -450,6 +462,7 @@ AST_Node* _while() {
 
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
+		var->as.var_name = parser->prev->value;
 		arr_append(node->as.arr, (size_t) var);
 
 		consume(T_BAR);
@@ -479,6 +492,7 @@ AST_Node* _if() {
 
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
+		var->as.var_name = parser->prev->value;
 		arr_append(node->as.arr, (size_t) var);
 
 		consume(T_BAR);
@@ -493,22 +507,29 @@ AST_Node* _if() {
 	return node;
 }
 
-
-
-
-
 AST_Node* under_var_decl() {
 	AST_Node* node = node_init(VAR_ASSIGNMENT);
+
 	consume(T_UNDER);
 	node->as.var_name = parser->prev->value;
+
 	consume(T_EQUAL);
 	node->left = expr();
 	consume(T_SEMI);
+
 	return node;
 }
 
+Ret_Type type() {
+	if(check(T_QUESTMARK)){
+		advance();
+	}
+	
+	Ret_Type type = get_ret_type();
+	advance();
 
-
+	return type;
+}
 
 AST_Node* var_decl() {
 	AST_Node* node = node_init(VAR_DECL);
@@ -530,8 +551,7 @@ AST_Node* var_decl() {
 	Ret_Type ret_type = IMPLICIT;
 	if (check(T_DDOT)) {
 		advance();
-		consume(T_DTYPE);
-		ret_type = get_ret_type();
+		ret_type = type();
 	}
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
@@ -610,6 +630,9 @@ AST_Node* stmt() {
 	case T_CONST:
 		return var_decl();
 
+	case T_UNDER:
+		return under_var_decl();
+
 	case T_ID:
 		advance();
 		if (check(T_EQUAL)) {
@@ -635,8 +658,6 @@ AST_Node* stmt() {
 
 	case T_WHILE:
 		return _while();	
-	case T_UNDER:
-		return under_var_decl();
 
         default:
             // TODO(Sigull) Add error message
@@ -645,14 +666,29 @@ AST_Node* stmt() {
 }
 
 Ret_Type get_ret_type() {
-	if (parser->prev->type == T_VOID) {
+	if (strcmp(parser->next->value, "void")) {
+		if(parser->prev->type == T_QUESTMARK) {
+			ERROR_RET(ERR_PARSE);
+		}
 		return R_VOID;
-	} else if (strcmp(parser->prev->value, "i32")) {
-		return R_I32;
-	} else if (strcmp(parser->prev->value, "f64")) {
-		return R_F64;
-	} else if (strcmp(parser->prev->value, "[]u8")) {
-		return R_U8;
+	} else if (strcmp(parser->next->value, "i32")) {
+		if(parser->prev->type == T_QUESTMARK) {
+			return N_I32;
+		} else {
+			return R_I32;
+		}
+	} else if (strcmp(parser->next->value, "f64")) {
+		if(parser->prev->type == T_QUESTMARK) {
+			return N_F64;
+		} else {
+			return R_F64;
+		}
+	} else if (strcmp(parser->next->value, "[]u8")) {
+		if(parser->prev->type == T_QUESTMARK) {
+			return N_U8;
+		} else {
+			return R_U8;
+		}
 	}
 
     ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
@@ -671,7 +707,7 @@ AST_Node* func_decl() {
     while(check(T_ID)) {
         advance();
         consume(T_DDOT);
-        consume(T_DTYPE);
+		type();
 
 		if (!check(T_COMMA)) {
 			break;
@@ -681,10 +717,10 @@ AST_Node* func_decl() {
 	}
 	consume(T_LPAR);
 
-    if (!check(T_DTYPE) && !check(T_VOID)) {
+    if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
     }
-    advance();
+    type();
 
 	block(node->as.func_data->arr);
 
@@ -732,8 +768,8 @@ void func_head() {
 
         consume(T_DDOT);
 
-        consume(T_DTYPE);
-        arg->type = get_ret_type();
+        arg->type = type();
+
         arr_append(entry->as.function_args, (size_t)arg);
 
         if (!check(T_COMMA)) {
@@ -744,12 +780,10 @@ void func_head() {
     }
     consume(T_LPAR);
 
-    if (!check(T_DTYPE) && !check(T_VOID)) {
+    if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
     } 
-    advance();
-
-    entry->ret_type = get_ret_type();
+    entry->ret_type = type();
 
     tree_insert(parser->s_table, entry);
 }
