@@ -89,7 +89,7 @@ bool is_data_type(AST_Type type);
  * 
  * @param curr expression to evaluate
  */
-void eval_condition(AST_Node* curr, Tree* symtable);
+void eval_condition(AST_Node* curr, Tree* symtable, int inside_fnc_call);
 
 
 
@@ -100,7 +100,7 @@ void eval_condition(AST_Node* curr, Tree* symtable);
  * @param curr node currently called - recursively changes
  * @param symtable symbolic table
  */
-void eval_exp(AST_Node* curr, Tree* symtable);
+void eval_exp(AST_Node* curr, Tree* symtable, int inside_fnc_call);
 
 
 
@@ -113,7 +113,7 @@ void eval_exp(AST_Node* curr, Tree* symtable);
  * @param curr root node of the expression
  * @param symtable symbolic table
  */
-void generate_expression(AST_Node* curr, Tree* symtable);
+void generate_expression(AST_Node* curr, Tree* symtable, int inside_fnc_call);
 
 
 
@@ -185,7 +185,7 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
  * @param curr node of a function to be called
  * @param symtable symbolic table
  */
-void generate_func_call(AST_Node* curr, Tree* symtable);
+void generate_func_call(AST_Node* curr, Tree* symtable, int inside_fnc_call);
 
 
 
@@ -239,7 +239,7 @@ void generate_var_assignment(AST_Node* curr, Tree* symtable);
  * @param stmt_index number of statement from array of statements in function data
  * @param nest level of nested loop or if statement
  */
-void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop);
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int inside_fnc_call);
 
 
 
