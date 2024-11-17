@@ -17,7 +17,7 @@
 #include "stack.h"
 #include <stdbool.h>
 #include <stdio.h>
-#define TABLE_SIZE 8
+#define TABLE_SIZE 13
 
 typedef enum {
 	N, // no precedence
