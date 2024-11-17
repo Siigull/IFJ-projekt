@@ -12,12 +12,12 @@
 #ifndef EXPRESSIONPARSER_H
 #define EXPRESSIONPARSER_H
 #include "ast.h"
+#include "error.h"
 #include "lexer.h"
 #include "stack.h"
 #include <stdbool.h>
 #include <stdio.h>
-#include "error.h"
-#define TABLE_SIZE 8
+#define TABLE_SIZE 14
 
 typedef enum {
 	N, // no precedence
@@ -34,10 +34,11 @@ Rules: E  → E + E
 		E → E == E
 		E  → (E)
 		E  → id
-		
+		E  → E relacni operator E
+
 */
 
-typedef enum{
+typedef enum {
 	E_PLUS_E,
 	E_MINUS_E,
 	E_TIMES_E,
@@ -45,7 +46,12 @@ typedef enum{
 	E_EQ_E,
 	E_E,
 	E_ID,
-}rules;
+	E_NEQ_E,
+	E_GET_E,
+	E_GT_E,
+	E_ST_E,
+	E_SET_E,
+} rules;
 
 void init_stack(List* Stack);
 AST_Node* parse_expression(List* list);

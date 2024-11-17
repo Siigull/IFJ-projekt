@@ -2,16 +2,21 @@
 
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
-	//   id +  -  *  /  (  )  $
-	{N, L, L, L, L, N, L, L}, // id
-	{R, L, L, R, R, R, L, L}, // +
-	{R, L, L, R, R, R, L, L}, // -
-	{R, L, L, L, L, R, L, L}, // *
-	{R, L, L, L, L, R, L, L}, // /
-	{R, R, R, R, R, R, M, N}, // (
-	{N, L, L, L, L, N, L, L}, // )
-	{R, R, R, R, R, R, N, R}  // $
-
+	//    id   +   -   *   /   (   )   $   ==  !=  <   >   <=  >=
+	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
+	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
+	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
+	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // *
+	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // /
+	{R, R, R, R, R, R, M, N, R, R, R, R, R, R}, // (
+	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
+	{R, R, R, R, R, R, N, R, L, L, L, L, L, L}, // $
+	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // ==
+	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // !=
+	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <
+	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >
+	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <=
+	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >=
 };
 
 const char* type_to_string(T_Type type) {
@@ -139,6 +144,8 @@ AST_Type get_type(T_Type type) {
 		return STRING;
 	case T_ID:
 		return ID;
+	case T_NULL:
+		return NUL;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;
@@ -155,6 +162,16 @@ AST_Type get_type_from_rule(int rule) {
 		return DIV;
 	case E_EQ_E:
 		return ISEQ;
+	case E_NEQ_E:
+		return ISNEQ;
+	case E_GET_E:
+		return ISMOREEQ;
+	case E_GT_E:
+		return ISMORE;
+	case E_ST_E:
+		return ISLESS;
+	case E_SET_E:
+		return ISLESSEQ;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;
@@ -189,7 +206,9 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 		return false;
 	} else if (type == T_ID || type == T_PLUS || type == T_MINUS || type == T_MUL ||
 			   type == T_DIV || type == T_LPAR || type == T_RPAR || type == T_DOLLARLIST ||
-			   type == T_I32 || type == T_F64 || type == T_STRING) {
+			   type == T_I32 || type == T_F64 || type == T_STRING || type == T_DDEQ ||
+			   type == T_GETHAN || type == T_GTHAN || type == T_SETHAN || type == T_STHAN ||
+			   type == T_NEQUAL) {
 		return true;
 	} else {
 		ERROR_RET(2);
@@ -197,7 +216,9 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 }
 
 bool is_id(T_Type type) {
-	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING) {
+	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING || type == T_DDEQ ||
+		type == T_NEQUAL || type == T_GTHAN || type == T_GETHAN || type == T_SETHAN ||
+		type == T_STHAN) {
 		return true;
 	}
 	return false;
@@ -213,7 +234,7 @@ int find_precedence_index(List* list) {
 		List_get_val(list, &current);
 		if (((current->type == T_ID && current->isProcessed == false) ||
 			 (current->type == T_I32 && current->isProcessed == false) || current->type == T_F64 ||
-			 current->type == T_ID || current->type == T_STRING) &&
+			 current->type == T_ID || current->type == T_STRING || current->type == T_NULL) &&
 			current->isProcessed == false) {
 			return 0;
 		} else if (current->type == T_PLUS) {
@@ -230,6 +251,18 @@ int find_precedence_index(List* list) {
 			return 6;
 		} else if (current->type == T_DOLLARLIST) {
 			return 7;
+		} else if (current->type == T_DDEQ) {
+			return 8;
+		} else if (current->type == T_NEQUAL) {
+			return 9;
+		} else if (current->type == T_STHAN) {
+			return 10;
+		} else if (current->type == T_GTHAN) {
+			return 11;
+		} else if (current->type == T_SETHAN) {
+			return 12;
+		} else if (current->type == T_GETHAN) {
+			return 13;
 		} else {
 			List_active_prev(list);
 		}
@@ -306,6 +339,16 @@ int find_reduction_rule(List* Stack) {
 			return E_DIV_E;
 		case T_DDEQ:
 			return E_EQ_E;
+		case T_NEQUAL:
+			return E_NEQ_E;
+		case T_GETHAN:
+			return E_GET_E;
+		case T_GTHAN:
+			return E_GT_E;
+		case T_SETHAN:
+			return E_SET_E;
+		case T_STHAN:
+			return E_ST_E;
 		default:
 			ERROR_RET(2);
 		}

@@ -1,0 +1,18 @@
+const ifj = @import("ifj24.zig");
+
+pub fn bomba() void{
+    ifj.write("_ works jupi\n");
+    return;
+}
+
+// Function to add two integers and print the result
+pub fn main() void {
+    // Declare and initialize variables
+    var a: i32 = 10;
+    var b: i32 = 20;
+    var result : i32 = a + b;
+
+    // Print the result
+    ifj.write(result * result / result);
+    _ = bomba();
+}

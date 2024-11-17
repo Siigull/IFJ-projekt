@@ -22,7 +22,7 @@ typedef struct Parser {
     Tree* s_table;
 } Parser;
 
-void parse(char* input);
+Arr* parse(char* input);
 int compile(char* input);
 char* string_to_assembly(const char* string);
 

@@ -201,10 +201,9 @@ void eval_exp(AST_Node* curr, Tree* symtable){
     else if(curr->type == ID){
         fprintf(stdout, "\tPUSHS LF@%s\n", curr->as.var_name);
     }
-    //else if(curr->type == NUL){
-    //    fprintf(stdout, "\tPUSHS nil@nil\n");
-    //}
-    //todo
+    else if(curr->type == NUL){
+        fprintf(stdout, "\tPUSHS nil@nil\n");
+    }
     return;
 }
 
@@ -244,12 +243,12 @@ void eval_condition(AST_Node* curr, Tree* symtable){
             break;
         case ISLESSEQ:
             fprintf(stdout, "\tLT GF@*tmp*res GF@*lhs GF@*rhs\n");
-            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF*rhs\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
             break;
         case ISMOREEQ:
             fprintf(stdout, "\tGT GF@*tmp*res GF@*lhs GF@*rhs\n");
-            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF*rhs\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
             break;
         case STRING:
@@ -394,7 +393,9 @@ void generate_var_decl(AST_Node* curr, Tree* symtable){
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
     //based on evaluated expression, save its value into the variable
     generate_expression(curr->left, symtable);
-    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
+    if(strcmp(curr->as.var_name, "_")){
+        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
+    }
 }//generate_var_assignment
 
 

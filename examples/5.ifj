@@ -1,0 +1,28 @@
+const ifj = @import("ifj24.zig");
+
+// Function to calculate the nth Fibonacci number
+pub fn fibonacci (n : i32) i32 {
+    var a: i32 = 0; // First Fibonacci number
+    var b: i32 = 1; // Second Fibonacci number
+    var temp: i32 = 0;  // Temporary variable for swapping
+    
+    var i: i32 = 2;
+    while(i <= n){
+        temp = a + b;
+        a = b;
+        b = temp;
+        i = i + 1;
+    }
+
+    return b; // Return the nth Fibonacci number
+}
+
+// Main function
+pub fn main() void {
+    var num: i32 = ifj.readi32();   // Input for Fibonacci index
+    var fib: i32 = fibonacci(num);       // Variable to store the result
+    ifj.write("\n");
+    ifj.write(fib);       // Output the result
+    ifj.write("\n");
+    return;
+}

@@ -1,9 +1,9 @@
 #include "parser.h"
 #include "ast.h"
+#include "expressionparser.h"
 #include "stack.h"
 #include "string.h"
 #include "test_generate_graph.h"
-#include "expressionparser.h"
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -19,29 +19,34 @@ AST_Node* func_call();
 AST_Node* stmt();
 Ret_Type get_ret_type();
 
-Parser* init_parser() {
-    Parser* parser = malloc(sizeof(Parser));
-
+void parser_reset() {
     parser->next = NULL;
     parser->prev = NULL;
+}
 
-    parser->s_table = tree_init();
+Parser* init_parser() {
+	Parser* parser = malloc(sizeof(Parser));
 
-    return parser;
+	parser->next = NULL;
+	parser->prev = NULL;
+
+	parser->s_table = tree_init();
+
+	return parser;
 }
 
 void advance() {
-    free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
-    parser->prev = parser->next;
-    parser->next = get_next_token(lexer);
+	free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
+	parser->prev = parser->next;
+	parser->next = get_next_token(lexer);
 
-    // parser->prev = parser->next;
-    // parser->next = &(debug_token_array[token_index++]);
+	// parser->prev = parser->next;
+	// parser->next = &(debug_token_array[token_index++]);
 }
 
 void consume(T_Type type) {
-    if (parser->next->type == type) {
-        advance();
+	if (parser->next->type == type) {
+		advance();
 
     } else {
         ERROR_RET(ERR_PARSE);
@@ -49,28 +54,28 @@ void consume(T_Type type) {
 }
 
 bool check(T_Type type) {
-    return parser->next->type == type;
+	return parser->next->type == type;
 }
 
 bool is_hexa(char x) {
-    return isdigit(x) || (x >= 'A' && x <= 'F') || (x >= 'a' && x <= 'f');
+	return isdigit(x) || (x >= 'A' && x <= 'F') || (x >= 'a' && x <= 'f');
 }
 
 int parse_escape(const char* in, char* out) {
-    int x;
-    if(is_hexa(in[2]) && is_hexa(in[3])) {
-        sscanf(in + 2, "%2x", &x);
+	int x;
+	if (is_hexa(in[2]) && is_hexa(in[3])) {
+		sscanf(in + 2, "%2x", &x);
 
     } else {
         ERROR_RET(ERR_LEX);
     }
 
-    return x;
+	return x;
 }
 
 char* parse_string_value(const char* string) {
-    int len = strlen(string);
-    int new_len = len;
+	int len = strlen(string);
+	int new_len = len;
 
     for(int i=0; i < len; i++) {
         if(string[i] == '\\') {
@@ -97,81 +102,80 @@ char* parse_string_value(const char* string) {
         }
     }
 
-    char* new_string = malloc(sizeof(char) * new_len + 1);
-    char* out = new_string;
+	char* new_string = malloc(sizeof(char) * new_len + 1);
+	char* out = new_string;
 
-    for(int i=0; i < len; i++) {
-        if(string[i] == '\\') {
-            switch(string[i+1]) {
-                case 'x':
-                {
-                    int x = parse_escape(string + i, new_string);
-                    new_string[0] = (char)(x);
-                    i += 2;
-                    break;
-                }
-                case 'n':
-                    new_string[0] = '\n';
-                    break;
-                case '\\':
-                    new_string[0] = '\\';
-                    break;
-                case '"':
-                    new_string[0] = '"';
-                    break;
-                case 'r':
-                    new_string[0] = '\r';
-                    break;
-                case 't':
-                    new_string[0] = '\t';
-                    break;
-            }
-            i++;
-            new_string++;
+	for (int i = 0; i < len; i++) {
+		if (string[i] == '\\') {
+			switch (string[i + 1]) {
+			case 'x': {
+				int x = parse_escape(string + i, new_string);
+				new_string[0] = (char) (x);
+				i += 2;
+				break;
+			}
+			case 'n':
+				new_string[0] = '\n';
+				break;
+			case '\\':
+				new_string[0] = '\\';
+				break;
+			case '"':
+				new_string[0] = '"';
+				break;
+			case 'r':
+				new_string[0] = '\r';
+				break;
+			case 't':
+				new_string[0] = '\t';
+				break;
+			}
+			i++;
+			new_string++;
 
-        } else {
-            new_string[0] = string[i];
-            new_string += 1;
-        }
-    }
-    new_string[0] = '\0';
+		} else {
+			new_string[0] = string[i];
+			new_string += 1;
+		}
+	}
+	new_string[0] = '\0';
 
-    return out;
+	return out;
 }
 
 char* string_to_assembly(const char* string) {
-    int len = strlen(string);
-    int new_len = len;
+	int len = strlen(string);
+	int new_len = len;
 
-    for(int i=0; i < len; i++) {
-        if(string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
-            new_len += 3;
-        }
-    }
+	for (int i = 0; i < len; i++) {
+		if (string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
+			new_len += 3;
+		}
+	}
 
-    char* new_string = malloc(sizeof(char) * new_len + 1);
-    char* out = new_string;
+	char* new_string = malloc(sizeof(char) * new_len + 1);
+	char* out = new_string;
 
-    for(int i=0; i < len; i++) {
-        if(string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
-            sprintf(new_string, "\\%03d", string[i]);
-            new_string += 4;
+	for (int i = 0; i < len; i++) {
+		if (string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
+			sprintf(new_string, "\\%03d", string[i]);
+			new_string += 4;
 
-        } else {
-            new_string[0] = string[i];
-            new_string += 1;
-        }
-    }
-    new_string[0] = '\0';
+		} else {
+			new_string[0] = string[i];
+			new_string += 1;
+		}
+	}
+	new_string[0] = '\0';
 
-    return out;
+	return out;
 }
 
 AST_Node* string() {
-    AST_Node* node = node_init(STRING);
-    node->as.string = parse_string_value(parser->prev->value);
+	AST_Node* node = node_init(STRING);
+	node->as.string = parse_string_value(parser->prev->value);
 
-    return node;
+	return node;
 }
 
  AST_Node* literal_load(List* tl) {
@@ -209,7 +213,7 @@ AST_Node* string() {
          return node;
 
      } else {
-         exit(ERR_PARSE);
+         ERROR_RET(ERR_PARSE);
      }
 
      return NULL;
@@ -245,19 +249,19 @@ bool check_operator() {
 }
 
 AST_Node* literal() {
-    if (check(T_ID)) {
-        advance();
-        if(check(T_RPAR)) {
-            AST_Node* node = func_call();
-            return node;
-        }
-        AST_Node* node = node_init(ID);
-        node->as.var_name = parser->prev->value;
-        return node;
+	if (check(T_ID)) {
+		advance();
+		if (check(T_RPAR)) {
+			AST_Node* node = func_call();
+			return node;
+		}
+		AST_Node* node = node_init(ID);
+		node->as.var_name = parser->prev->value;
+		return node;
 
-    } else if (check(T_STRING)) {
-        advance();
-        return string();
+	} else if (check(T_STRING)) {
+		advance();
+		return string();
 
     } else if (check(T_I32)) {
         advance();
@@ -287,16 +291,16 @@ AST_Node* literal() {
         AST_Node* node = node_init(NIL);
         return node;
 
-    } else if (check(T_RPAR)) {
-        advance();
-        AST_Node* node = binary();
-        consume(T_LPAR);
-        return node;
+	} else if (check(T_RPAR)) {
+		advance();
+		AST_Node* node = binary();
+		consume(T_LPAR);
+		return node;
 
-    } else if(check(T_BUILDIN)){
-        advance();
-        AST_Node* node = func_call();
-        return node;
+	} else if (check(T_BUILDIN)) {
+		advance();
+		AST_Node* node = func_call();
+		return node;
 
     } else {
         ERROR_RET(ERR_PARSE);
@@ -304,90 +308,91 @@ AST_Node* literal() {
 }
 
 AST_Node* scaling() {
-    AST_Node* left = literal();
+	AST_Node* left = literal();
 
-    while(true) {
-        if(check(T_MUL)) {
-            advance();
-            AST_Node* right = scaling();
-            AST_Node* node = node_init(MUL);
-            node->left = left;
-            node->right = right;
-            left = node;
+	while (true) {
+		if (check(T_MUL)) {
+			advance();
+			AST_Node* right = scaling();
+			AST_Node* node = node_init(MUL);
+			node->left = left;
+			node->right = right;
+			left = node;
 
-        } else if(check(T_DIV)) {
-            advance();
-            AST_Node* right = scaling();
-            AST_Node* node = node_init(DIV);
-            node->left = left;
-            node->right = right;
-            left = node;
-        
-        } else {
-            break;
-        }
-    }
+		} else if (check(T_DIV)) {
+			advance();
+			AST_Node* right = scaling();
+			AST_Node* node = node_init(DIV);
+			node->left = left;
+			node->right = right;
+			left = node;
 
-    return left;
+		} else {
+			break;
+		}
+	}
+
+	return left;
 }
 
 AST_Node* linear() {
-    AST_Node* left = scaling();
+	AST_Node* left = scaling();
 
-    while(true) {
-        if(check(T_PLUS)) {
-            advance();
-            AST_Node* right = scaling();
-            AST_Node* node = node_init(PLUS);
-            node->left = left;
-            node->right = right;
-            left = node;
+	while (true) {
+		if (check(T_PLUS)) {
+			advance();
+			AST_Node* right = scaling();
+			AST_Node* node = node_init(PLUS);
+			node->left = left;
+			node->right = right;
+			left = node;
 
-        } else if(check(T_MINUS)) {
-            advance();
-            AST_Node* right = scaling();
-            AST_Node* node = node_init(MINUS);
-            node->left = left;
-            node->right = right;
-            left = node;
+		} else if (check(T_MINUS)) {
+			advance();
+			AST_Node* right = scaling();
+			AST_Node* node = node_init(MINUS);
+			node->left = left;
+			node->right = right;
+			left = node;
 
-        } else {
-            break;
-        }
-    }
+		} else {
+			break;
+		}
+	}
 
-    return left;
+	return left;
 }
 
 AST_Type get_3_type() {
-    T_Type ops[] = {T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
-    AST_Type types[] = {ISEQ, ISNEQ, ISLESS, ISMORE, ISLESSEQ, ISMOREEQ};
-    for(int i=0; i < 6; i++) {
-        if(check(ops[i])) return types[i];
-    }
+	T_Type ops[] = {T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
+	AST_Type types[] = {ISEQ, ISNEQ, ISLESS, ISMORE, ISLESSEQ, ISMOREEQ};
+	for (int i = 0; i < 6; i++) {
+		if (check(ops[i]))
+			return types[i];
+	}
 
-    return -1;
+	return -1;
 }
 
 AST_Node* binary() {
-    AST_Node* left = linear();
+	AST_Node* left = linear();
 
-    while(true) {
-        AST_Type type = get_3_type();
-        if((int)type != -1) {
-            advance();
-            AST_Node* right = linear();
-            AST_Node* node = node_init(type);
-            node->right = right;
-            node->left = left;
-            left = node;
+	while (true) {
+		AST_Type type = get_3_type();
+		if ((int) type != -1) {
+			advance();
+			AST_Node* right = linear();
+			AST_Node* node = node_init(type);
+			node->right = right;
+			node->left = left;
+			left = node;
 
-        } else {
-            break;
-        }
-    }
+		} else {
+			break;
+		}
+	}
 
-    return left;
+	return left;
 }
 
 // Expression parser
@@ -406,60 +411,60 @@ AST_Node* expr() {
 
 // Normal parser
 void block(Arr* stmts) {
-    consume(T_CUYRBRACKET);
+	consume(T_CUYRBRACKET);
 
-    while(!check(T_CUYLBRACKET)) {
-        arr_append(stmts, (size_t)stmt());
-    }
+	while (!check(T_CUYLBRACKET)) {
+		arr_append(stmts, (size_t) stmt());
+	}
 
-    consume(T_CUYLBRACKET);
+	consume(T_CUYLBRACKET);
 }
 
 AST_Node* _else() {
-    AST_Node* node = node_init(ELSE);
+	AST_Node* node = node_init(ELSE);
 
-    consume(T_ELSE);
+	consume(T_ELSE);
 
-    block(node->as.arr);
+	block(node->as.arr);
 
-    return node;
+	return node;
 }
 
 AST_Node* _while() {
-    AST_Node* node = node_init(WHILE);
+	AST_Node* node = node_init(WHILE);
 
-    consume(T_WHILE);
-    consume(T_RPAR);
+	consume(T_WHILE);
+	consume(T_RPAR);
 
-    if (!check(T_LPAR)) {
-        node->left = expr();
+	if (!check(T_LPAR)) {
+		node->left = expr();
 
     } else {
         ERROR_RET(ERR_PARSE);
     }
 
-    consume(T_LPAR);
+	consume(T_LPAR);
 
-    if (check(T_BAR)) {
-        advance();
+	if (check(T_BAR)) {
+		advance();
 
-        consume(T_ID);
-        AST_Node* var = node_init(NNULL_VAR_DECL);
-        arr_append(node->as.arr, (size_t)var);
+		consume(T_ID);
+		AST_Node* var = node_init(NNULL_VAR_DECL);
+		arr_append(node->as.arr, (size_t) var);
 
-        consume(T_BAR);
-    }
+		consume(T_BAR);
+	}
 
-    block(node->as.arr);
+	block(node->as.arr);
 
-    return node;
+	return node;
 }
 
 AST_Node* _if() {
-    AST_Node* node = node_init(IF);
-    
-    consume(T_IF);
-    consume(T_RPAR);
+	AST_Node* node = node_init(IF);
+
+	consume(T_IF);
+	consume(T_RPAR);
 
     if (!check(T_LPAR)) {
         node->left = expr();
@@ -467,154 +472,152 @@ AST_Node* _if() {
         ERROR_RET(ERR_PARSE);
     }
 
-    consume(T_LPAR);
+	consume(T_LPAR);
 
-    if (check(T_BAR)) {
-        advance();
+	if (check(T_BAR)) {
+		advance();
 
-        consume(T_ID);
-        AST_Node* var = node_init(NNULL_VAR_DECL);
-        arr_append(node->as.arr, (size_t)var);
+		consume(T_ID);
+		AST_Node* var = node_init(NNULL_VAR_DECL);
+		arr_append(node->as.arr, (size_t) var);
 
-        consume(T_BAR);        
-    }
+		consume(T_BAR);
+	}
 
-    block(node->as.arr);
+	block(node->as.arr);
 
-    if (check(T_ELSE)) {
-        node->right = _else();
-    }
+	if (check(T_ELSE)) {
+		node->right = _else();
+	}
 
-    return node;
+	return node;
 }
 
 AST_Node* var_decl() {
-    AST_Node* node = node_init(VAR_DECL);
+	AST_Node* node = node_init(VAR_DECL);
 
-    bool can_mut;
+	bool can_mut;
 
-    if (check(T_VAR)) {
-        advance();
-        can_mut = true;
+	if (check(T_VAR)) {
+		advance();
+		can_mut = true;
 
-    } else {
-        consume(T_CONST);
-        can_mut = false;
-    }
+	} else {
+		consume(T_CONST);
+		can_mut = false;
+	}
 
-    consume(T_ID);
-    node->as.var_name = parser->prev->value;
+	consume(T_ID);
+	node->as.var_name = parser->prev->value;
 
-    Ret_Type ret_type = IMPLICIT;
-    if (check(T_DDOT)) {
-        advance();
-        consume(T_DTYPE);
-        ret_type = get_ret_type();
-    }
+	Ret_Type ret_type = IMPLICIT;
+	if (check(T_DDOT)) {
+		advance();
+		consume(T_DTYPE);
+		ret_type = get_ret_type();
+	}
 
-    Entry* entry = entry_init(node->as.var_name, E_VAR,
-                              ret_type, can_mut);
+	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
 
-    if(tree_find(parser->s_table, node->as.var_name) != NULL) {
-        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
-    }
-    tree_insert(parser->s_table, entry);
+	if (tree_find(parser->s_table, node->as.var_name) != NULL) {
+		ERROR_RET(ERR_SEM_REDEF);
+	}
+	tree_insert(parser->s_table, entry);
 
-    consume(T_EQUAL);
-    node->left = expr();
-    consume(T_SEMI);
+	consume(T_EQUAL);
+	node->left = expr();
+	consume(T_SEMI);
 
-    return node;
+	return node;
 }
 
 AST_Node* func_call() {
-    AST_Node* node = node_init(FUNC_CALL);
-    node->as.func_data->var_name = parser->prev->value;
+	AST_Node* node = node_init(FUNC_CALL);
+	node->as.func_data->var_name = parser->prev->value;
 
-    consume(T_RPAR);
+	consume(T_RPAR);
 
-    while(!check(T_LPAR)) {
-        AST_Node* param = expr();
-        arr_append(node->as.func_data->arr, (size_t)param);
+	while (!check(T_LPAR)) {
+		AST_Node* param = expr();
+		arr_append(node->as.func_data->arr, (size_t) param);
 
-        if (!check(T_COMMA)) {
-            break;
-        }
+		if (!check(T_COMMA)) {
+			break;
+		}
 
-        consume(T_COMMA);
-    }
+		consume(T_COMMA);
+	}
 
-    consume(T_LPAR);
+	consume(T_LPAR);
 
-    return node;
+	return node;
 }
 
 AST_Node* assignment() {
-    AST_Node* node;
+	AST_Node* node;
 
-    if (parser->prev->type == T_UNDER) {
-        consume(T_EQUAL);
-        node = expr();
+	if (parser->prev->type == T_UNDER) {
+		consume(T_EQUAL);
+		node = expr();
 
-    } else {
-        node = node_init(VAR_ASSIGNMENT);
-        node->as.var_name = parser->prev->value;
-        consume(T_EQUAL);
-        node->left = expr();
-    }
+	} else {
+		node = node_init(VAR_ASSIGNMENT);
+		node->as.var_name = parser->prev->value;
+		consume(T_EQUAL);
+		node->left = expr();
+	}
 
-    consume(T_SEMI);
-    return node;
+	consume(T_SEMI);
+	return node;
 }
 
 AST_Node* _return() {
-    AST_Node* node = node_init(RETURN);
-    consume(T_RETURN);
+	AST_Node* node = node_init(RETURN);
+	consume(T_RETURN);
 
-    if (!check(T_SEMI)) {
-        node->left = expr();
-    }
+	if (!check(T_SEMI)) {
+		node->left = expr();
+	}
 
-    consume(T_SEMI);
+	consume(T_SEMI);
 
-    return node;
+	return node;
 }
 
 AST_Node* stmt() {
-    switch(parser->next->type) {
-        case T_IF:
-            return _if();
+	switch (parser->next->type) {
+	case T_IF:
+		return _if();
 
-        case T_VAR:
-        case T_CONST:
-            return var_decl();
+	case T_VAR:
+	case T_CONST:
+		return var_decl();
 
-        case T_ID:
-            advance();
-            if(check(T_EQUAL)) {
-                return assignment();
+	case T_ID:
+		advance();
+		if (check(T_EQUAL)) {
+			return assignment();
 
-            } else if(check(T_RPAR)){
-                AST_Node* node = func_call();
-                consume(T_SEMI);
-                return node;
+		} else if (check(T_RPAR)) {
+			AST_Node* node = func_call();
+			consume(T_SEMI);
+			return node;
 
             } else {
                 ERROR_RET(ERR_PARSE);
             }
 
-        case T_BUILDIN:
-            advance();
-            AST_Node* node = func_call();
-            consume(T_SEMI);
-            return node;
-            
+	case T_BUILDIN:
+		advance();
+		AST_Node* node = func_call();
+		consume(T_SEMI);
+		return node;
 
-        case T_RETURN:
-            return _return();
+	case T_RETURN:
+		return _return();
 
-        case T_WHILE:
-            return _while();
+	case T_WHILE:
+		return _while();	
 
         default:
             // TODO(Sigull) Add error message
@@ -623,27 +626,82 @@ AST_Node* stmt() {
 }
 
 Ret_Type get_ret_type() {
-    if (strcmp(parser->prev->value, "void")) {
-        return R_VOID;
-    } else if(strcmp(parser->prev->value, "i32")) {
-        return R_I32;
-    } else if(strcmp(parser->prev->value, "f64")) {
-        return R_F64;
-    } else if(strcmp(parser->prev->value, "[]u8")) {
-        return R_U8;
-    }
+	if (strcmp(parser->prev->value, "void")) {
+		return R_VOID;
+	} else if (strcmp(parser->prev->value, "i32")) {
+		return R_I32;
+	} else if (strcmp(parser->prev->value, "f64")) {
+		return R_F64;
+	} else if (strcmp(parser->prev->value, "[]u8")) {
+		return R_U8;
+	}
 
     ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
 }
 
 AST_Node* func_decl() {
-    AST_Node* node = node_init(FUNCTION_DECL);
+	AST_Node* node = node_init(FUNCTION_DECL);
+	consume(T_PUB);
+	consume(T_FN);
+	consume(T_ID);
+
+    const char* func_name = parser->prev->value;
+    node->as.func_data->var_name = func_name;
+
+    consume(T_RPAR);
+    while(check(T_ID)) {
+        advance();
+        consume(T_DDOT);
+        consume(T_DTYPE);
+
+		if (!check(T_COMMA)) {
+			break;
+		}
+
+		consume(T_COMMA);
+	}
+	consume(T_LPAR);
+
+    if (!check(T_DTYPE) && !check(T_VOID)) {
+        ERROR_RET(ERR_PARSE);
+    }
+    advance();
+
+	block(node->as.func_data->arr);
+
+	return node;
+}
+
+AST_Node* decl() {
+	return func_decl();
+}
+
+void prolog() {
+	consume(T_CONST);
+	consume(T_ID);
+	if (strcmp(parser->prev->value, "ifj")) {
+		ERROR_RET(ERR_PARSE);
+	}
+
+	consume(T_EQUAL);
+	consume(T_IMPORT);
+	consume(T_RPAR);
+	consume(T_STRING);
+	char* prolog_file = parser->prev->value;
+
+	consume(T_LPAR);
+	consume(T_SEMI);
+}
+
+void func_head() {
     consume(T_PUB);
     consume(T_FN);
     consume(T_ID);
 
     const char* func_name = parser->prev->value;
-    node->as.func_data->var_name = func_name;
+    if(tree_find(parser->s_table, func_name) != NULL) {
+        ERROR_RET(ERR_SEM_REDEF);
+    }
 
     Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);
 
@@ -675,117 +733,40 @@ AST_Node* func_decl() {
     entry->ret_type = get_ret_type();
 
     tree_insert(parser->s_table, entry);
-
-    block(node->as.func_data->arr);
-
-    return node;
 }
 
-AST_Node* decl() {
-    return func_decl();
-}
-
-
-void prolog() {
-    consume(T_CONST);
-    consume(T_ID);
-    if(strcmp(parser->prev->value, "ifj")) {
-        ERROR_RET(ERR_PARSE);
-    }
-
-    consume(T_EQUAL);
-    consume(T_IMPORT);
-    consume(T_RPAR);
-    consume(T_STRING);
-    char* prolog_file = parser->prev->value;
-
-    consume(T_LPAR);
-    consume(T_SEMI);
-}
-
-void parse(char* orig_input) {
+Arr* parse(char* orig_input) {
     size_t len = strlen(orig_input) + 1;
     char* input = malloc(sizeof(char) * (len + 10));
     memcpy(input, orig_input, len * sizeof(char));
 
+    // First pass
+    // Load function heads
     lexer = init_lexer(input);
     parser = init_parser();
 
-    // Token token_arr[] = {{T_CONST, "const", 5},{T_ID, "ifj", 3},{T_EQUAL, "=", 1},
-    //                     {T_IMPORT, "@import", 7},{T_RPAR, "(", 1},{T_STRING, "ifj24.zig", 9},
-    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_PUB, "pub", 3},
-    //                     {T_FN, "fn", 2},{T_ID, "main", 4},{T_RPAR, "(", 1},
-    //                     {T_LPAR, ")", 1},{T_VOID, "void", 4},{T_CUYRBRACKET, "{", 1},
-    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Zadejte cislo pro vypocet faktorialu\n", 38},
-    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_CONST, "const", 5},
-    //                     {T_ID, "a", 1},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.readi32", 11},
-    //                     {T_RPAR, "(", 1},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-    //                     {T_IF, "if", 2},{T_RPAR, "(", 1},{T_ID, "a", 1},
-    //                     {T_LPAR, ")", 1},{T_BAR, "|", 1},{T_ID, "val", 3},
-    //                     {T_BAR, "|", 1},{T_CUYRBRACKET, "{", 1},{T_IF, "if", 2},
-    //                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_STHAN, "<", 1},
-    //                     {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
-    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_STRING, "Faktorial ", 10},
-    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-    //                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
-    //                     {T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-    //                     {T_STRING, " nelze spocitat\n", 17},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-    //                     {T_CUYLBRACKET, "}", 1},{T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},
-    //                     {T_VAR, "var", 3},{T_ID, "d", 1},{T_DDOT, ":", 1},
-    //                     {T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},{T_BUILDIN, "ifj.i2f", 7},
-    //                     {T_RPAR, "(", 1},{T_ID, "val", 3},{T_LPAR, ")", 1},
-    //                     {T_SEMI, ";", 1},{T_VAR, "var", 3},{T_ID, "vysl", 4},
-    //                     {T_DDOT, ":", 1},{T_DTYPE, "f64", 3},{T_EQUAL, "=", 1},
-    //                     {T_F64, "1.0", 3},{T_SEMI, ";", 1},{T_WHILE, "while", 5},
-    //                     {T_RPAR, "(", 1},{T_ID, "d", 1},{T_GTHAN, ">", 1},
-    //                     {T_I32, "0", 1},{T_LPAR, ")", 1},{T_CUYRBRACKET, "{", 1},
-    //                     {T_ID, "vysl", 4},{T_EQUAL, "=", 1},{T_ID, "vysl", 4},
-    //                     {T_MUL, "*", 1},{T_ID, "d", 1},{T_SEMI, ";", 1},
-    //                     {T_ID, "d", 1},{T_EQUAL, "=", 1},{T_ID, "d", 1},
-    //                     {T_MINUS, "-", 1},{T_F64, "1.0", 3},{T_SEMI, ";", 1},
-    //                     {T_CUYLBRACKET, "}", 1},{T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},
-    //                     {T_STRING, "Vysledek: ", 10},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl", 4},
-    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-    //                     {T_RPAR, "(", 1},{T_STRING, " = ", 3},{T_LPAR, ")", 1},
-    //                     {T_SEMI, ";", 1},{T_CONST, "const", 5},{T_ID, "vysl_i32", 8},
-    //                     {T_EQUAL, "=", 1},{T_BUILDIN, "ifj.f2i", 7},{T_RPAR, "(", 1},
-    //                     {T_ID, "vysl", 4},{T_LPAR, ")", 1},{T_SEMI, ";", 1},
-    //                     {T_BUILDIN, "ifj.write", 9},{T_RPAR, "(", 1},{T_ID, "vysl_i32", 8},
-    //                     {T_LPAR, ")", 1},{T_SEMI, ";", 1},{T_BUILDIN, "ifj.write", 9},
-    //                     {T_RPAR, "(", 1},{T_STRING, "\n", 2},{T_LPAR, ")", 1},
-    //                     {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
-    //                     {T_ELSE, "else", 4},{T_CUYRBRACKET, "{", 1},{T_BUILDIN, "ifj.write", 9},
-    //                     {T_RPAR, "(", 1},{T_STRING, "Faktorial pro null nelze spocitat\n", 35},{T_LPAR, ")", 1},
-    //                     {T_SEMI, ";", 1},{T_CUYLBRACKET, "}", 1},{T_CUYLBRACKET, "}", 1},
-    //                     {T_EOF, "0", 0},};
+    advance();
+    while(parser->next->type != T_EOF) {
+        if(parser->next->type == T_PUB) {
+            func_head();
+        }
+        advance();
+    }
 
-    // Token token_arr[] = {{T_PUB, "pub", 3},       {T_FN, "fn", 2}, 
-    //                      {T_ID, "main", 4},       {T_RPAR, "(", 1},
-    //                      {T_LPAR, ")", 1},        {T_VOID, "void", 4},
-    //                      {T_CUYRBRACKET, "{", 1}, {T_CONST, "const", 5}, 
-    //                      {T_ID, "a", 1},          {T_EQUAL, "=", 1},
-    //                      {T_I32, "10", 2},        {T_PLUS, "+", 1},
-    //                      {T_RPAR, "(", 1},        {T_I32, "69", 2},
-    //                      {T_DIV, "/", 1},         {T_I32, "420", 2},
-    //                      {T_LPAR, ")", 1},        {T_SEMI, ";", 1},
-    //                      {T_IF, "if", 2},         {T_RPAR, "(", 1}, 
-    //                      {T_ID, "a", 1},          {T_LPAR, ")", 1},
-    //                      {T_BAR, "|", 1},         {T_ID, "A", 1},
-    //                      {T_BAR, "|", 1},         {T_CUYRBRACKET, "{", 1}, 
-    //                      {T_CUYLBRACKET, "}", 1}, {T_CUYLBRACKET, "}", 1},
-    //                      {T_EOF, "\0", 1}};
 
-    // debug_token_array = token_arr;
+    // Second pass
+    // Normal parsing
+    lexer = init_lexer(input);
+    parser_reset();
 
     advance();
 
     prolog();
 
-    char graph_filename[] = "graph.txt";
+	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
-    if(f == NULL) return;
+    if(f == NULL) return NULL;
     fclose(f);
 
     Arr* nodes = arr_init();
