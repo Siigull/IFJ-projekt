@@ -497,6 +497,19 @@ AST_Node* _if() {
 	return node;
 }
 
+AST_Node* under_var_decl() {
+	AST_Node* node = node_init(VAR_DECL);
+
+	consume(T_UNDER);
+	node->as.var_name = parser->prev->value;
+
+	consume(T_EQUAL);
+	node->left = expr();
+	consume(T_SEMI);
+
+	return node;
+}
+
 AST_Node* var_decl() {
 	AST_Node* node = node_init(VAR_DECL);
 
@@ -596,6 +609,9 @@ AST_Node* stmt() {
 	case T_VAR:
 	case T_CONST:
 		return var_decl();
+
+	case T_UNDER:
+		return under_var_decl();
 
 	case T_ID:
 		advance();
@@ -770,7 +786,7 @@ Arr* parse(char* orig_input) {
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
-    if(f == NULL) return;
+    if(f == NULL) return NULL;
     fclose(f);
 
     Arr* nodes = arr_init();

@@ -58,6 +58,16 @@ typedef struct Tree {
 	Node* root;
 } Tree;
 
+typedef struct Context {
+
+} Context;
+
+typedef struct Context_Stack {
+	int cur_nest;
+	int max_nest;
+	
+	Context* arr;
+} C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,
 				  Ret_Type ret_type, bool can_mut);
