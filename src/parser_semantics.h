@@ -4,6 +4,6 @@
 #include <stdio.h>
 
 void parse_check(AST_Node* node);
-void sem_validate_return(AST_Node* node, Ret_Type expected_type);
+Ret_Type check_node(AST_Node* node);
 
 #endif
