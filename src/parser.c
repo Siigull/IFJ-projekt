@@ -48,9 +48,9 @@ void consume(T_Type type) {
 	if (parser->next->type == type) {
 		advance();
 
-	} else {
-		exit(ERR_PARSE);
-	}
+    } else {
+        ERROR_RET(ERR_PARSE);
+    }
 }
 
 bool check(T_Type type) {
@@ -66,9 +66,9 @@ int parse_escape(const char* in, char* out) {
 	if (is_hexa(in[2]) && is_hexa(in[3])) {
 		sscanf(in + 2, "%2x", &x);
 
-	} else {
-		exit(ERR_LEX);
-	}
+    } else {
+        ERROR_RET(ERR_LEX);
+    }
 
 	return x;
 }
@@ -77,30 +77,30 @@ char* parse_string_value(const char* string) {
 	int len = strlen(string);
 	int new_len = len;
 
-	for (int i = 0; i < len; i++) {
-		if (string[i] == '\\') {
-			switch (string[i + 1]) {
-			case 'x':
-				if (i + 3 >= len) {
-					exit(ERR_LEX);
-				}
-				break;
-			case 'n':
-			case 'r':
-			case 't':
-			case '"':
-				new_len--;
-				break;
-			case '\\':
-				new_len--;
-				i++;
-				break;
-			default:
-				exit(ERR_LEX);
-				break;
-			}
-		}
-	}
+    for(int i=0; i < len; i++) {
+        if(string[i] == '\\') {
+            switch(string[i+1]) {
+                case 'x':
+                    if(i+3 >= len) {
+                        ERROR_RET(ERR_LEX);
+                    }
+                    break;
+                case 'n':
+                case 'r':
+                case 't':
+                case '"':
+                    new_len--;
+                    break;
+                case '\\':
+                    new_len--;
+                    i++;
+                    break;
+                default:
+                    ERROR_RET(ERR_LEX);
+                    break;
+            }
+        }
+    }
 
 	char* new_string = malloc(sizeof(char) * new_len + 1);
 	char* out = new_string;
@@ -257,32 +257,33 @@ AST_Node* literal() {
 		advance();
 		return string();
 
-	} else if (check(T_I32)) {
-		advance();
-		errno = 0;
-		char* end;
-		AST_Node* node = node_init(I32);
-		node->as.i32 = strtol(parser->prev->value, &end, 10);
-		if (errno == ERANGE || *end != '\0' || node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
-			exit(ERR_SEM_OTHER);
-		}
-		return node;
+    } else if (check(T_I32)) {
+        advance();
+        errno = 0;
+        char* end;
+        AST_Node* node = node_init(I32);
+        node->as.i32 = strtol(parser->prev->value, &end, 10);
+        if(errno == ERANGE || *end != '\0' || 
+           node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
+            ERROR_RET(ERR_SEM_OTHER);
+        }
+        return node;
 
-	} else if (check(T_F64)) {
-		advance();
-		errno = 0;
-		char* end;
-		AST_Node* node = node_init(F64);
-		node->as.f64 = strtof(parser->prev->value, &end);
-		if (errno == ERANGE || *end != '\0') {
-			exit(ERR_SEM_OTHER);
-		}
-		return node;
-
-	} else if (check(T_NULL)) {
-		advance();
-		AST_Node* node = node_init(NIL);
-		return node;
+    } else if (check(T_F64)) {
+        advance();
+        errno = 0;
+        char* end;
+        AST_Node* node = node_init(F64);
+        node->as.f64 = strtof(parser->prev->value, &end);
+        if(errno == ERANGE || *end != '\0') {
+            ERROR_RET(ERR_SEM_OTHER);
+        }
+        return node;
+    
+    } else if (check(T_NULL)) {
+        advance();
+        AST_Node* node = node_init(NIL);
+        return node;
 
 	} else if (check(T_RPAR)) {
 		advance();
@@ -295,9 +296,9 @@ AST_Node* literal() {
 		AST_Node* node = func_call();
 		return node;
 
-	} else {
-		exit(ERR_PARSE);
-	}
+    } else {
+        ERROR_RET(ERR_PARSE);
+    }
 }
 
 AST_Node* scaling() {
@@ -443,9 +444,9 @@ AST_Node* _while() {
 	if (!check(T_LPAR)) {
 		node->left = expr();
 
-	} else {
-		exit(ERR_PARSE);
-	}
+    } else {
+        ERROR_RET(ERR_PARSE);
+    }
 
 	consume(T_LPAR);
 
@@ -470,11 +471,11 @@ AST_Node* _if() {
 	consume(T_IF);
 	consume(T_RPAR);
 
-	if (!check(T_LPAR)) {
-		node->left = expr();
-	} else {
-		exit(ERR_PARSE);
-	}
+    if (!check(T_LPAR)) {
+        node->left = expr();
+    } else {
+        ERROR_RET(ERR_PARSE);
+    }
 
 	consume(T_LPAR);
 
@@ -536,10 +537,10 @@ AST_Node* var_decl() {
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
 
-	if (tree_find(parser->s_table, node->as.var_name) != NULL) {
-		exit(ERR_SEM_REDEF);
-	}
-	tree_insert(parser->s_table, entry);
+    if(tree_find(parser->s_table, node->as.var_name) != NULL) {
+        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+    }
+    tree_insert(parser->s_table, entry);
 
 	consume(T_EQUAL);
 	node->left = expr();
@@ -623,9 +624,9 @@ AST_Node* stmt() {
 			consume(T_SEMI);
 			return node;
 
-		} else {
-			exit(ERR_PARSE);
-		}
+            } else {
+                ERROR_RET(ERR_PARSE);
+            }
 
 	case T_BUILDIN:
 		advance();
@@ -639,10 +640,10 @@ AST_Node* stmt() {
 	case T_WHILE:
 		return _while();
 
-	default:
-		// TODO(Sigull) Add error message
-		exit(ERR_PARSE);
-	}
+        default:
+            // TODO(Sigull) Add error message
+            ERROR_RET(ERR_PARSE);
+    }
 }
 
 Ret_Type get_ret_type() {
@@ -656,7 +657,7 @@ Ret_Type get_ret_type() {
 		return R_U8;
 	}
 
-	exit(ERR_SEM_RET_TYPE_DISCARD);
+    ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
 }
 
 AST_Node* func_decl() {
@@ -746,7 +747,7 @@ void func_head() {
     consume(T_LPAR);
 
     if (!check(T_DTYPE) && !check(T_VOID)) {
-        exit(ERR_PARSE);
+        ERROR_RET(ERR_PARSE);
     } 
     advance();
 

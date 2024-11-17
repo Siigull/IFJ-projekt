@@ -15,6 +15,34 @@ void sem_func_call(AST_Node* node) {
     //TODO(Sigull) todo
 }
 
+void sem_validate_return(AST_Node* node, Ret_Type expected_type) {
+    if (node->type == RETURN) {
+        // has return value
+        if (node->left) {
+            check_node(node->left);
+
+            if (node->left->as.expr_type != expected_type) {
+                exit(ERR_SEM_RET_TYPE_DISCARD); // return type missmatch
+            }
+        // doesn't have return value    
+        } else if (expected_type != R_VOID) {
+            exit(ERR_SEM_RET_TYPE_DISCARD); // non-void func must return a value
+        }
+    }
+
+    // check statements in nested blocks
+    if (node->as.arr) {
+        for (int i = 0; i < node->as.arr->length; i++) {
+            AST_Node* child = (AST_Node*)node->as.arr->data[i];
+            sem_validate_return(child, expected_type);
+        }
+    }
+
+    // check both branches for if statements
+    if (node->left) sem_validate_return(node->left, expected_type);
+    if (node->right) sem_validate_return(node->right, expected_type);
+}
+
 void sem_function_decl(AST_Node* node) {
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 

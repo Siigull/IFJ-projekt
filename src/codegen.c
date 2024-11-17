@@ -1,3 +1,13 @@
+/**
+ * @file codegen.c
+ * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
+ * @brief Implementation of IFJ24 code generator, generates from given AST
+ * 
+ * @todo remove symtable where not needed, add/revamp builtins, add evaluation of conditions of loops and ifs
+ * 
+ * @date 2024-11-15
+ * 
+ */
 
 #include "codegen.h"
 
@@ -7,48 +17,57 @@ void generate_prolog(){
     return;
 }
 
+void builtin_start(char* func_name){
+    fprintf(stdout, "LABEL %s\n", func_name);
+    fprintf(stdout, "\tPUSHFRAME\n");
+    return;
+}
+
+void builtin_end(){
+    fprintf(stdout, "\tPOPFRAME\n");
+    fprintf(stdout, "\tRETURN\n\n");
+}
+
+void builtin_reads(char* func_name, char* type){
+    builtin_start(func_name);
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tREAD LF@*return*value %s\n", type);
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    builtin_end();
+}
 
 void generate_builtins(){
     //WRITE
-    fprintf(stdout, "LABEL *write\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    builtin_start("*write");
     fprintf(stdout, "\tDEFVAR LF@*to*write\n");
     fprintf(stdout, "\tMOVE LF@*to*write LF@*param0\n");
     fprintf(stdout, "\tWRITE LF@*to*write\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    builtin_end();
 
     //i2f
-    fprintf(stdout, "LABEL *i2f\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    builtin_start("*i2f");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
     fprintf(stdout, "\tINT2FLOAT LF@*return*value LF@*param0\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    builtin_end();
 
     //f2i
-    fprintf(stdout, "LABEL *f2i\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    builtin_start("*f2i");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
     fprintf(stdout, "\tFLOAT2INT LF@*return*value LF@*param0\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    builtin_end();
 
     //LENGTH
-    fprintf(stdout, "LABEL *length\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    builtin_start("*length");
     fprintf(stdout, "\tDEFVAR LF@*strlen\n");
     fprintf(stdout, "\tMOVE LF@*strlen LF@*param0\n");
     fprintf(stdout, "\tSTRLEN LF@*strlen LF@*strlen\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*strlen\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    builtin_end();
 
     //CONCATENATE
-    fprintf(stdout, "LABEL *concat\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    builtin_start("*concat");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
     fprintf(stdout, "\tDEFVAR LF@*first\n");
     fprintf(stdout, "\tMOVE LF@*first LF@*param0\n");
@@ -56,65 +75,287 @@ void generate_builtins(){
     fprintf(stdout, "\tMOVE LF@*second LF@*param1\n");
     fprintf(stdout, "\tCONCAT LF@*return*value LF@*first LF@*second\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
-    //todo add all builtin functions
+    builtin_end();
 
-    //readstr
-    fprintf(stdout, "LABEL *readstr\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
-    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tREAD LF@*return*value string\n");
-    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    //readstr, readi32, readf64
+    builtin_reads("*readstr", "string");
+    builtin_reads("*readi32", "int");
+    builtin_reads("*readf64", "float");
 
-    //readi32
-    fprintf(stdout, "LABEL *readstr\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    //ord
+    builtin_start("*ord");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tREAD LF@*return*value int\n");
+    fprintf(stdout, "\tSTRI2INT LF@*return*value LF@*param0 LF@*param1\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    builtin_end();
 
-    //readf64
-    fprintf(stdout, "LABEL *readstr\n");
-    fprintf(stdout, "\tPUSHFRAME\n");
+    //chr
+    builtin_start("*chr");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tREAD LF@*return*value float\n");
+    fprintf(stdout, "\tINT2CHAR LF@*return*value LF@*param0\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    builtin_end();
+
+    builtin_start("*string");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tMOVE LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    builtin_end();
+
+    //strcmp
+    builtin_start("*strcmp");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tDEFVAR LF@*res\n");
+    fprintf(stdout, "\tEQ LF@*res LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tJUMPIFEQ *strcmp*skipeq LF@*res bool@false\n");
+    fprintf(stdout, "\tMOVE LF@*return*value int@0\n");
+    fprintf(stdout, "\tJUMP *strcmp*end\n");
+    fprintf(stdout, "\tLABEL *strcmp*skipeq\n");
+    fprintf(stdout, "\tLT LF@*res LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tJUMPIFEQ *strcmp*skiplt LF@*res bool@false\n");
+    fprintf(stdout, "\tMOVE LF@*return*value int@-1\n");
+    fprintf(stdout, "\tJUMP *strcmp*end\n");
+    fprintf(stdout, "\tLABEL *strcmp*skiplt\n");
+    fprintf(stdout, "\tMOVE LF@*return*value int@1\n");
+    fprintf(stdout, "\tLABEL *strcmp*end\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    builtin_end();
+
+    //substring
+    builtin_start("*substring");
+    fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tMOVE LF@*return*value string@\n");
+    fprintf(stdout, "\tDEFVAR LF@*start*index\n");
+    fprintf(stdout, "\tDEFVAR LF@*res\n");
+    fprintf(stdout, "\tMOVE LF@*start*index LF@*param1\n");
+    fprintf(stdout, "\tLABEL *substring*while\n");
+    fprintf(stdout, "\tEQ LF@*res LF@*start*index LF@*param2\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*loop*end LF@*res bool@true\n");
+
+    fprintf(stdout, "\tGETCHAR LF@*res LF@*param0 LF@*start*index\n");
+    fprintf(stdout, "\tCONCAT LF@*return*value LF@*return*value LF@*res\n");
+
+    fprintf(stdout, "\tADD LF@*start*index LF@*start*index int@1\n");
+    fprintf(stdout, "\tJUMP *substring*while\n");
+    fprintf(stdout, "\tLABEL *substring*loop*end\n");
+    fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
+    builtin_end();
 }
 
-void eval_exp(AST_Node* curr){
+bool is_operator_arithmetic(AST_Type type){
+    if(type == PLUS || type == MINUS || type == MUL || type == DIV){
+        return true;
+    }
+
+    return false;
+}
+
+bool is_data_type(AST_Type type){
+    if(type == I32 || type == F64 ||type == STRING){
+        return true;
+    }
+
+    return false;
+}
+
+//postorder traversal through the expression tree
+void eval_exp(AST_Node* curr, Tree* symtable){
+    if(curr->left != NULL) eval_exp(curr->left, symtable);
+    if(curr->right != NULL) eval_exp(curr->right, symtable);
+
+    //here current instruction can be processed
+    if(is_operator_arithmetic(curr->type)){
+        switch(curr->type){
+            case PLUS:
+                fprintf(stdout, "\tADDS\n");
+                break;
+            case MINUS:
+                fprintf(stdout, "\tSUBS\n");
+                break;
+            case MUL:
+                fprintf(stdout, "\tMULS\n");
+                break;
+            case DIV:
+                fprintf(stdout, "\tDIVS\n");
+                break;
+        }
+    }
+    else if(curr->type == FUNC_CALL){
+        generate_func_call(curr, symtable);
+        fprintf(stdout, "\tPUSHS GF@*return*val\n");
+    }
+    else if(is_data_type(curr->type)){
+        switch(curr->type){
+            //ast_node union doesnt have correct values TODO TODO TODO
+            case I32:
+                fprintf(stdout, "\tPUSHS int@%d\n", curr->as.i32);
+                break;
+            case F64:
+                fprintf(stdout, "\tPUSHS float@%a\n", curr->as.f64);
+                break;
+            case STRING:
+                fprintf(stdout, "\tPUSHS string@%s\n", string_to_assembly(curr->as.string));
+                break;
+        }
+    }
+    else if(curr->type == ID){
+        fprintf(stdout, "\tPUSHS LF@%s\n", curr->as.var_name);
+    }
     //todo
     return;
 }
 
-//value of return of fnc, value to assign into var -> GF@__expression__result global variable
+//condition structure - root is relation operator, left and right children are classic expressions
+void eval_condition(AST_Node* curr, Tree* symtable){
+    if(curr->left != NULL){
+        generate_expression(curr->left, symtable);
+        fprintf(stdout, "\tMOVE GF@*lhs GF@*expression*result\n");
+    }
+    if(curr->right != NULL){
+        generate_expression(curr->right, symtable);
+        fprintf(stdout, "\tMOVE GF@*rhs GF@*expression*result\n");
+    }
+
+    switch(curr->type){
+        case ISEQ:
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
+            break;
+        case ISNEQ:
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
+            fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
+            break;
+        case ISLESS:
+            fprintf(stdout, "\tLT GF@*expression*result GF@*lhs GF@*rhs\n");
+            break;
+        case ISMORE:
+            fprintf(stdout, "\tGT GF@*expression*result GF@*lhs GF@*rhs\n");
+            break;
+        case ISLESSEQ:
+            fprintf(stdout, "\tLT GF@*tmp*res GF@*lhs GF@*rhs\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF*rhs\n");
+            fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
+            break;
+        case ISMOREEQ:
+            fprintf(stdout, "\tGT GF@*tmp*res GF@*lhs GF@*rhs\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF*rhs\n");
+            fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
+            break;
+        case STRING:
+        case I32:
+        case F64:
+        case ID:
+            fprintf(stdout, "\tEQ GF@*expression*result LF@%s nil@nil\n", curr->as.var_name);
+            fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
+            break;
+    }
+    //todo
+    return;
+}
+
+
+//value of return of fnc, value to assign into var -> GF@*expression*result global variable
 //maybe change this
 void generate_expression(AST_Node* curr, Tree* symtable){
-    //todo
+    eval_exp(curr, symtable);
+    fprintf(stdout, "\tPOPS GF@*expression*result\n");
     return;
 }
 
-void generate_if(AST_Node* curr, Tree* symtable){
-    //todo
+void predefine_vars(AST_Node* curr, Tree* symtable){
+    Arr* statements = curr->as.arr;
+    for(int i = 0; i < statements->length; i++){
+        AST_Node* curr = (AST_Node*)((statements->data)[i]);
+        if(curr->type == VAR_DECL){
+            fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
+        }
+
+        if(curr->type == WHILE){
+            predefine_vars(curr, symtable);
+        }
+        if(curr->type == IF){
+            predefine_vars(curr, symtable);
+            predefine_vars(curr->right, symtable); //else part
+        }
+    }
 }
 
-void generate_while(AST_Node* curr, Tree* symtable){
-    //todo
+void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
+    Arr* statements = curr->as.arr;
+    for(int i = 0; i < statements->length; i++){
+        AST_Node* stmt = (AST_Node*)((statements->data)[i]);
+        generate_statement(stmt, symtable, func_name, i, nest+1, true);
+    }
+    return;
 }
+
+
+void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop){
+    if(!inside_if_loop){
+        predefine_vars(curr, symtable);
+        predefine_vars(curr->right, symtable);
+    }
+    eval_condition(curr->left, symtable);
+    // condition is false if evaluated expression is 0
+    fprintf(stdout, "\tJUMPIFEQ *else*%s*%d*%d GF@*expression*result bool@false\n", func_name, stmt_index, nest);
+
+    int i = 0;
+    Arr* statements = curr->as.arr;
+    AST_Node* first = (AST_Node*)((statements->data)[0]);
+    if(first->type == NNULL_VAR_DECL){
+        fprintf(stdout, "\tDEFVAR LF@%s\n", first->as.var_name);
+        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", first->as.var_name);
+        i = 1;
+    }
+
+    for(; i < statements->length; i++){
+        AST_Node* stmt = (AST_Node*)((statements->data)[i]);
+        generate_statement(stmt, symtable, func_name, i, nest+1, true);
+    }
+    fprintf(stdout, "\tJUMP *end*of*if*%s*%d*%d\n", func_name, stmt_index, nest);
+
+    fprintf(stdout, "\tLABEL *else*%s*%d*%d\n", func_name, stmt_index, nest);
+    generate_else(curr->right, symtable, func_name, stmt_index, nest);
+    fprintf(stdout, "\tLABEL *end*of*if*%s*%d*%d\n", func_name, stmt_index, nest);
+    return;
+}
+
+void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop){
+    if(!inside_if_loop) predefine_vars(curr, symtable);
+    
+    fprintf(stdout, "\tLABEL *while*%s*%d*%d\n", func_name, stmt_index, nest);
+    eval_condition(curr->left, symtable);
+    // condition is false if evaluated expression is 0
+    fprintf(stdout, "\tJUMPIFEQ *end*loop*%s*%d*%d GF@*expression*result bool@false\n", func_name, stmt_index, nest);
+
+    int i = 0;
+    Arr* statements = curr->as.arr;
+    AST_Node* first = (AST_Node*)((statements->data)[0]);
+    if(first->type == NNULL_VAR_DECL){
+        fprintf(stdout, "\tDEFVAR LF@%s\n", first->as.var_name);
+        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", first->as.var_name);
+        i = 1;
+    }
+
+    for(; i < statements->length; i++){
+        AST_Node* stmt = (AST_Node*)((statements->data)[i]);
+        generate_statement(stmt, symtable, func_name, i, nest+1, true);
+    }
+
+    fprintf(stdout, "\tJUMP *while*%s*%d*%d\n", func_name, stmt_index, nest);
+    fprintf(stdout, "\tLABEL *end*loop*%s*%d*%d\n", func_name, stmt_index, nest);
+    return;
+}
+
 
 void generate_return(AST_Node* curr, Tree* symtable){
     if(curr->left != NULL){
         generate_expression(curr->left, symtable);
+        fprintf(stdout, "\tMOVE GF@*return*val GF@*expression*result\n");
     }
     fprintf(stdout, "\tPOPFRAME\n");
     fprintf(stdout, "\tRETURN\n\n");
 }
+
 
 void generate_func_call(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tCREATEFRAME\n");
@@ -125,13 +366,11 @@ void generate_func_call(AST_Node* curr, Tree* symtable){
         fprintf(stdout, "\tDEFVAR TF@*param%d\n", i);
         generate_expression(param, symtable);
         fprintf(stdout, "\tMOVE TF@*param%d GF@*expression*result\n", i);
-        //fprintf(stdout, "\tPUSHS GF@*expression*result\n");
     }
-
-    //fprintf(stdout, "\tPUSHFRAME\n");
     fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
-    //fprintf(stdout, "\tPOPFRAME\n\n");
+    //fprintf(stdout, "\tMOVE GF@*expression*result, GF@*return*val\n");
 }
+
 
 void generate_var_decl(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
@@ -139,39 +378,16 @@ void generate_var_decl(AST_Node* curr, Tree* symtable){
     fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
 }
 
+
 void generate_var_assignment(AST_Node* curr, Tree* symtable){
-    //add variable that will store from global frame into the variable
-    //case when var is _ 
+    //based on evaluated expression, save its value into the variable
     generate_expression(curr->left, symtable);
     fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
-}
+}//generate_var_assignment
 
-void generate_statement(AST_Node* curr, Tree* symtable){
-    switch(curr->type){
-        case IF:
-            generate_if(curr, symtable);
-            return;
-        case RETURN:
-            generate_return(curr, symtable);
-            return;
-        case WHILE:
-            generate_while(curr, symtable);
-            return;
-        case FUNC_CALL:
-            generate_func_call(curr, symtable);
-            return;
-        case VAR_DECL:
-            generate_var_decl(curr, symtable);
-            return;
-        case VAR_ASSIGNMENT:
-            generate_var_assignment(curr, symtable);
-            return;
-    }
-    return;
-}
 
 void generate_function_decl(AST_Node* curr, Tree* symtable){
-    fprintf(stdout, "LABEL *%s\n", curr->as.func_data->var_name);
+    fprintf(stdout, "LABEL %s\n", curr->as.func_data->var_name);
     bool main = (!strcmp(curr->as.func_data->var_name, "main"));
     if(main){
         fprintf(stdout, "\tCREATEFRAME\n");
@@ -190,7 +406,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     for(int i = 0; i < args->length; i++){
         Function_Arg* argument = (Function_Arg*)((args->data)[i]);
         fprintf(stdout, "\tDEFVAR LF@%s\n", argument->arg_name); 
-        fprintf(stdout, "\tMOVE LF@%s LF@%s*param\n", argument->arg_name, argument->arg_name);
+        fprintf(stdout, "\tMOVE LF@%s LF@*param%d\n", argument->arg_name, i);
     }
 
     // statements in as->func_data as an array
@@ -199,22 +415,57 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     for(int i = 0; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
         if(stmt->type == RETURN && !strcmp(curr->as.func_data->var_name, "main")) break;
-        generate_statement(stmt, symtable);
+        generate_statement(stmt, symtable, curr->as.func_data->var_name, i, 0, false);
     }
 
     if(main){
         fprintf(stdout, PROG_END);
     }
     return;
-}
+}//generate_function_decl
+
+
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop){
+    //choose which type of statement to generate
+    switch(curr->type){
+        case IF:
+            generate_if(curr, symtable, func_name, stmt_index, nest, inside_if_loop);
+            return;
+        case RETURN:
+            generate_return(curr, symtable);
+            return;
+        case WHILE:
+            generate_while(curr, symtable, func_name, stmt_index, nest, inside_if_loop);
+            return;
+        case FUNC_CALL:
+            generate_func_call(curr, symtable);
+            return;
+        case VAR_DECL:
+            if(inside_if_loop){
+                generate_var_assignment(curr, symtable);
+            }
+            else{     
+                generate_var_decl(curr, symtable);
+            }
+            return;
+        case VAR_ASSIGNMENT:
+            generate_var_assignment(curr, symtable);
+            return;
+    }
+    return;
+}//generate_statement
 
 
 void generate_code(Arr* input, Tree* symtable){
+    //program start ensures we jump into main function directly
     generate_prolog();
-    //start on main
+
+    //generate all builtin functions
     generate_builtins();
+
+    //generate all user defined functions
     for(int i = 0; i < input->length; i++){
         AST_Node* curr = (AST_Node*)((input->data)[i]);
         generate_function_decl(curr, symtable);
     }
-}
+}//generate_code
