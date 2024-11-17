@@ -145,7 +145,7 @@ AST_Type get_type(T_Type type) {
 	case T_ID:
 		return ID;
 	case T_NULL:
-		return NUL;
+		return NIL;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;

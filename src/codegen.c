@@ -182,7 +182,20 @@ void eval_exp(AST_Node* curr, Tree* symtable){
     }
     else if(curr->type == FUNC_CALL){
         generate_func_call(curr, symtable);
-        fprintf(stdout, "\tPUSHS GF@*return*val\n");
+        Entry* e = tree_find(symtable, curr->as.func_data->var_name);
+        if(e != NULL){
+            //user-defined functions
+            if(e->ret_type == R_VOID){
+                fprintf(stdout, "\tPUSHS nil@nil\n");
+            }
+            else{
+                fprintf(stdout, "\tPUSHS GF@*return*val\n");
+            }
+        }
+        else{
+            //builtin case
+            fprintf(stdout, "\tPUSHS GF@*return*val\n");
+        }
     }
     else if(is_data_type(curr->type)){
         switch(curr->type){
@@ -201,7 +214,7 @@ void eval_exp(AST_Node* curr, Tree* symtable){
     else if(curr->type == ID){
         fprintf(stdout, "\tPUSHS LF@%s\n", curr->as.var_name);
     }
-    else if(curr->type == NUL){
+    else if(curr->type == NIL){
         fprintf(stdout, "\tPUSHS nil@nil\n");
     }
     return;
@@ -379,14 +392,15 @@ void generate_func_call(AST_Node* curr, Tree* symtable){
         fprintf(stdout, "\tMOVE TF@*param%d GF@*expression*result\n", i);
     }
     fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
-    //fprintf(stdout, "\tMOVE GF@*expression*result, GF@*return*val\n");
 }
 
 
 void generate_var_decl(AST_Node* curr, Tree* symtable){
-    fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
-    generate_expression(curr->left, symtable);
-    fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
+    if(strcmp(curr->as.var_name, "_")){
+        fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
+        generate_expression(curr->left, symtable);
+        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n\n", curr->as.var_name);
+    }
 }
 
 

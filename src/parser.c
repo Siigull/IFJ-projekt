@@ -493,6 +493,23 @@ AST_Node* _if() {
 	return node;
 }
 
+
+
+
+
+AST_Node* under_var_decl() {
+	AST_Node* node = node_init(VAR_ASSIGNMENT);
+	consume(T_UNDER);
+	node->as.var_name = parser->prev->value;
+	consume(T_EQUAL);
+	node->left = expr();
+	consume(T_SEMI);
+	return node;
+}
+
+
+
+
 AST_Node* var_decl() {
 	AST_Node* node = node_init(VAR_DECL);
 
@@ -618,6 +635,8 @@ AST_Node* stmt() {
 
 	case T_WHILE:
 		return _while();	
+	case T_UNDER:
+		return under_var_decl();
 
         default:
             // TODO(Sigull) Add error message
@@ -626,7 +645,7 @@ AST_Node* stmt() {
 }
 
 Ret_Type get_ret_type() {
-	if (strcmp(parser->prev->value, "void")) {
+	if (parser->prev->type == T_VOID) {
 		return R_VOID;
 	} else if (strcmp(parser->prev->value, "i32")) {
 		return R_I32;
