@@ -129,49 +129,51 @@ const char* type_to_string(T_Type type) {
 	}
 }
 
-AST_Type get_type(T_Type type){
-	switch(type){
-		case T_I32:
-			return I32;
-		case T_F64:
-			return F64;
-		case T_STRING:
-			return STRING;
+AST_Type get_type(T_Type type) {
+	switch (type) {
+	case T_I32:
+		return I32;
+	case T_F64:
+		return F64;
+	case T_STRING:
+		return STRING;
+	case T_ID:
+		return ID;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;
 }
-AST_Type get_type_from_rule(int rule){
-	switch(rule){
-		case E_PLUS_E:
-			return PLUS;
-		case E_MINUS_E:
-			return MINUS;
-		case E_TIMES_E:
-			return MUL;
-		case E_DIV_E:
-			return DIV;
-		case E_EQ_E:
-			return ISEQ;
+AST_Type get_type_from_rule(int rule) {
+	switch (rule) {
+	case E_PLUS_E:
+		return PLUS;
+	case E_MINUS_E:
+		return MINUS;
+	case E_TIMES_E:
+		return MUL;
+	case E_DIV_E:
+		return DIV;
+	case E_EQ_E:
+		return ISEQ;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;
 }
 
-void adjust_stack_rule_E_ID(List* Stack, Token* processed){
+void adjust_stack_rule_E_ID(List* Stack, Token* processed) {
 	List_activeL(Stack);
 	List_removeL(Stack);
 	List_removeL(Stack);
 	List_insertL(Stack, processed);
 }
-void adjust_stack_rule_E_E(List* Stack, Token* processed){
+void adjust_stack_rule_E_E(List* Stack, Token* processed) {
 	List_removeL(Stack);
 	List_removeL(Stack);
 	List_removeL(Stack);
 	List_removeL(Stack);
 	List_insertL(Stack, processed);
 }
-void adjust_stack_else(List* Stack, AST_Node* middle_node){
+void adjust_stack_else(List* Stack, AST_Node* middle_node) {
 	List_removeL(Stack);
 	List_removeL(Stack);
 	List_removeL(Stack);
@@ -195,7 +197,7 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 }
 
 bool is_id(T_Type type) {
-	if (type == T_ID || type == T_F64 || type == T_I32) {
+	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING) {
 		return true;
 	}
 	return false;
@@ -209,8 +211,10 @@ int find_precedence_index(List* list) {
 	while (1) // THIS CAN BE DONE BETTER
 	{
 		List_get_val(list, &current);
-		if ((current->type == T_ID && current->isProcessed == false) ||
-			(current->type == T_I32 && current->isProcessed == false) || current->type == T_F64) {
+		if (((current->type == T_ID && current->isProcessed == false) ||
+			 (current->type == T_I32 && current->isProcessed == false) || current->type == T_F64 ||
+			 current->type == T_ID || current->type == T_STRING) &&
+			current->isProcessed == false) {
 			return 0;
 		} else if (current->type == T_PLUS) {
 			return 1;
@@ -245,25 +249,31 @@ void insert_dollar(List* input) {
 }
 
 void handle_rule(int rule, List* Stack) {
-	if(rule == E_ID){
+	if (rule == E_ID) {
 		// <i
 		Token* processed_token = Stack->last->token;
 		AST_Type nodetype = get_type(processed_token->type);
 		AST_Node* node = node_init(nodetype);
 		// here we should add value to the nodes
-		if (nodetype == ID || nodetype == I32) {
-			node->as.var_name = processed_token->value;
-		}
 		processed_token->isProcessed = true;
 		processed_token->node = node;
 		// now the token is prepared to be pushed as an E symbol (isProcessed)
+		char* end;
+		if (processed_token->type == T_I32) {
+			node->as.i32 = strtol(processed_token->value, &end, 10);
+		} else if (processed_token->type == T_F64) {
+			node->as.f64 = strtof(processed_token->value, &end);
+		} else if (processed_token->type == T_ID) {
+			node->as.var_name = processed_token->value;
+		} else if (processed_token->type == T_STRING) {
+			node->as.string = processed_token->value;
+		}
+
 		adjust_stack_rule_E_ID(Stack, processed_token);
-	}
-	else if(rule == E_E){
+	} else if (rule == E_E) {
 		Token* processed_token = Stack->last->previousElement->token;
 		adjust_stack_rule_E_E(Stack, processed_token);
-	}
-	else{
+	} else {
 		// handling <E+E rule
 		AST_Node* right_node = Stack->last->token->node;
 		AST_Node* left_node = Stack->last->previousElement->previousElement->token->node;
@@ -284,29 +294,26 @@ int find_reduction_rule(List* Stack) {
 	bool id_second = is_id(prev->type);
 	bool id_middle = is_id(Stack->last->previousElement->token->type);
 	T_Type op = Stack->last->previousElement->token->type;
-	if(id_first && id_second){
-		switch(op){
-			case T_PLUS:
-				return E_PLUS_E;
-			case T_MINUS:
-				return E_MINUS_E;
-			case T_MUL:
-				return E_TIMES_E;
-			case T_DIV:
-				return E_DIV_E;
-			case T_DDEQ:
-				return E_EQ_E;
-			default:
-				ERROR_RET(2);
+	if (id_first && id_second) {
+		switch (op) {
+		case T_PLUS:
+			return E_PLUS_E;
+		case T_MINUS:
+			return E_MINUS_E;
+		case T_MUL:
+			return E_TIMES_E;
+		case T_DIV:
+			return E_DIV_E;
+		case T_DDEQ:
+			return E_EQ_E;
+		default:
+			ERROR_RET(2);
 		}
-	}
-	else if(last->type == T_LPAR && id_middle && prev->type == T_RPAR){
+	} else if (last->type == T_LPAR && id_middle && prev->type == T_RPAR) {
 		return E_ID;
-	}
-	else if(id_first){
+	} else if (id_first) {
 		return E_ID;
-	}
-	else{
+	} else {
 		ERROR_RET(2);
 	}
 }
@@ -335,7 +342,6 @@ void handle_precedence(int precedence, List* Stack, List* input) {
 		List_activeL(input);
 
 	} else if (precedence == M) {
-
 	}
 }
 
@@ -370,8 +376,8 @@ AST_Node* parse_expression(List* input) {
 	int precedence_stack, precendence_input, precendence_operation = 0;
 
 	while (1) {
-		//print_list(Stack);
-		//print_list(input);
+		// print_list(Stack);
+		// print_list(input);
 		precedence_stack = find_precedence_index(Stack);
 		precendence_input = find_precedence_index(input);
 		precendence_operation = precedence_table[precedence_stack][precendence_input];
