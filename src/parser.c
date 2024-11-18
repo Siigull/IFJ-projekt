@@ -23,6 +23,8 @@ Parser* init_parser() {
 	parser->prev = NULL;
 
 	parser->s_table = tree_init();
+    parser->c_stack = init_c_stack(parser->s_table);
+    parser->c_stack.global_table = parser->s_table;
 
 	return parser;
 }
@@ -390,27 +392,27 @@ AST_Node* binary() {
 
 // Expression parser
 AST_Node* expr() {
-List* token_list = malloc(sizeof(List));
-	// List_init(token_list);
+    List* token_list = malloc(sizeof(List));
+	List_init(token_list);
 
-	// AST_Node* node = binary_load(token_list);
-	// if (node == NULL) {
-	// 	List_activeF(token_list);
-	// 	while (List_is_active(token_list)) {
-	// 		Token* temp;
-	// 		List_get_val(token_list, &temp);
-	// 		print_token(temp, stdout, false);
-	// 		printf(" ");
-	// 		List_active_next(token_list);
-	// 	}
+	AST_Node* node = binary_load(token_list);
+	if (node == NULL) {
+		List_activeF(token_list);
+		while (List_is_active(token_list)) {
+			Token* temp;
+			List_get_val(token_list, &temp);
+			print_token(temp, stdout, false);
+			printf(" ");
+			List_active_next(token_list);
+		}
 
-	// 	node = parse_expression(token_list);
-	// 	printf("\n");
-	// }
+		node = parse_expression(token_list);
+		printf("\n");
+	}
 
-	// return node;
+	return node;
 
-    return binary();
+    // return binary();
 }
 
 // Normal parser
@@ -429,7 +431,9 @@ AST_Node* _else() {
 
 	consume(T_ELSE);
 
+    context_push(&(parser->c_stack));
 	block(node->as.arr);
+    context_pop(&(parser->c_stack));
 
 	return node;
 }
@@ -449,18 +453,22 @@ AST_Node* _while() {
 
 	consume(T_LPAR);
 
+    context_push(&(parser->c_stack));
 	if (check(T_BAR)) {
 		advance();
 
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
+        Entry* entry = entry_init(node->as.var_name, E_VAR, IMPLICIT, false);
+        context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
 		consume(T_BAR);
 	}
 
 	block(node->as.arr);
+    context_pop(&(parser->c_stack));
 
 	return node;
 }
@@ -479,18 +487,22 @@ AST_Node* _if() {
 
 	consume(T_LPAR);
 
+    context_push(&(parser->c_stack));
 	if (check(T_BAR)) {
 		advance();
 
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
+        Entry* entry = entry_init(node->as.var_name, E_VAR, IMPLICIT, false);
+        context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
 		consume(T_BAR);
 	}
 
 	block(node->as.arr);
+    context_pop(&(parser->c_stack));
 
 	if (check(T_ELSE)) {
 		node->right = _else();
@@ -548,10 +560,10 @@ AST_Node* var_decl() {
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
 
-	if (tree_find(parser->s_table, node->as.var_name) != NULL) {
+	if (context_find(&(parser->c_stack), node->as.var_name) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
 	}
-	tree_insert(parser->s_table, entry);
+	context_put(&(parser->c_stack), entry);
 
 	consume(T_EQUAL);
 	node->left = expr();
@@ -591,7 +603,9 @@ AST_Node* assignment() {
 
 	} else {
 		node = node_init(VAR_ASSIGNMENT);
-		node->as.var_name = parser->prev->value;
+        Entry* entry = context_find(&(parser->c_stack), parser->prev->value);
+        if(entry == NULL) exit(ERR_SEM_NOT_DEF_FNC_VAR);
+		node->as.var_name = entry->key;
 		consume(T_EQUAL);
 		node->left = expr();
 	}
@@ -714,7 +728,9 @@ AST_Node* func_decl() {
     }
     type();
 
+    context_push(&(parser->c_stack));
 	block(node->as.func_data->arr);
+    context_pop(&(parser->c_stack));
 
 	return node;
 }
@@ -780,7 +796,7 @@ void func_head() {
     tree_insert(parser->s_table, entry);
 }
 
-Arr* parse(char* orig_input) {
+void parse(char* orig_input) {
     size_t len = strlen(orig_input) + 1;
     char* input = malloc(sizeof(char) * (len + 10));
     memcpy(input, orig_input, len * sizeof(char));
@@ -814,7 +830,7 @@ Arr* parse(char* orig_input) {
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
-    if(f == NULL) return NULL;
+    if(f == NULL) return;
     fclose(f);
 
     Arr* nodes = arr_init();

@@ -26,9 +26,10 @@ typedef struct Parser {
     Token* prev;
 
     Tree* s_table;
+    C_Stack c_stack;
 } Parser;
 
-Arr* parse(char* input);
+void parse(char* input);
 int compile(char* input);
 char* string_to_assembly(const char* string);
 

@@ -241,6 +241,29 @@ Entry* tree_find(Tree* tree, const char* key) {
 	return node->entry;
 }
 
+Entry* tree_pop_traverse(Node* node) {
+	if (node == NULL) {
+		return NULL;
+	}
+
+	if(node->left == NULL && node->right == NULL) {
+		return node->entry;
+	}
+
+	Entry* entry = tree_pop_traverse(node->left);
+	if(entry != NULL) return entry;
+
+	return tree_pop_traverse(node->right);
+}
+
+Entry* tree_pop(Tree* tree) {
+	Entry* entry = tree_pop_traverse(tree->root);
+
+	tree_delete(tree, entry->key);
+
+	return entry;
+}
+
 Node* transplant(Node* from, Node* to) {
 	if (to->parent->left == to) {
 		to->parent->left = from;
@@ -400,6 +423,115 @@ void node_print(Node* node, int depth) {
 
 	node_print(node->left, depth + 1);
 	node_print(node->right, depth + 1);
+}
+
+C_Stack init_c_stack(Tree* global_tree) {
+	C_Stack stack;
+
+	stack.max_nest = 8;
+	stack.arr = malloc(sizeof(Context) * stack.max_nest);
+	stack.cur_nest = -1;
+
+	stack.path = malloc(sizeof(int) * 4);
+	stack.max_path = 4;
+	stack.path[0] = 0;
+
+	stack.global_table = global_tree;
+
+	return stack;
+}
+
+void extend_path(C_Stack* stack, bool up) {
+	if(stack->cur_path >= stack->max_path - 1) {
+		stack->max_path *= 2;
+		stack->path = realloc(stack->path, stack->max_path);
+		if(stack->path == NULL) {
+			exit(99);
+		}
+	}
+
+	if(stack->last_up == up) {
+		stack->path[stack->cur_path]++;
+	} else {
+		stack->path[--(stack->cur_path)] = 1;
+	}
+}
+
+void context_push(C_Stack* stack) {
+	if(stack->cur_nest >= stack->max_nest - 2) {
+		stack->max_nest *= 2;
+		Context* data = realloc(stack->arr, stack->max_nest * sizeof(Context));
+		
+		if(data == NULL) {
+			free(stack->arr);
+			exit(99);
+		}
+
+		stack->arr = data;
+	}
+
+	extend_path(stack, true);
+
+	stack->cur_nest++;
+	tree_init(stack->cur_nest);
+}
+
+bool context_pop(C_Stack* stack) {
+	if(stack->cur_nest < 0) {
+		return false;
+	}
+
+	Entry* entry;
+	while (true){
+		entry = tree_pop(stack->arr[stack->cur_nest]);
+		if(entry == NULL) {
+			break;
+		}
+		
+		if(tree_find(stack->global_table, entry->key) != NULL) {
+			entry->key = realloc(entry->key, strlen(entry->key) + (stack->cur_path * 2) + 1);
+			if(entry->key == NULL) {
+				exit(99);
+			}
+			int i = 0;
+			int len = strlen(entry->key);
+			for(; i < stack->cur_path; i++) {
+				entry->key[len + (i * 2)] = (char)stack->path[i] << 8;
+				entry->key[len + (i * 2) + 1] = (char)stack->path[i];
+			}
+			tree_insert(stack->global_table, entry);
+		}
+	}
+
+	extend_path(stack, false);
+
+	stack->cur_nest--;
+
+	return true;
+}
+
+Entry* context_find(C_Stack* stack, const char* key) {
+	int cur_nest = stack->cur_nest;
+	
+	while(cur_nest >= 0) {
+		Entry* entry = tree_find(&(stack->arr[cur_nest]), key);
+		
+		if(entry != NULL) {
+			return entry;
+		}
+
+		cur_nest--;
+	}
+
+	return tree_find(stack->global_table, key);
+}
+
+void context_put(C_Stack* stack, Entry* entry) {
+	if(stack->cur_nest < 0) {
+		tree_insert(stack->global_table, entry);
+	}
+
+	tree_insert(stack->arr[stack->cur_nest], entry);
 }
 
 void tree_print(Tree* tree) {

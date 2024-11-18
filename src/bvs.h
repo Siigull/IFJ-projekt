@@ -38,7 +38,7 @@ typedef struct {
 typedef struct Entry {
 	Entry_Type type;
 	
-	const char* key; // TODO(Sigull): change const char* string to our own type
+	char* key; // TODO(Sigull): change const char* string to our own type
 	Ret_Type ret_type;
 	bool has_null;
 
@@ -62,14 +62,19 @@ typedef struct Tree {
 } Tree;
 
 typedef struct Context {
-
+	Tree* table;
 } Context;
 
 typedef struct Context_Stack {
 	int cur_nest;
 	int max_nest;
 	
-	Context* arr;
+	Context** arr;
+	Tree* global_table;
+	int* path;
+	int cur_path;
+	int max_path;
+	bool last_up;
 } C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,
@@ -81,6 +86,13 @@ void tree_destroy(Tree* tree);
 void tree_insert(Tree* tree, Entry* entry);
 bool tree_delete(Tree* tree, const char* key);
 Entry* tree_find(Tree* tree, const char* key);
+Entry* tree_pop(Tree* tree);
+
+C_Stack init_c_stack(Tree* global_tree);
+void context_push(C_Stack* stack);
+bool context_pop(C_Stack* stack);
+Entry* context_find(C_Stack* stack, const char* key);
+void context_put(C_Stack* stack, Entry* entry);
 
 void tree_print(Tree* tree);
 

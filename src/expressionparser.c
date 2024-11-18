@@ -147,6 +147,8 @@ AST_Type get_type(T_Type type) {
 		return ID;
 	case T_NULL:
 		return NUL;
+	case T_BUILDIN:
+		return FUNC_CALL;
 	}
 	ERROR_RET(ERR_PARSE);
 	return 42;
@@ -308,12 +310,12 @@ void handle_rule(int rule, List* Stack) {
 		} else if (processed_token->type == T_STRING) {
 			node->as.string = processed_token->value;
 		}
-		int errno;
-		// todo
-		if (errno == ERANGE || *end != '\0' || node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
-			ERROR_RET(ERR_SEM_OTHER);
-		}
-		return node;
+		// int errno;
+		// // todo
+		// if (errno == ERANGE || *end != '\0' || node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
+		// 	ERROR_RET(ERR_SEM_OTHER);
+		// }
+		// return node;
 
 		adjust_stack_rule_E_ID(Stack, processed_token);
 	} else if (rule == E_E) {
