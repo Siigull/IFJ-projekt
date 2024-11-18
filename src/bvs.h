@@ -61,15 +61,11 @@ typedef struct Tree {
 	Node* root;
 } Tree;
 
-typedef struct Context {
-	Tree* table;
-} Context;
-
 typedef struct Context_Stack {
 	int cur_nest;
 	int max_nest;
 	
-	Context** arr;
+	Tree** arr;
 	Tree* global_table;
 	int* path;
 	int cur_path;

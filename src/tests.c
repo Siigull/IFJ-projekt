@@ -18,7 +18,9 @@ void test_input(char* input, char* expected_result) {
 char* load_inputos(const char* filepath) {
 	char* input;
 	FILE* f = fopen(filepath, "r");
-	if(f == NULL) return input;
+	if(f == NULL){
+		return input;
+	}
 
 	char temp;
 	int len = 0;
@@ -27,7 +29,7 @@ char* load_inputos(const char* filepath) {
 	}
 	rewind(f);
 
-	input = calloc(len + 10,sizeof(char));
+	input = calloc(len + 10, sizeof(char));
 
 	for(int i=0; fscanf(f, "%c", input + i) == 1; i++);
 

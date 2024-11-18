@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-Token* init_token(char* value, T_Type type, unsigned int length) {
+Token* init_token(const char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));
-	token->value = value;
+	token->value = (char*)value;
 	token->type = type;
 	token->length = length;
 	token->isProcessed = false;
-	token->node == NULL;
+	token->node = NULL;
 	return token;
 }
 

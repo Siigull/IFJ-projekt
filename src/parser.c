@@ -460,7 +460,7 @@ AST_Node* _while() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(node->as.var_name, E_VAR, IMPLICIT, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, IMPLICIT, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -494,7 +494,7 @@ AST_Node* _if() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(node->as.var_name, E_VAR, IMPLICIT, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, IMPLICIT, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -844,6 +844,8 @@ void parse(char* orig_input) {
 }
 
 int compile(char* input) {
-    parse(input);
+    fprintf(stderr, "%s", input);
+	parse(input);
+
     return 0;
 }

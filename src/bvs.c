@@ -18,7 +18,7 @@ Entry* entry_init(const char* key, Entry_Type type,
 	Entry* entry = malloc(sizeof(Entry));
 
 	entry->type = type;
-	entry->key = key;
+	entry->key = (char*)key;
 	entry->ret_type = ret_type;
 
 	if (type == E_FUNC) {
@@ -257,7 +257,13 @@ Entry* tree_pop_traverse(Node* node) {
 }
 
 Entry* tree_pop(Tree* tree) {
-	Entry* entry = tree_pop_traverse(tree->root);
+	Entry* entry_old = tree_pop_traverse(tree->root);
+	if(entry_old == NULL) {
+		return NULL;
+	}
+	
+	Entry* entry = malloc(sizeof(Entry));
+	memcpy(entry, entry_old, sizeof(Entry));
 
 	tree_delete(tree, entry->key);
 
@@ -404,7 +410,15 @@ bool tree_delete(Tree* tree, const char* key) {
 	if (node == NULL)
 		return false;
 
-	node_delete(node);
+	if(tree->root == node){
+		entry_destroy(node->entry);
+		free(node->parent);
+		free(node);
+		tree->root = NULL;
+	
+	} else {
+		node_delete(node);
+	}	
 
 	return true;
 }
@@ -429,12 +443,15 @@ C_Stack init_c_stack(Tree* global_tree) {
 	C_Stack stack;
 
 	stack.max_nest = 8;
-	stack.arr = malloc(sizeof(Context) * stack.max_nest);
+	stack.arr = malloc(sizeof(Tree*) * stack.max_nest);
 	stack.cur_nest = -1;
 
 	stack.path = malloc(sizeof(int) * 4);
 	stack.max_path = 4;
+	stack.cur_path = 0;
 	stack.path[0] = 0;
+
+	stack.last_up = true;
 
 	stack.global_table = global_tree;
 
@@ -460,7 +477,7 @@ void extend_path(C_Stack* stack, bool up) {
 void context_push(C_Stack* stack) {
 	if(stack->cur_nest >= stack->max_nest - 2) {
 		stack->max_nest *= 2;
-		Context* data = realloc(stack->arr, stack->max_nest * sizeof(Context));
+		Tree** data = realloc(stack->arr, stack->max_nest * sizeof(Tree*));
 		
 		if(data == NULL) {
 			free(stack->arr);
@@ -473,7 +490,7 @@ void context_push(C_Stack* stack) {
 	extend_path(stack, true);
 
 	stack->cur_nest++;
-	tree_init(stack->cur_nest);
+	stack->arr[stack->cur_nest] = tree_init();
 }
 
 bool context_pop(C_Stack* stack) {
@@ -514,7 +531,7 @@ Entry* context_find(C_Stack* stack, const char* key) {
 	int cur_nest = stack->cur_nest;
 	
 	while(cur_nest >= 0) {
-		Entry* entry = tree_find(&(stack->arr[cur_nest]), key);
+		Entry* entry = tree_find(stack->arr[cur_nest], key);
 		
 		if(entry != NULL) {
 			return entry;
