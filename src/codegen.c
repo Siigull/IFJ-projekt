@@ -124,6 +124,22 @@ void generate_builtins(){
     //substring
     builtin_start("*substring");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    //checking conditions
+    fprintf(stdout, "\tLT GF@*tmp*res LF@*param1 int@0\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
+    fprintf(stdout, "\tLT GF@*tmp*res LF@*param2 int@0\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
+    fprintf(stdout, "\tGT GF@*tmp*res LF@*param1 LF@*param2\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
+    fprintf(stdout, "\tSTRLEN GF@*tmp*res LF@*param0\n");
+    fprintf(stdout, "\tGT GF@*tmp*res LF@*param2 GF@*tmp*res\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
+    fprintf(stdout, "\tSTRLEN GF@*tmp*res LF@*param0\n");
+    fprintf(stdout, "\tEQ GF@*expression*result LF@*param1 GF@*tmp*res\n");
+    fprintf(stdout, "\tGT GF@*tmp*res LF@*param1 GF@*tmp*res\n");
+    fprintf(stdout, "\tOR GF@*tmp*res GF@*expression*result GF@*tmp*res\n");
+    fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
+
     fprintf(stdout, "\tMOVE LF@*return*value string@\n");
     fprintf(stdout, "\tDEFVAR LF@*start*index\n");
     fprintf(stdout, "\tDEFVAR LF@*res\n");
@@ -140,6 +156,10 @@ void generate_builtins(){
     fprintf(stdout, "\tLABEL *substring*loop*end\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
+    //error state
+    fprintf(stdout, "\tLABEL *substring*err\n");
+    fprintf(stdout, "\tMOVE LF@*return*value nil@nil\n");
+    fprintf(stdout, "\tJUMP *substring*loop*end\n");
 }
 
 bool is_operator_arithmetic(AST_Type type){
@@ -176,7 +196,12 @@ void eval_exp(AST_Node* curr, Tree* symtable, int inside_fnc_call){
                 fprintf(stdout, "\tMULS\n");
                 break;
             case DIV:
-                fprintf(stdout, "\tDIVS\n");
+                if(curr->as.expr_type == R_F64 || curr->as.expr_type == N_F64){
+                    fprintf(stdout, "\tDIVS\n");
+                }
+                else if(curr->as.expr_type == R_I32 || curr->as.expr_type == N_I32){
+                    fprintf(stdout, "\tIDIVS\n");
+                }
                 break;
         }
     }
