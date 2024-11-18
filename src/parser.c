@@ -392,27 +392,27 @@ AST_Node* binary() {
 
 // Expression parser
 AST_Node* expr() {
-    List* token_list = malloc(sizeof(List));
-	List_init(token_list);
+    // List* token_list = malloc(sizeof(List));
+	// List_init(token_list);
 
-	AST_Node* node = binary_load(token_list);
-	if (node == NULL) {
-		List_activeF(token_list);
-		while (List_is_active(token_list)) {
-			Token* temp;
-			List_get_val(token_list, &temp);
-			print_token(temp, stdout, false);
-			printf(" ");
-			List_active_next(token_list);
-		}
+	// AST_Node* node = binary_load(token_list);
+	// if (node == NULL) {
+	// 	List_activeF(token_list);
+	// 	while (List_is_active(token_list)) {
+	// 		Token* temp;
+	// 		List_get_val(token_list, &temp);
+	// 		print_token(temp, stdout, false);
+	// 		printf(" ");
+	// 		List_active_next(token_list);
+	// 	}
 
-		node = parse_expression(token_list);
-		printf("\n");
-	}
+	// 	node = parse_expression(token_list);
+	// 	printf("\n");
+	// }
 
-	return node;
+	// return node;
 
-    // return binary();
+    return binary();
 }
 
 // Normal parser
@@ -836,15 +836,15 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
-		check_node(node);
+		// check_node(node);
         generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }
+	
     generate_code(nodes, parser->s_table);
 }
 
 int compile(char* input) {
-    fprintf(stderr, "%s", input);
 	parse(input);
 
     return 0;

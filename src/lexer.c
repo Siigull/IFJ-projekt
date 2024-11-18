@@ -298,10 +298,10 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	if (type == T_BUILDIN) {
 		int last_space = -1;
 		for(int i=3; i < len; i++) {
-			if(value[i] == ' ') {
+			if((value[i] == ' ' || value[i] == '\n') && last_space == -1) {
 				last_space = i;
 
-			} else if(last_space != -1 && value[i] != ' ') {
+			} else if(last_space != -1 && (value[i] == ' ' || value[i] == '\n')) {
 				memmove(value + last_space, value + i, len - (i - 1));
 				i = last_space;
 				last_space = -1;
