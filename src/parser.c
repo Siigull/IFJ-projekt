@@ -666,10 +666,7 @@ AST_Node* stmt() {
 }
 
 Ret_Type get_ret_type() {
-	if (parser->next->type == T_VOID) {
-		if(parser->prev->type == T_QUESTMARK) {
-			ERROR_RET(ERR_PARSE);
-		}
+	if (parser->prev->type == T_VOID) {
 		return R_VOID;
 	} else if (strcmp(parser->next->value, "i32")) {
 		if(parser->prev->type == T_QUESTMARK) {
