@@ -243,36 +243,49 @@ void eval_condition(AST_Node* curr, Tree* symtable, int inside_fnc_call){
     switch(curr->type){
         case ISEQ:
             fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*expression*result\n");
             break;
         case ISNEQ:
             fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*expression*result\n");
             break;
         case ISLESS:
             fprintf(stdout, "\tLT GF@*expression*result GF@*lhs GF@*rhs\n");
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*expression*result\n");
             break;
         case ISMORE:
             fprintf(stdout, "\tGT GF@*expression*result GF@*lhs GF@*rhs\n");
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*expression*result\n");
             break;
         case ISLESSEQ:
             fprintf(stdout, "\tLT GF@*tmp*res GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*expression*result\n");
             break;
         case ISMOREEQ:
             fprintf(stdout, "\tGT GF@*tmp*res GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tEQ GF@*expression*result GF@*lhs GF@*rhs\n");
             fprintf(stdout, "\tOR GF@*expression*result GF@*expression*result GF@*tmp*res\n");
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*expression*result\n");
             break;
         case STRING:
         case I32:
         case F64:
         case ID:
+            fprintf(stdout, "\tMOVE GF@*tmp*res LF@%s\n", curr->as.var_name);
             fprintf(stdout, "\tEQ GF@*expression*result LF@%s nil@nil\n", curr->as.var_name);
             fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
             break;
+        case FUNC_CALL:
+            generate_func_call(curr, symtable, ++inside_fnc_call);
+            fprintf(stdout, "\tMOVE GF@*tmp*res GF@*return*val\n");
+            fprintf(stdout, "\tEQ GF@*expression*result GF@*return*val nil@nil\n");
+            fprintf(stdout, "\tNOT GF@*expression*result GF@*expression*result\n");
+            break;
+            //todo todo
     }
-    //todo
     return;
 }
 
@@ -327,7 +340,7 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
     AST_Node* first = (AST_Node*)((statements->data)[0]);
     if(first->type == NNULL_VAR_DECL){
         fprintf(stdout, "\tDEFVAR LF@%s\n", first->as.var_name);
-        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", first->as.var_name);
+        fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
         i = 1;
     }
 
@@ -356,7 +369,7 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
     AST_Node* first = (AST_Node*)((statements->data)[0]);
     if(first->type == NNULL_VAR_DECL){
         fprintf(stdout, "\tDEFVAR LF@%s\n", first->as.var_name);
-        fprintf(stdout, "\tMOVE LF@%s GF@*expression*result\n", first->as.var_name);
+        fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
         i = 1;
     }
 
