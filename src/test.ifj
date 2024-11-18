@@ -1,5 +1,9 @@
 const ifj = @import("ifj24.zig");
 
 pub fn main() void {
-    var i = 2 + 3;
+    if(true) {
+        var i = 10;
+    }
+
+    var i = 20;
 }
