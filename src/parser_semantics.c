@@ -9,7 +9,6 @@
 
 
 #include "parser_semantics.h"
-#include "parser.h"
 
 extern Parser* parser;
 
@@ -45,11 +44,13 @@ Ret_Type sem_check_binary_expression(AST_Node* node) {
         case DIV: {
             if (left_type == R_F64 || right_type == R_F64) {
                 node->as.expr_type = R_F64;
+                return R_F64;
             } else if (left_type == N_F64 || right_type == N_F64) {
                 if (!is_nullable(node->as.expr_type)) {
                     ERROR_RET(ERR_SEM_TYPE_CONTROL);
                 }
                 node->as.expr_type = N_F64;
+                return N_F64;
             }
             node->as.expr_type = R_I32;
             return R_I32;
@@ -70,7 +71,21 @@ Ret_Type sem_check_binary_expression(AST_Node* node) {
 }
 
 Ret_Type sem_func_call(AST_Node* node) {
-    //TODO(Sigull) todo
+    Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
+
+    if (!func_entry || func_entry->type != E_FUNC) {
+        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+    }
+
+    size_t expected_args = func_entry->as.function_args->length;
+    size_t provided_args = node->as.func_data->arr->length;
+
+    if (expected_args != provided_args) {
+        ERROR_RET(ERR_SEM_PARAMS);
+    }
+
+    // todo check arg types
+    return -1;
 }
 
 Ret_Type sem_function_decl(AST_Node* node) {
@@ -120,6 +135,7 @@ Ret_Type sem_var_decl(AST_Node* node) {
             if (value != (int)value) {
                 ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
+            node->as.expr_type = R_I32;
         } else {
             ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
@@ -133,7 +149,16 @@ Ret_Type sem_var_assignment(AST_Node* node) {
 }
 
 Ret_Type sem_else(AST_Node* node) {
-    //TODO(Sigull) todo
+    if (node->left != NULL || node->right != NULL) {
+        ERROR_RET(ERR_SEM_OTHER); 
+    }
+
+    for (size_t i = 0; i < node->as.arr->length; i++) {
+        AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+        check_node(stmt);
+    }
+    
+    return -1;
 }
 
 Ret_Type sem_nnull_var_decl(AST_Node* node) {
@@ -158,20 +183,34 @@ Ret_Type sem_return(AST_Node* node) {
     return check_node(node->left);
 }
 
-Ret_Type sem_if (AST_Node* node) {
-    check_node(node->left);
+Ret_Type sem_if(AST_Node* node) {
+    Ret_Type cond_type = check_node(node->left);
  
-    if (node->as.arr->length) {
-        AST_Node* node = (AST_Node*)node->as.arr->data[0];
+    if (node->as.arr->length > 0) {
+        AST_Node* first_stmt = (AST_Node*)node->as.arr->data[0];
 
-        if (node->type == NNULL_VAR_DECL) {
-            if(is_nullable(node->left->as.expr_type)) {
-                ERROR_RET(ERR_SEM_OTHER);
+        if (first_stmt->type == NNULL_VAR_DECL) {
+            if (!is_nullable(cond_type)) {
+                ERROR_RET(ERR_SEM_OTHER); 
+            }
+
+            for (size_t i = 1; i < node->as.arr->length; i++) {
+                AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+                check_node(stmt);
+            }
+        } else {
+            for (size_t i = 0; i < node->as.arr->length; i++) {
+                AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+                check_node(stmt);
             }
         }
     }
 
-    check_node(node->right);
+    if (node->right != NULL) {
+        check_node(node->right);
+    }
+
+    return -1;
 }
 
 Ret_Type check_node(AST_Node* node) {
