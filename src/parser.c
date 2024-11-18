@@ -666,24 +666,24 @@ AST_Node* stmt() {
 }
 
 Ret_Type get_ret_type() {
-	if (strcmp(parser->next->value, "void")) {
+	if (!strcmp(parser->next->value, "void")) {
 		if(parser->prev->type == T_QUESTMARK) {
 			ERROR_RET(ERR_PARSE);
 		}
 		return R_VOID;
-	} else if (strcmp(parser->next->value, "i32")) {
+	} else if (!strcmp(parser->next->value, "i32")) {
 		if(parser->prev->type == T_QUESTMARK) {
 			return N_I32;
 		} else {
 			return R_I32;
 		}
-	} else if (strcmp(parser->next->value, "f64")) {
+	} else if (!strcmp(parser->next->value, "f64")) {
 		if(parser->prev->type == T_QUESTMARK) {
 			return N_F64;
 		} else {
 			return R_F64;
 		}
-	} else if (strcmp(parser->next->value, "[]u8")) {
+	} else if (!strcmp(parser->next->value, "[]u8")) {
 		if(parser->prev->type == T_QUESTMARK) {
 			return N_U8;
 		} else {

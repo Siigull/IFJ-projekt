@@ -26,6 +26,49 @@ bool is_nullable(Ret_Type type) {
     }
 }
 
+bool is_numeric_type(Ret_Type type) {
+    return (type == N_F64 || type == N_I32 || type == R_F64 || type == R_I32);
+}
+
+Ret_Type sem_check_binary_expression(AST_Node* node) {
+    Ret_Type left_type = check_node(node->left);
+    Ret_Type right_type = check_node(node->right);
+
+    if (is_numeric_type(left_type) && is_numeric_type(right_type)) {
+        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    }
+
+    switch (node->type) {
+        case PLUS:
+        case MINUS:
+        case MUL:
+        case DIV: {
+            if (left_type == R_F64 || right_type == R_F64) {
+                node->as.expr_type = R_F64;
+            } else if (left_type == N_F64 || right_type == N_F64) {
+                if (!is_nullable(node->as.expr_type)) {
+                    ERROR_RET(ERR_SEM_TYPE_CONTROL);
+                }
+                node->as.expr_type = N_F64;
+            }
+            node->as.expr_type = R_I32;
+            return R_I32;
+        }
+
+        case ISEQ:
+        case ISNEQ:
+        case ISLESS:
+        case ISMORE:
+        case ISLESSEQ:
+        case ISMOREEQ: {
+            node->as.expr_type = R_I32;
+            return R_I32;
+        }
+        default:
+            ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    }
+}
+
 Ret_Type sem_func_call(AST_Node* node) {
     //TODO(Sigull) todo
 }
@@ -72,6 +115,11 @@ Ret_Type sem_var_decl(AST_Node* node) {
     if (declared_type != expression_type) {
         if (declared_type == IMPLICIT) {
             declared_type = expression_type;
+        } else if ((declared_type == R_I32 || declared_type == N_I32) && (expression_type == R_F64 || expression_type == N_F64)) {
+            double value = node->left->as.f64;
+            if (value != (int)value) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
+            }
         } else {
             ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
@@ -132,6 +180,19 @@ Ret_Type check_node(AST_Node* node) {
     }
 
     switch(node->type) {
+        // binary expressions
+        case PLUS:
+        case MINUS:
+        case MUL:
+        case DIV:
+        case ISEQ:
+        case ISNEQ:
+        case ISLESS:
+        case ISMORE:
+        case ISLESSEQ:
+        case ISMOREEQ: 
+            return sem_check_binary_expression(node);
+        // statements
         case IF:             return sem_if(node);
         case FUNC_CALL:      return sem_func_call(node);
         case FUNCTION_DECL:  return sem_function_decl(node);
