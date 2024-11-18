@@ -792,7 +792,9 @@ Arr* parse(char* orig_input) {
         }
         advance();
     }
-
+	if(!tree_find(parser->s_table, "main")){
+		ERROR_RET(ERR_SEM_OTHER);
+	}
 
     // Second pass
     // Normal parsing
@@ -812,6 +814,7 @@ Arr* parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
+		//check_node(node);
         generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }

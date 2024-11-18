@@ -474,7 +474,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
 
     Entry* arg_entry = tree_find(symtable, curr->as.func_data->var_name);
     Arr* args = arg_entry->as.function_args;
-    // create local variables for all argument 
+    // create local variables for all arguments
     // and continuously pop arguments from stack into them
     for(int i = 0; i < args->length; i++){
         Function_Arg* argument = (Function_Arg*)((args->data)[i]);

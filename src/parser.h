@@ -14,6 +14,12 @@
 #include "error.h"
 #include "string.h"
 #include "codegen.h"
+#include "parser_semantics.h"
+#include "stack.h"
+#include "test_generate_graph.h"
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 
 typedef struct Parser {
     Token* next;
