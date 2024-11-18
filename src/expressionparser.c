@@ -1,22 +1,23 @@
 #include "expressionparser.h"
-
+#include <errno.h>
+#include <limits.h>
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
-	//  id +  -  *  /  (  )  $ == !=  <  > <= >=
-	{	N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
-	{	R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
-	{	R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
-	{	R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // *
-	{	R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // /
-	{	R, R, R, R, R, R, M, N, R, R, R, R, R, R}, // (
-	{	N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
-	{	R, R, R, R, R, R, N, R, L, L, L, L, L, L}, // $
-	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // ==
-	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // !=
-	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <
-	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >
-	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <=
-	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >=
+	//   id +  -  *  /  (  )  $  ==
+	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
+	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
+	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
+	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // *
+	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // /
+	{R, R, R, R, R, R, M, N, N, N, N, N, N, N}, // (
+	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
+	{R, R, R, R, R, R, N, R, R, R, R, R, R, R}, // $
+	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // ==
+	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // !=
+	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // <
+	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // >
+	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // <=
+	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // >=
 };
 
 const char* type_to_string(T_Type type) {
@@ -202,23 +203,23 @@ void adjust_stack_else(List* Stack, AST_Node* middle_node) {
 }
 
 bool is_nonTerm(T_Type type, bool isProcessed) {
-	if (type == T_LEFTSHIFTLIST || type == T_RIGHTSHIFTLIST || isProcessed == true) {
-		return false;
-	} else if (type == T_ID || type == T_PLUS || type == T_MINUS || type == T_MUL ||
-			   type == T_DIV || type == T_LPAR || type == T_RPAR || type == T_DOLLARLIST ||
-			   type == T_I32 || type == T_F64 || type == T_STRING || type == T_DDEQ ||
-			   type == T_GETHAN || type == T_GTHAN || type == T_SETHAN || type == T_STHAN ||
-			   type == T_NEQUAL) {
-		return true;
-	} else {
-		ERROR_RET(2);
-	}
+    if (type == T_LEFTSHIFTLIST || type == T_RIGHTSHIFTLIST || isProcessed == true) {
+        return false;
+    } else if (type == T_ID || type == T_PLUS || type == T_MINUS || type == T_MUL ||
+               type == T_DIV || type == T_LPAR || type == T_RPAR || type == T_DOLLARLIST ||
+               type == T_I32 || type == T_F64 || type == T_STRING || type == T_DDEQ ||
+               type == T_GETHAN || type == T_GTHAN || type == T_SETHAN || type == T_STHAN ||
+               type == T_NEQUAL || type == T_BUILDIN) {
+        return true;
+    } else {
+        ERROR_RET(2);
+    }
 }
 
 bool is_id(T_Type type) {
 	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING || type == T_DDEQ ||
 		type == T_NEQUAL || type == T_GTHAN || type == T_GETHAN || type == T_SETHAN ||
-		type == T_STHAN) {
+		type == T_STHAN || type == T_BUILDIN) {
 		return true;
 	}
 	return false;
@@ -234,7 +235,8 @@ int find_precedence_index(List* list) {
 		List_get_val(list, &current);
 		if (((current->type == T_ID && current->isProcessed == false) ||
 			 (current->type == T_I32 && current->isProcessed == false) || current->type == T_F64 ||
-			 current->type == T_ID || current->type == T_STRING || current->type == T_NULL) &&
+			 current->type == T_ID || current->type == T_STRING || current->type == T_NULL ||
+			 current->type == T_BUILDIN) &&
 			current->isProcessed == false) {
 			return 0;
 		} else if (current->type == T_PLUS) {
@@ -285,6 +287,12 @@ void handle_rule(int rule, List* Stack) {
 	if (rule == E_ID) {
 		// <i
 		Token* processed_token = Stack->last->token;
+		if (processed_token->type == T_BUILDIN) {
+			// TODOVACKO
+			processed_token->isProcessed = true;
+			adjust_stack_rule_E_ID(Stack, processed_token);
+			return;
+		}
 		AST_Type nodetype = get_type(processed_token->type);
 		AST_Node* node = node_init(nodetype);
 		// here we should add value to the nodes
@@ -301,7 +309,14 @@ void handle_rule(int rule, List* Stack) {
 		} else if (processed_token->type == T_STRING) {
 			node->as.string = processed_token->value;
 		}
-
+		/*
+		int errno;
+		// todo
+		if (errno == ERANGE || *end != '\0' || node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
+			ERROR_RET(ERR_SEM_OTHER);
+		}
+		return node;
+		*/
 		adjust_stack_rule_E_ID(Stack, processed_token);
 	} else if (rule == E_E) {
 		Token* processed_token = Stack->last->previousElement->token;
@@ -320,6 +335,7 @@ void handle_rule(int rule, List* Stack) {
 int find_reduction_rule(List* Stack) {
 	// need to add isProcessed check, so we wont take <i+i as and rule, However this situation
 	// shouldnt occour.
+
 	List_activeL(Stack);
 	Token* last = Stack->last->token;
 	Token* prev = Stack->last->previousElement->previousElement->token;
@@ -327,6 +343,9 @@ int find_reduction_rule(List* Stack) {
 	bool id_second = is_id(prev->type);
 	bool id_middle = is_id(Stack->last->previousElement->token->type);
 	T_Type op = Stack->last->previousElement->token->type;
+	if (Stack->last->previousElement->token->type == T_LEFTSHIFTLIST) {
+		return E_ID;
+	}
 	if (id_first && id_second) {
 		switch (op) {
 		case T_PLUS:
@@ -353,7 +372,7 @@ int find_reduction_rule(List* Stack) {
 			ERROR_RET(2);
 		}
 	} else if (last->type == T_LPAR && id_middle && prev->type == T_RPAR) {
-		return E_ID;
+		return E_E;
 	} else if (id_first) {
 		return E_ID;
 	} else {
@@ -385,6 +404,12 @@ void handle_precedence(int precedence, List* Stack, List* input) {
 		List_activeL(input);
 
 	} else if (precedence == M) {
+		Token* transitionToken;
+		List_last_val(input, &transitionToken);
+		List_insertL(Stack, transitionToken);
+		List_removeL(input);
+		List_activeL(Stack);
+		List_activeL(input);
 	}
 }
 

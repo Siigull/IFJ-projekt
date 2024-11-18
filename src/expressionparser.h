@@ -1,13 +1,11 @@
 /**
- * @file expressionparser.h
- * @author Martin Vaculik (xvaculm00)
- * @brief
- * @version 0.1
- * @date 2024-09-30
- *
- * @copyright Copyright (c) 2024
- *
- */
+ 
+@file expressionparser.h
+@author Martin Vaculik (xvaculm00)
+@brief
+@version 0.1
+@date 2024-09-30*
+@copyright Copyright (c) 2024**/
 
 #ifndef EXPRESSIONPARSER_H
 #define EXPRESSIONPARSER_H
@@ -20,37 +18,38 @@
 #define TABLE_SIZE 14
 
 typedef enum {
-	N, // no precedence
-	L, // left precedence
-	R, // right precedence
-	M, // equal precedence
+    N, // no precedence
+    L, // left precedence
+    R, // right precedence
+    M, // equal precedence
 } precedence;
 
 /*
 Rules: E  → E + E
-	   E  → E - E
-	   E  → E * E
-		E  → E / E
-		E → E == E
-		E  → (E)
-		E  → id
-		E  → E relacni operator E
+       E  → E - E
+       E  → E * E
+        E  → E / E
+        E → E == E
+        E  → (E)
+        E  → id
+        E  → E relacni operator E
 
 */
 
 typedef enum {
-	E_PLUS_E,
-	E_MINUS_E,
-	E_TIMES_E,
-	E_DIV_E,
-	E_EQ_E,
-	E_E,
-	E_ID,
-	E_NEQ_E,
-	E_GET_E,
-	E_GT_E,
-	E_ST_E,
-	E_SET_E,
+    E_PLUS_E,
+    E_MINUS_E,
+    E_TIMES_E,
+    E_DIV_E,
+    E_EQ_E,
+    E_E,
+    E_ID,
+    E_NEQ_E,
+    E_GET_E,
+    E_GT_E,
+    E_ST_E,
+    E_SET_E,
+    E_ZAVAROKA_DEADLY_E
 } rules;
 
 void init_stack(List* Stack);

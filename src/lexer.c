@@ -301,7 +301,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 			if(is_whitespace(value[i])) {
 				last_space = i;
 
-			} else if(last_space != -1 && value[i] != ' ') {
+			} else if(last_space != -1 && !is_whitespace(value[i])) {
 				memmove(value + last_space, value + i, len - (i - 1));
 				i = last_space;
 				last_space = -1;
