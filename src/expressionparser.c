@@ -2,21 +2,21 @@
 
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
-	//    id   +   -   *   /   (   )   $   ==  !=  <   >   <=  >=
-	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
-	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
-	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
-	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // *
-	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // /
-	{R, R, R, R, R, R, M, N, R, R, R, R, R, R}, // (
-	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
-	{R, R, R, R, R, R, N, R, L, L, L, L, L, L}, // $
-	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // ==
-	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // !=
-	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <
-	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >
-	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <=
-	{R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >=
+	//  id +  -  *  /  (  )  $ == !=  <  > <= >=
+	{	N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
+	{	R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
+	{	R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
+	{	R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // *
+	{	R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // /
+	{	R, R, R, R, R, R, M, N, R, R, R, R, R, R}, // (
+	{	N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
+	{	R, R, R, R, R, R, N, R, L, L, L, L, L, L}, // $
+	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // ==
+	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // !=
+	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <
+	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >
+	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // <=
+	{	R, R, R, R, R, R, L, R, M, M, M, M, M, M}, // >=
 };
 
 const char* type_to_string(T_Type type) {

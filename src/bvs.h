@@ -22,8 +22,11 @@ typedef enum {
 typedef enum {
 	R_VOID,
 	R_I32,
+	N_I32,
 	R_F64,
+	N_F64,
 	R_U8,
+	N_U8,
 	IMPLICIT,
 } Ret_Type;
 
