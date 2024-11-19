@@ -27,19 +27,26 @@ typedef enum {
 	N_F64,
 	R_U8,
 	N_U8,
+	R_STRING,
+	R_BOOLEAN,
 	IMPLICIT,
-} Ret_Type;
+} Ret_Type_;
+
+typedef struct {
+	Ret_Type_ type;
+	bool is_const_literal;
+} Expr_Type;
 
 typedef struct {
 	char* arg_name;
-	Ret_Type type;
+	Ret_Type_ type;
 } Function_Arg;
 
 typedef struct Entry {
 	Entry_Type type;
 	
-	char* key; // TODO(Sigull): change const char* string to our own type
-	Ret_Type ret_type;
+	const char* key; // TODO(Sigull): change const char* string to our own type
+	Expr_Type ret_type;
 	bool has_null;
 
 	union {
@@ -70,7 +77,7 @@ typedef struct Context_Stack {
 } C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Ret_Type ret_type, bool can_mut);
+				  Expr_Type ret_type, bool can_mut);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);

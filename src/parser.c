@@ -10,7 +10,7 @@ AST_Node* binary_load(List* tl);
 AST_Node* binary();
 AST_Node* func_call();
 AST_Node* stmt();
-Ret_Type get_ret_type();
+Ret_Type_ get_ret_type();
 
 void parser_reset() {
     parser->next = NULL;
@@ -459,7 +459,7 @@ AST_Node* _while() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(var->as.var_name, E_VAR, IMPLICIT, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -493,7 +493,7 @@ AST_Node* _if() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(var->as.var_name, E_VAR, IMPLICIT, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -523,12 +523,12 @@ AST_Node* under_var_decl() {
 	return node;
 }
 
-Ret_Type type() {
+Ret_Type_ type() {
 	if(check(T_QUESTMARK)){
 		advance();
 	}
 	
-	Ret_Type type = get_ret_type();
+	Ret_Type_ type = get_ret_type();
 	advance();
 
 	return type;
@@ -551,13 +551,13 @@ AST_Node* var_decl() {
 	consume(T_ID);
 	node->as.var_name = parser->prev->value;
 
-	Ret_Type ret_type = IMPLICIT;
+	Ret_Type_ ret_type = IMPLICIT;
 	if (check(T_DDOT)) {
 		advance();
 		ret_type = type();
 	}
 
-	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
+	Entry* entry = entry_init(node->as.var_name, E_VAR, (Expr_Type){ret_type, false}, can_mut);
 
 	if (context_find(&(parser->c_stack), node->as.var_name, true) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
@@ -670,7 +670,7 @@ AST_Node* stmt() {
     }
 }
 
-Ret_Type get_ret_type() {
+Ret_Type_ get_ret_type() {
 	if (!strcmp(parser->next->value, "void")) {
 		if(parser->prev->type == T_QUESTMARK) {
 			ERROR_RET(ERR_PARSE);
@@ -718,9 +718,9 @@ AST_Node* func_decl() {
         advance();
 		char* var_name = parser->prev->value;
         consume(T_DDOT);
-		Ret_Type r_type = type();
+		Ret_Type_ r_type = type();
 
-		Entry* entry = entry_init(var_name, E_VAR, r_type, false);
+		Entry* entry = entry_init(var_name, E_VAR, (Expr_Type){r_type, false}, false);
 		(*args++)->arg_name = var_name;
 		context_put(&(parser->c_stack), entry);
 
@@ -774,7 +774,7 @@ void func_head() {
         ERROR_RET(ERR_SEM_REDEF);
     }
 
-    Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);
+    Entry* entry = entry_init(func_name, E_FUNC, (Expr_Type){R_VOID, false}, false);
 
     consume(T_RPAR);
     while(check(T_ID)) {
@@ -799,7 +799,7 @@ void func_head() {
     if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
     } 
-    entry->ret_type = type();
+    entry->ret_type = (Expr_Type){type(), false};
 
     tree_insert(parser->s_table, entry);
 }
