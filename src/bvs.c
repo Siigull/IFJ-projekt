@@ -468,9 +468,18 @@ void extend_path(C_Stack* stack, bool up) {
 	}
 
 	if(stack->last_up == up) {
-		stack->path[stack->cur_path]++;
+		if(up) {
+			stack->path[stack->cur_path]++;
+		} else {
+			stack->path[stack->cur_path]--;
+		}
 	} else {
-		stack->path[--(stack->cur_path)] = 1;
+		if(up) {
+			stack->path[++(stack->cur_path)] = 1;
+		} else {
+			stack->path[++(stack->cur_path)] = -1;
+		}
+		
 	}
 }
 
@@ -493,6 +502,27 @@ void context_push(C_Stack* stack) {
 	stack->arr[stack->cur_nest] = tree_init();
 }
 
+char* get_path(C_Stack* stack) {
+	int path_len = 0;
+	char* path;
+	for(int i=0; i < stack->cur_path + 1; i++) {
+		char temp_buf[13];
+		sprintf(temp_buf, "%d", stack->path[i]);
+		path_len += strlen(temp_buf);
+	}
+
+	path = malloc(sizeof(char) * (path_len + 2));
+	path[0] = '?';
+	path++;
+	for(int i=0; i < stack->cur_path + 1; i++) {
+		path += sprintf(path, "%d", stack->path[i]);
+	}
+
+	path -= path_len + 1;
+
+	return path;
+}
+
 bool context_pop(C_Stack* stack) {
 	if(stack->cur_nest < 0) {
 		return false;
@@ -505,17 +535,21 @@ bool context_pop(C_Stack* stack) {
 			break;
 		}
 		
+		char* path = get_path(stack);
+		int path_len = strlen(path);
+
 		if(tree_find(stack->global_table, entry->key) != NULL) {
-			entry->key = realloc(entry->key, strlen(entry->key) + (stack->cur_path * 2) + 1);
-			if(entry->key == NULL) {
+			char* temp = realloc(entry->key, strlen(entry->key) + path_len + 2);
+			if(temp == NULL) {
 				exit(99);
 			}
-			int i = 0;
-			int len = strlen(entry->key);
-			for(; i < stack->cur_path; i++) {
-				entry->key[len + (i * 2)] = (char)stack->path[i] << 8;
-				entry->key[len + (i * 2) + 1] = (char)stack->path[i];
-			}
+			entry->key = temp;
+
+			strcat(entry->key, path);
+
+			tree_insert(stack->global_table, entry);
+		
+		} else {
 			tree_insert(stack->global_table, entry);
 		}
 	}
@@ -527,7 +561,7 @@ bool context_pop(C_Stack* stack) {
 	return true;
 }
 
-Entry* context_find(C_Stack* stack, const char* key) {
+Entry* context_find(C_Stack* stack, const char* key, bool global) {
 	int cur_nest = stack->cur_nest;
 	
 	while(cur_nest >= 0) {
@@ -540,7 +574,13 @@ Entry* context_find(C_Stack* stack, const char* key) {
 		cur_nest--;
 	}
 
-	return tree_find(stack->global_table, key);
+
+	if(global) {
+		return tree_find(stack->global_table, key);
+	
+	} else {
+		return NULL;
+	}
 }
 
 void context_put(C_Stack* stack, Entry* entry) {

@@ -560,7 +560,7 @@ AST_Node* var_decl() {
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
 
-	if (context_find(&(parser->c_stack), node->as.var_name) != NULL) {
+	if (context_find(&(parser->c_stack), node->as.var_name, false) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
 	}
 	context_put(&(parser->c_stack), entry);
@@ -603,7 +603,7 @@ AST_Node* assignment() {
 
 	} else {
 		node = node_init(VAR_ASSIGNMENT);
-        Entry* entry = context_find(&(parser->c_stack), parser->prev->value);
+        Entry* entry = context_find(&(parser->c_stack), parser->prev->value, false);
         if(entry == NULL) exit(ERR_SEM_NOT_DEF_FNC_VAR);
 		node->as.var_name = entry->key;
 		consume(T_EQUAL);

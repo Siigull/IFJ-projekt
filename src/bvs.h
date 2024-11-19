@@ -87,7 +87,7 @@ Entry* tree_pop(Tree* tree);
 C_Stack init_c_stack(Tree* global_tree);
 void context_push(C_Stack* stack);
 bool context_pop(C_Stack* stack);
-Entry* context_find(C_Stack* stack, const char* key);
+Entry* context_find(C_Stack* stack, const char* key, bool global);
 void context_put(C_Stack* stack, Entry* entry);
 
 void tree_print(Tree* tree);

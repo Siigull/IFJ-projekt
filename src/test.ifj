@@ -3,6 +3,8 @@ const ifj = @import("ifj24.zig");
 pub fn main() void {
     if(true) {
         var i = 10;
+    } else {
+        
     }
 
     var i = 20;
