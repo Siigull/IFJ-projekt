@@ -120,7 +120,7 @@ typedef struct AST_Node {
 		const char* string;
 		const char* var_name;
 		Arr* arr;
-		Ret_Type expr_type;
+		Expr_Type expr_type;
 		Func_Data* func_data;
 		int i32;
 		double f64;

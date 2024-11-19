@@ -14,7 +14,7 @@
 #include "bvs.h"
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Ret_Type ret_type, bool can_mut) {
+				  Expr_Type ret_type, bool can_mut) {
 	Entry* entry = malloc(sizeof(Entry));
 
 	entry->type = type;

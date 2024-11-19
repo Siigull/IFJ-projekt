@@ -196,10 +196,10 @@ void eval_exp(AST_Node* curr, Tree* symtable, int inside_fnc_call){
                 fprintf(stdout, "\tMULS\n");
                 break;
             case DIV:
-                if(curr->as.expr_type == R_F64 || curr->as.expr_type == N_F64){
+                if(curr->as.expr_type.type == R_F64 || curr->as.expr_type.type == N_F64){
                     fprintf(stdout, "\tDIVS\n");
                 }
-                else if(curr->as.expr_type == R_I32 || curr->as.expr_type == N_I32){
+                else if(curr->as.expr_type.type == R_I32 || curr->as.expr_type.type == N_I32){
                     fprintf(stdout, "\tIDIVS\n");
                 }
                 break;
@@ -210,7 +210,7 @@ void eval_exp(AST_Node* curr, Tree* symtable, int inside_fnc_call){
         Entry* e = tree_find(symtable, curr->as.func_data->var_name);
         if(e != NULL){
             //user-defined functions
-            if(e->ret_type == R_VOID){
+            if(e->ret_type.type == R_VOID){
                 fprintf(stdout, "\tPUSHS nil@nil\n");
             }
             else{

@@ -30,7 +30,7 @@ char* load_input(){
 	return input;
 }
 
-int main() {
+int mainqwe() {
 	char* input = load_input();
 	return compile(input);
 }

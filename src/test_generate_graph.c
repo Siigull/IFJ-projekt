@@ -30,6 +30,8 @@ FILE* file = NULL;
 
 void generate_graph_node(AST_Node* node, char* last_node, char* path);
 
+char* ret_type_to_string[] = {"NULL", "R_I32","N_I32","R_F64","N_F64","R_U8","N_U8","IMPLICIT"};
+
 void write_connection(char* last_node, char* current_node, 
                       char* where) {
 
@@ -40,6 +42,10 @@ void write_connection(char* last_node, char* current_node,
         current_node[0] = '!';
     }
     fprintf(file, "%s -> %s : %s\n", last_node, current_node, where);
+}
+
+void write_data(const char* node, const char* data) {
+    fprintf(file, "%s: {tooltip: %s}\n", node, data);
 }
 
 void generate_graph_func_call(AST_Node* node, char* last_node, char* path) {
@@ -69,7 +75,8 @@ void generate_graph_function_decl(AST_Node* node, char* last_node, char* path) {
 void generate_graph_var_decl(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "VAR_DECL", var_decl_count++);
-
+    
+    write_data(current_node, node->as.var_name);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "expr");
@@ -79,6 +86,7 @@ void generate_graph_var_assignment(AST_Node* node, char* last_node, char* path) 
     char current_node[30];
     sprintf(current_node, "%s(%d)", "VAR_ASSIGNMENT", var_assignment_count++);
 
+    write_data(current_node, node->as.var_name);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "expr");
@@ -167,6 +175,7 @@ void generate_graph_id(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "ID", ID_count++);
 
+    write_data(current_node, node->as.var_name);
     write_connection(last_node, current_node, path);
 } 
 
@@ -181,6 +190,7 @@ void generate_graph_plus(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "+", PLUS_count++);
 
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "left");
@@ -191,6 +201,7 @@ void generate_graph_iseq(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "==", ISEQ_count++);
 
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "left");
@@ -202,6 +213,7 @@ void generate_graph_isneq(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "!=", ISNEQ_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -212,6 +224,7 @@ void generate_graph_isless(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "LESS", ISLESS_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -222,6 +235,7 @@ void generate_graph_ismore(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "MORE", ISMORE_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -232,6 +246,7 @@ void generate_graph_islesseq(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "LESS_EQ", ISLESSEQ_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -242,6 +257,7 @@ void generate_graph_ismoreeq(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "MORE_EQ", ISMOREEQ_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -252,6 +268,7 @@ void generate_graph_minus(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "-", MINUS_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -262,6 +279,7 @@ void generate_graph_mul(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "*", MUL_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -272,6 +290,7 @@ void generate_graph_div(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "/", DIV_count++);
 
     write_connection(last_node, current_node, path);
+    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");

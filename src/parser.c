@@ -17,7 +17,7 @@ AST_Node* binary_load(List* tl);
 AST_Node* binary();
 AST_Node* func_call();
 AST_Node* stmt();
-Ret_Type get_ret_type();
+Ret_Type_ get_ret_type();
 
 void parser_reset() {
     parser->next = NULL;
@@ -510,12 +510,12 @@ AST_Node* under_var_decl() {
 	return node;
 }
 
-Ret_Type type() {
+Ret_Type_ type() {
 	if(check(T_QUESTMARK)){
 		advance();
 	}
 	
-	Ret_Type type = get_ret_type();
+	Ret_Type_ type = get_ret_type();
 	advance();
 
 	return type;
@@ -538,13 +538,13 @@ AST_Node* var_decl() {
 	consume(T_ID);
 	node->as.var_name = parser->prev->value;
 
-	Ret_Type ret_type = IMPLICIT;
+	Ret_Type_ ret_type = IMPLICIT;
 	if (check(T_DDOT)) {
 		advance();
 		ret_type = type();
 	}
 
-	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
+	Entry* entry = entry_init(node->as.var_name, E_VAR, (Expr_Type){ret_type, false}, can_mut);
 
 	if (tree_find(parser->s_table, node->as.var_name) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
@@ -655,7 +655,7 @@ AST_Node* stmt() {
     }
 }
 
-Ret_Type get_ret_type() {
+Ret_Type_ get_ret_type() {
 	if (!strcmp(parser->next->value, "void")) {
 		return R_VOID;
 	} else if (!strcmp(parser->next->value, "i32")) {
@@ -745,7 +745,7 @@ void func_head() {
         ERROR_RET(ERR_SEM_REDEF);
     }
 
-    Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false);
+    Entry* entry = entry_init(func_name, E_FUNC, (Expr_Type){R_VOID, false}, false);
 
     consume(T_RPAR);
     while(check(T_ID)) {
@@ -770,7 +770,7 @@ void func_head() {
     if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
     } 
-    entry->ret_type = type();
+    entry->ret_type = (Expr_Type){type(), false};
 
     tree_insert(parser->s_table, entry);
 }
@@ -792,8 +792,10 @@ Arr* parse(char* orig_input) {
         }
         advance();
     }
-	if(!tree_find(parser->s_table, "main")){
-		ERROR_RET(ERR_SEM_OTHER);
+	
+	Entry* main_entry = tree_find(parser->s_table, "main");
+	if (!main_entry) {
+		ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 	}
 
     // Second pass

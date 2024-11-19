@@ -12,7 +12,7 @@ pub fn main() void {
         } else {
             var d: f64 = ifj.i2f(val);
             var vysl: f64 = 1.0;
-            while (d > 0.0) {
+            while (d > 0) {
                 vysl = vysl * d;
                 d = d - 1.0;
             }
