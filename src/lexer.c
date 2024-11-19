@@ -30,7 +30,7 @@ void lexer_advance(Lexer* lexer) {
 		lexer->idr++;
 	else {
 		// handle error
-		exit(1);
+		ERROR_RET(1);
 	}
 }
 
@@ -64,7 +64,7 @@ void lexer_skip_whitespace(Lexer* lexer) {
 
 void lexer_skip_space(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	while(c == ' ') {
+	while(is_whitespace(c)) {
 		lexer_advance(lexer);
 		c = lexer->input[lexer->idr];
 	}
@@ -237,7 +237,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 			token->type = T_ID;
 			return token;
 		}
-		exit(1);
+		ERROR_RET(1);
 	}
 
 	// OPERATOR TOKENS
@@ -322,7 +322,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	if (lexer->idr == lexer->input_len) {
 		return init_token("0", T_EOF, 0);
 	} else {
-		exit(1);
+		ERROR_RET(1);
 	}
 } // end of find_token_value
 
@@ -483,7 +483,7 @@ Token* get_next_token(Lexer* lexer) {
 	if (lexer->idr == lexer->input_len) {
 		return init_token("0", T_EOF, 0);
 	} else {
-		exit(1);
+		ERROR_RET(1);
 	}
 } // end of get_next_token
 

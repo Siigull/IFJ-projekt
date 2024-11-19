@@ -1,0 +1,46 @@
+const ifj = @import("ifj24.zig");
+
+// Function to check if a character is a vowel
+pub fn is_vowel(c: i32) i32 {
+    var vowels: []u8 = ifj.string("aeiouAEIOU");
+    var j: i32 = 0;
+
+    while (j < ifj.length(vowels)) {
+        if (c == ifj.ord(vowels, j)) {
+            return 0;  // It's a vowel
+        }else{}
+        j = j + 1;
+    }
+
+    return 1;  // Not a vowel
+}
+
+// Function to count vowels in a string
+pub fn count_vowels(s: []u8) i32 {
+    var count: i32 = 0;
+    var i: i32 = 0;
+
+    while (i < ifj.length(s)) {
+        var char_code: i32 = ifj.ord(s, i);
+        if (is_vowel(char_code) == 0) {
+            count = count + 1;
+        }else{}
+        i = i + 1;
+    }
+
+    return count;
+}
+
+// Main function
+pub fn main() void {
+    var input: []u8 = ifj.readstr();  // Read input string
+    var vowel_count: i32 = count_vowels(input);
+
+    ifj.write("Input string: ");
+    ifj.write(input);
+    ifj.write("\n");
+
+    ifj.write("Number of vowels: ");
+    ifj.write(vowel_count);
+    ifj.write("\n");
+}

@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "ast.h"
+#include "error.h"
 /// \todo ’\"’, ’\n’, ’\r’, ’\t’
 
 #define BACKSLASH 92

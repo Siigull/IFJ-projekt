@@ -1,0 +1,39 @@
+const ifj = @import("ifj24.zig");
+
+// Function to replace a character in a string
+pub fn replace_char(s: []u8, old_char: i32, new_char: i32) []u8 {
+    var result: []u8 = ifj.string("");
+    var i: i32 = 0;
+
+    while (i < ifj.length(s)) {
+        var char_code: i32 = ifj.ord(s, i);
+
+        if (char_code == old_char) {
+            var new_str: []u8 = ifj.chr(new_char);
+            result = ifj.concat(result, new_str);
+        } else {
+            var original_char: []u8 = ifj.substring(s, i, i + 1);
+            result = ifj.concat(result, original_char);
+        }
+        i = i + 1;
+    }
+
+    return result;
+}
+
+// Main function
+pub fn main() void {
+    var input: []u8 = ifj.readstr();  // Read input string
+    var old_char: f64 = ifj.f2i(ifj.i2f(ifj.ord(ifj.readstr(), 0)));  // kristepane
+    var new_char: i32 = ifj.ord(ifj.readstr(), 0);  // Read replacement character
+
+    var modified: []u8 = replace_char(input, old_char, new_char);
+
+    ifj.write("Original string: ");
+    ifj.write(input);
+    ifj.write("\n");
+
+    ifj.write("Modified string: ");
+    ifj.write(modified);
+    ifj.write("\n");
+}

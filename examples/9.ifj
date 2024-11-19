@@ -1,0 +1,46 @@
+const ifj = @import("ifj24.zig");
+
+// Function to check if a number is divisible by another
+pub fn is_divisible(a: i32, b: i32) i32 {
+    var result: i32 = a;
+    
+    while (result >= b) {
+        result = result - b;  // Subtract b from a until a is less than b
+    }
+
+    if (result == 0) {
+        return 1;  // Divisible (no remainder)
+    } else {
+        return 0;  // Not divisible
+    }
+}
+
+// Function to check if a number is prime
+pub fn is_prime(n: i32) i32 {
+    if (n <= 1) {
+        return 1;  // Not prime for numbers less than or equal to 1
+    } else {
+        var i: i32 = 2;  // Start checking from 2
+
+        while (i * i <= n) {  // Check divisibility up to sqrt(n)
+            if (is_divisible(n, i) == 1) {  // If divisible, not prime
+                return 0;
+            } else {}
+            i = i + 1;   // Increment i
+        }
+
+        return 1;  // Prime number if no divisors were found
+    }
+}
+
+// Main function
+pub fn main() void {
+    var num: i32 = ifj.readi32();   // Input number
+    var prime: i32 = is_prime(num);  // Call prime check function
+
+    if (prime == 1) {
+        ifj.write("Prime number\n");
+    } else {
+        ifj.write("Not a prime number\n");
+    }
+}

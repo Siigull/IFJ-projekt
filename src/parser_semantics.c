@@ -95,12 +95,12 @@ Ret_Type sem_function_decl(AST_Node* node) {
         ERROR_RET(ERR_SEM_REDEF);
     }
 
-    if (node->as.func_data->arr) {
-        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
-            Function_Arg* current = (Function_Arg*)node->as.func_data->arr->data[i];
+    if (func_entry->as.function_args) {
+        for (size_t i = 0; i < func_entry->as.function_args->length; i++) {
+            Function_Arg* current = (Function_Arg*)func_entry->as.function_args->data[i];
 
-            for (size_t j = i + 1; j < node->as.func_data->arr->length; j++) {
-                Function_Arg* next = (Function_Arg*)node->as.func_data->arr->data[j];
+            for (size_t j = i + 1; j < func_entry->as.function_args->length; j++) {
+                Function_Arg* next = (Function_Arg*)func_entry->as.function_args->data[j];
 
                 if (!strcmp(current->arg_name, next->arg_name)) {
                     ERROR_RET(ERR_SEM_PARAMS);

@@ -36,7 +36,6 @@ typedef enum {
 	MINUS,
 	MUL,
 	DIV,
-	NUL
 } AST_Type;
 
 // typedef enum {
