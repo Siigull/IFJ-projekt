@@ -446,41 +446,9 @@ C_Stack init_c_stack(Tree* global_tree) {
 	stack.arr = malloc(sizeof(Tree*) * stack.max_nest);
 	stack.cur_nest = -1;
 
-	stack.path = malloc(sizeof(int) * 4);
-	stack.max_path = 4;
-	stack.cur_path = 0;
-	stack.path[0] = 0;
-
-	stack.last_up = true;
-
 	stack.global_table = global_tree;
 
 	return stack;
-}
-
-void extend_path(C_Stack* stack, bool up) {
-	if(stack->cur_path >= stack->max_path - 1) {
-		stack->max_path *= 2;
-		stack->path = realloc(stack->path, sizeof(int) * stack->max_path);
-		if(stack->path == NULL) {
-			exit(99);
-		}
-	}
-
-	if(stack->last_up == up) {
-		if(up) {
-			stack->path[stack->cur_path]++;
-		} else {
-			stack->path[stack->cur_path]--;
-		}
-	} else {
-		if(up) {
-			stack->path[++(stack->cur_path)] = 1;
-		} else {
-			stack->path[++(stack->cur_path)] = -1;
-		}
-		
-	}
 }
 
 void context_push(C_Stack* stack) {
@@ -496,31 +464,25 @@ void context_push(C_Stack* stack) {
 		stack->arr = data;
 	}
 
-	extend_path(stack, true);
-
 	stack->cur_nest++;
 	stack->arr[stack->cur_nest] = tree_init();
 }
 
-char* get_path(C_Stack* stack) {
-	int path_len = 0;
-	char* path;
-	for(int i=0; i < stack->cur_path + 1; i++) {
-		char temp_buf[13];
-		sprintf(temp_buf, "%d", stack->path[i]);
-		path_len += strlen(temp_buf);
+char* get_path() {
+	#define HASH_BITS 8
+
+	const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	char* out = calloc(HASH_BITS + 2, sizeof(char));
+
+	out[0] = '?';
+	for(int i=1; i < 9; i++) {
+		int base64_index = rand() % 62;
+		out[i] = (char)base64_chars[base64_index];
 	}
 
-	path = malloc(sizeof(char) * (path_len + 2));
-	path[0] = '?';
-	path++;
-	for(int i=0; i < stack->cur_path + 1; i++) {
-		path += sprintf(path, "%d", stack->path[i]);
-	}
+	return out;
 
-	path -= path_len + 1;
-
-	return path;
+	#undef HASH_BITS
 }
 
 bool context_pop(C_Stack* stack) {
@@ -529,32 +491,29 @@ bool context_pop(C_Stack* stack) {
 	}
 
 	Entry* entry;
+	char* path = get_path(stack);
+	int path_len = strlen(path);
 	while (true){
 		entry = tree_pop(stack->arr[stack->cur_nest]);
 		if(entry == NULL) {
 			break;
 		}
-		
-		char* path = get_path(stack);
-		int path_len = strlen(path);
 
-		if(tree_find(stack->global_table, entry->key) != NULL) {
-			char* temp = realloc(entry->key, strlen(entry->key) + path_len + 2);
-			if(temp == NULL) {
-				exit(99);
-			}
-			entry->key = temp;
+		int orig_len = strlen(entry->key);
+		char* temp = realloc(entry->key, orig_len + path_len + 2);
+		if(temp == NULL) {
+			exit(99);
+		}
+		entry->key = temp;
 
-			strcat(entry->key, path);
+		strcat(entry->key, path);
 
-			tree_insert(stack->global_table, entry);
-		
-		} else {
+		while(tree_find(stack->global_table, entry->key) != NULL) {
+			path = get_path(stack);
+			memcpy(entry->key + orig_len, path, path_len);
 			tree_insert(stack->global_table, entry);
 		}
 	}
-
-	extend_path(stack, false);
 
 	stack->cur_nest--;
 
@@ -573,7 +532,6 @@ Entry* context_find(C_Stack* stack, const char* key, bool global) {
 
 		cur_nest--;
 	}
-
 
 	if(global) {
 		return tree_find(stack->global_table, key);

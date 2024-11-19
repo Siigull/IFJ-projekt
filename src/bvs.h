@@ -67,10 +67,6 @@ typedef struct Context_Stack {
 	
 	Tree** arr;
 	Tree* global_table;
-	int* path;
-	int cur_path;
-	int max_path;
-	bool last_up;
 } C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,

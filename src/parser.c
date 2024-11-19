@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <time.h>
 
 Lexer* lexer;
 Parser* parser;
@@ -558,7 +559,7 @@ AST_Node* var_decl() {
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut);
 
-	if (context_find(&(parser->c_stack), node->as.var_name, false) != NULL) {
+	if (context_find(&(parser->c_stack), node->as.var_name, true) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
 	}
 	context_put(&(parser->c_stack), entry);
@@ -709,6 +710,9 @@ AST_Node* func_decl() {
     const char* func_name = parser->prev->value;
     node->as.func_data->var_name = func_name;
 
+	Entry* func = tree_find(parser->s_table, func_name);
+	Function_Arg** args = (Function_Arg**)func->as.function_args->data;
+
     consume(T_RPAR);
     while(check(T_ID)) {
         advance();
@@ -717,6 +721,7 @@ AST_Node* func_decl() {
 		Ret_Type r_type = type();
 
 		Entry* entry = entry_init(var_name, E_VAR, r_type, false);
+		(*args++)->arg_name = var_name;
 		context_put(&(parser->c_stack), entry);
 
 		if (!check(T_COMMA)) {
@@ -848,6 +853,8 @@ void parse(char* orig_input) {
 }
 
 int compile(char* input) {
+	srand(time(NULL));
+
 	parse(input);
 
     return 0;
