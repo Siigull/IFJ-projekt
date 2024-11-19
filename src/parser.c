@@ -178,12 +178,20 @@ AST_Node* string() {
      List_insertF(tl, token);
 
      if (check(T_ID)) {
-         advance();
-         if(check(T_RPAR)) {
-             AST_Node* node = func_call();
-             token->node = node;
-			 token->type = T_BUILDIN;
-         }
+		advance();
+		if(check(T_RPAR)) {
+			AST_Node* node = func_call();
+			token->node = node;
+			token->type = T_BUILDIN;
+
+		} else {
+			Entry* entry = context_find(&(parser->c_stack), token->value, false);
+			if(entry != NULL) {
+				token->value = entry->key;
+			} else {
+				ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+			}
+		}
 
      } else if (check(T_STRING)) {
          advance();
@@ -696,14 +704,20 @@ AST_Node* func_decl() {
 	consume(T_FN);
 	consume(T_ID);
 
+	context_push(&(parser->c_stack));
+
     const char* func_name = parser->prev->value;
     node->as.func_data->var_name = func_name;
 
     consume(T_RPAR);
     while(check(T_ID)) {
         advance();
+		char* var_name = parser->prev->value;
         consume(T_DDOT);
-		type();
+		Ret_Type r_type = type();
+
+		Entry* entry = entry_init(var_name, E_VAR, r_type, false);
+		context_put(&(parser->c_stack), entry);
 
 		if (!check(T_COMMA)) {
 			break;
@@ -718,7 +732,6 @@ AST_Node* func_decl() {
     }
     type();
 
-    context_push(&(parser->c_stack));
 	block(node->as.func_data->arr);
     context_pop(&(parser->c_stack));
 

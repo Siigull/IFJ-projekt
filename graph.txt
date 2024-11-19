@@ -1,6 +1,0 @@
-root -> FUNC_DECL(0) : functions
-FUNC_DECL(0) -> IF(0) : body
-IF(0) -> ID(0) : expr
-IF(0) -> ELSE(0) : else
-IF(0) -> VAR_DECL(0) : body
-VAR_DECL(0) -> I32(0) : expr

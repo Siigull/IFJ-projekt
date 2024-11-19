@@ -42,6 +42,10 @@ void write_connection(char* last_node, char* current_node,
     fprintf(file, "%s -> %s : %s\n", last_node, current_node, where);
 }
 
+void write_data(const char* node, const char* data) {
+    fprintf(file, "%s: {tooltip: %s}\n", node, data);
+}
+
 void generate_graph_func_call(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "FUNC_CALL", func_call_count++);
@@ -69,7 +73,8 @@ void generate_graph_function_decl(AST_Node* node, char* last_node, char* path) {
 void generate_graph_var_decl(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "VAR_DECL", var_decl_count++);
-
+    
+    write_data(current_node, node->as.var_name);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "expr");
@@ -79,6 +84,7 @@ void generate_graph_var_assignment(AST_Node* node, char* last_node, char* path) 
     char current_node[30];
     sprintf(current_node, "%s(%d)", "VAR_ASSIGNMENT", var_assignment_count++);
 
+    write_data(current_node, node->as.var_name);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "expr");
@@ -167,6 +173,7 @@ void generate_graph_id(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "ID", ID_count++);
 
+    write_data(current_node, node->as.var_name);
     write_connection(last_node, current_node, path);
 } 
 

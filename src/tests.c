@@ -86,7 +86,7 @@ int mainasd() {
 
 	// generate_debug_token_arr();
 
-	char* temp = load_inputos("src/input8.2.ifj");
+	char* temp = load_inputos("examples/input8.8.ifj");
 	compile(temp);	
 	return 0;
 };

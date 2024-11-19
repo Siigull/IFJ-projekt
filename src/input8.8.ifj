@@ -14,15 +14,15 @@ pub fn g (x : i32) i32 {
     ifj.write("calling f with "); ifj.write(x); ifj.write("\n"); 
     const y = f(x); // inicializace konstanty volanim funkce
     return y; 
+
   } else {
-  
-  return 200;
-  
+    return 200;
   }
 }
 
 pub fn main() void {
-  const res = f(10);
+  const res : i32 = f(10);
+  res = 10;
   ifj.write("res: "); ifj.write(res); ifj.write("\n");
 }
 
