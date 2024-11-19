@@ -30,7 +30,7 @@ FILE* file = NULL;
 
 void generate_graph_node(AST_Node* node, char* last_node, char* path);
 
-char* type_to_string[] = {"NULL", "R_I32","N_I32","R_F64","N_F64","R_U8","N_U8","IMPLICIT"};
+char* ret_type_to_string[] = {"NULL", "R_I32","N_I32","R_F64","N_F64","R_U8","N_U8","IMPLICIT"};
 
 void write_connection(char* last_node, char* current_node, 
                       char* where) {
