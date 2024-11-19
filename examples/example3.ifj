@@ -7,6 +7,7 @@ pub fn main() void {
     var str2 = ifj.string(", ktery jeste trochu obohatime");
     str2 = ifj.concat(str1, str2);
         ifj
+        
         .  write(str1);
     ifj.write("\n");
     ifj.write(str2);

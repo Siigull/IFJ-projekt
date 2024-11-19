@@ -157,52 +157,182 @@ LABEL *substring
 	LABEL *substring*err
 	MOVE LF@*return*value nil@nil
 	JUMP *substring*loop*end
-LABEL bomba
-	PUSHFRAME
-	DEFVAR LF@*return*value
-	MOVE LF@*return*value nil@nil
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS string@_\032works\032jupi\010
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	POPFRAME
-	RETURN
-
 LABEL main
 	CREATEFRAME
 	PUSHFRAME
-	DEFVAR LF@a
-	PUSHS int@10
+	DEFVAR LF@str1
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@Toto\032je\032nejaky\032text\032v\032programu\032jazyka\032IFJ24
 	POPS GF@*expression*result
-	MOVE LF@a GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *string
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@str1 GF@*expression*result
 
-	DEFVAR LF@b
-	PUSHS int@20
+	DEFVAR LF@str2
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@,\032ktery\032jeste\032trochu\032obohatime
 	POPS GF@*expression*result
-	MOVE LF@b GF@*expression*result
-
-	DEFVAR LF@result
-	PUSHS LF@a
-	PUSHS LF@b
-	ADDS
+	MOVE TF@*param0 GF@*expression*result
+	CALL *string
+	PUSHS GF@*return*val
 	POPS GF@*expression*result
-	MOVE LF@result GF@*expression*result
+	MOVE LF@str2 GF@*expression*result
 
 	CREATEFRAME
 	DEFVAR TF@*param0
-	PUSHS LF@result
-	PUSHS LF@result
-	MULS
-	PUSHS LF@result
+	PUSHS LF@str1
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	DEFVAR TF@*param1
+	PUSHS LF@str2
+	POPS GF@*expression*result
+	MOVE TF@*param1 GF@*expression*result
+	CALL *concat
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@str2 GF@*expression*result
+
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@str1
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *     write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@\010
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
 	CREATEFRAME
-	CALL bomba
+	DEFVAR TF@*param0
+	PUSHS LF@str2
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@\010
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *            write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@Zadejte\032serazenou\032posloupnost\032vsech\032malych\032pismen\032a-h,\032
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	DEFVAR LF@newInput
+	CREATEFRAME
+	CALL *readstr
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@newInput GF@*expression*result
+
+	DEFVAR LF@all
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *string
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@all GF@*expression*result
+
+	DEFVAR LF@abcdefgh
+	DEFVAR LF@strcmpResult
+	LABEL *while*main*10*0
+	MOVE GF@*tmp*res LF@newInput
+	EQ GF@*expression*result LF@newInput nil@nil
+	NOT GF@*expression*result GF@*expression*result
+	JUMPIFEQ *end*loop*main*10*0 GF@*expression*result bool@false
+	DEFVAR LF@inpOK
+	MOVE LF@inpOK GF@*tmp*res
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@abcdefgh
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *string
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@abcdefgh GF@*expression*result
+
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@inpOK
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	DEFVAR TF@*param1
+	PUSHS LF@abcdefgh
+	POPS GF@*expression*result
+	MOVE TF@*param1 GF@*expression*result
+	CALL *strcmp
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@strcmpResult GF@*expression*result
+
+	PUSHS LF@strcmpResult
+	POPS GF@*expression*result
+	MOVE GF@*lhs GF@*expression*result
+	PUSHS int@0
+	POPS GF@*expression*result
+	MOVE GF@*rhs GF@*expression*result
+	EQ GF@*expression*result GF@*lhs GF@*rhs
+	MOVE GF@*tmp*res GF@*expression*result
+	JUMPIFEQ *else*main*3*1 GF@*expression*result bool@false
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@Spravne\032zadano!\010
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@all
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
 	PUSHS nil@nil
 	POPS GF@*expression*result
+	MOVE LF@newInput GF@*expression*result
+
+	JUMP *end*of*if*main*3*1
+	LABEL *else*main*3*1
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@Spatne\032zadana\032posloupnost,\032zkuste\032znovu:\010
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@all
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	DEFVAR TF@*param1
+	PUSHS LF@inpOK
+	POPS GF@*expression*result
+	MOVE TF@*param1 GF@*expression*result
+	CALL *concat
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@all GF@*expression*result
+
+	CREATEFRAME
+	CALL *readstr
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@newInput GF@*expression*result
+
+	LABEL *end*of*if*main*3*1
+	JUMP *while*main*10*0
+	LABEL *end*loop*main*10*0
 	POPFRAME
 	EXIT int@0
 

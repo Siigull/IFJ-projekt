@@ -1,0 +1,77 @@
+root -> FUNC_DECL(0) : functions
+VAR_DECL(0): {tooltip: str1}
+FUNC_DECL(0) -> VAR_DECL(0) : body
+VAR_DECL(0) -> FUNC_CALL(0) : expr
+FUNC_CALL(0) -> STRING(0) : args
+VAR_DECL(1): {tooltip: str2}
+FUNC_DECL(0) -> VAR_DECL(1) : body
+VAR_DECL(1) -> FUNC_CALL(1) : expr
+FUNC_CALL(1) -> STRING(1) : args
+VAR_ASSIGNMENT(0): {tooltip: str2}
+FUNC_DECL(0) -> VAR_ASSIGNMENT(0) : body
+VAR_ASSIGNMENT(0) -> FUNC_CALL(2) : expr
+ID(0): {tooltip: str1}
+FUNC_CALL(2) -> ID(0) : args
+ID(1): {tooltip: str2}
+FUNC_CALL(2) -> ID(1) : args
+FUNC_DECL(0) -> FUNC_CALL(3) : body
+ID(2): {tooltip: str1}
+FUNC_CALL(3) -> ID(2) : args
+FUNC_DECL(0) -> FUNC_CALL(4) : body
+FUNC_CALL(4) -> STRING(2) : args
+FUNC_DECL(0) -> FUNC_CALL(5) : body
+ID(3): {tooltip: str2}
+FUNC_CALL(5) -> ID(3) : args
+FUNC_DECL(0) -> FUNC_CALL(6) : body
+FUNC_CALL(6) -> STRING(3) : args
+FUNC_DECL(0) -> FUNC_CALL(7) : body
+FUNC_CALL(7) -> STRING(4) : args
+VAR_DECL(2): {tooltip: newInput}
+FUNC_DECL(0) -> VAR_DECL(2) : body
+VAR_DECL(2) -> FUNC_CALL(8) : expr
+VAR_DECL(3): {tooltip: all}
+FUNC_DECL(0) -> VAR_DECL(3) : body
+VAR_DECL(3) -> FUNC_CALL(9) : expr
+FUNC_CALL(9) -> STRING(5) : args
+FUNC_DECL(0) -> WHILE(0) : body
+ID(4): {tooltip: newInput}
+WHILE(0) -> ID(4) : expr
+WHILE(0) -> NNUL(0) : body
+VAR_DECL(4): {tooltip: abcdefgh}
+WHILE(0) -> VAR_DECL(4) : body
+VAR_DECL(4) -> FUNC_CALL(10) : expr
+FUNC_CALL(10) -> STRING(6) : args
+VAR_DECL(5): {tooltip: strcmpResult}
+WHILE(0) -> VAR_DECL(5) : body
+VAR_DECL(5) -> FUNC_CALL(11) : expr
+ID(5): {tooltip: inpOK}
+FUNC_CALL(11) -> ID(5) : args
+ID(6): {tooltip: abcdefgh}
+FUNC_CALL(11) -> ID(6) : args
+WHILE(0) -> IF(0) : body
+==(0): {tooltip: NULL}
+IF(0) -> ==(0) : expr
+ID(7): {tooltip: strcmpResult}
+==(0) -> ID(7) : left
+==(0) -> I32(0) : right
+IF(0) -> ELSE(0) : else
+ELSE(0) -> FUNC_CALL(12) : body
+FUNC_CALL(12) -> STRING(7) : args
+VAR_ASSIGNMENT(1): {tooltip: all}
+ELSE(0) -> VAR_ASSIGNMENT(1) : body
+VAR_ASSIGNMENT(1) -> FUNC_CALL(13) : expr
+ID(8): {tooltip: all}
+FUNC_CALL(13) -> ID(8) : args
+ID(9): {tooltip: inpOK}
+FUNC_CALL(13) -> ID(9) : args
+VAR_ASSIGNMENT(2): {tooltip: newInput}
+ELSE(0) -> VAR_ASSIGNMENT(2) : body
+VAR_ASSIGNMENT(2) -> FUNC_CALL(14) : expr
+IF(0) -> FUNC_CALL(15) : body
+FUNC_CALL(15) -> STRING(8) : args
+IF(0) -> FUNC_CALL(16) : body
+ID(10): {tooltip: all}
+FUNC_CALL(16) -> ID(10) : args
+VAR_ASSIGNMENT(3): {tooltip: newInput}
+IF(0) -> VAR_ASSIGNMENT(3) : body
+VAR_ASSIGNMENT(3) -> NIL(0) : expr

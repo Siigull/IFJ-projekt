@@ -297,24 +297,14 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 
 	if (type == T_BUILDIN) {
 		int last_space = -1;
-		for(int i=3; i < len; i++) {
-			if((value[i] == ' ' || value[i] == '\n') && last_space == -1) {
-				last_space = i;
-
-			} else if(last_space != -1 && (value[i] == ' ' || value[i] == '\n')) {
-				memmove(value + last_space, value + i, len - (i - 1));
-				i = last_space;
-				last_space = -1;
-			}
-		}
+		int i, len = strlen(value);
 		
-		token->length = strlen(token->value);
+		for(i=3; (value[i] == ' ' || value[i] == '\n' || value[i] == '.'); i++) {}
 
-		memmove(value, value + 3, len - 3);
-		token->length -= 3;
-
-		token->value[0] = '*';
-		token->value[token->length] = '\0';
+		memmove(value + 1, value + i, (len - i + 1));
+		
+		value[0] = '*';
+		token->length = strlen(value);
 		return token;
 	};
 

@@ -37,7 +37,7 @@ char* load_inputos(const char* filepath) {
 }
 
 void generate_debug_token_arr() {
-	FILE* f = fopen("src/example_multiline.ifj", "r");
+	FILE* f = fopen("examples/example3.ifj", "r");
 	if(f == NULL) {
 		return;
 	}
@@ -78,15 +78,15 @@ void generate_debug_token_arr() {
 	printf("}\n");
 }
 
-int mainasd() {
+int main() {
 	// const ifj = @import("ifj24.zig"); jeden token
 	// char input1[50] = "456e2 7.89E-2 test1iden _identf";
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	// generate_debug_token_arr();
+	generate_debug_token_arr();
 
-	char* temp = load_inputos("examples/input8.8.ifj");
-	compile(temp);	
+	// char* temp = load_inputos("examples/example3.ifj");
+	// compile(temp);
 	return 0;
 };
