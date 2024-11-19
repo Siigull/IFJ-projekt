@@ -461,7 +461,7 @@ C_Stack init_c_stack(Tree* global_tree) {
 void extend_path(C_Stack* stack, bool up) {
 	if(stack->cur_path >= stack->max_path - 1) {
 		stack->max_path *= 2;
-		stack->path = realloc(stack->path, stack->max_path);
+		stack->path = realloc(stack->path, sizeof(int) * stack->max_path);
 		if(stack->path == NULL) {
 			exit(99);
 		}

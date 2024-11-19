@@ -124,6 +124,20 @@ LABEL *strcmp
 LABEL *substring
 	PUSHFRAME
 	DEFVAR LF@*return*value
+	LT GF@*tmp*res LF@*param1 int@0
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	LT GF@*tmp*res LF@*param2 int@0
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	GT GF@*tmp*res LF@*param1 LF@*param2
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	STRLEN GF@*tmp*res LF@*param0
+	GT GF@*tmp*res LF@*param2 GF@*tmp*res
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	STRLEN GF@*tmp*res LF@*param0
+	EQ GF@*expression*result LF@*param1 GF@*tmp*res
+	GT GF@*tmp*res LF@*param1 GF@*tmp*res
+	OR GF@*tmp*res GF@*expression*result GF@*tmp*res
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
 	MOVE LF@*return*value string@
 	DEFVAR LF@*start*index
 	DEFVAR LF@*res
@@ -140,10 +154,14 @@ LABEL *substring
 	POPFRAME
 	RETURN
 
+	LABEL *substring*err
+	MOVE LF@*return*value nil@nil
+	JUMP *substring*loop*end
 LABEL main
 	CREATEFRAME
 	PUSHFRAME
 	DEFVAR LF@i
+	MOVE GF@*tmp*res LF@true
 	EQ GF@*expression*result LF@true nil@nil
 	NOT GF@*expression*result GF@*expression*result
 	JUMPIFEQ *else*main*0*0 GF@*expression*result bool@false
@@ -154,11 +172,6 @@ LABEL main
 	JUMP *end*of*if*main*0*0
 	LABEL *else*main*0*0
 	LABEL *end*of*if*main*0*0
-	DEFVAR LF@i?20-1
-	PUSHS int@20
-	POPS GF@*expression*result
-	MOVE LF@i?20-1 GF@*expression*result
-
 	POPFRAME
 	EXIT int@0
 

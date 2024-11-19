@@ -78,7 +78,7 @@ void generate_debug_token_arr() {
 	printf("}\n");
 }
 
-int main123() {
+int mainasd() {
 	// const ifj = @import("ifj24.zig"); jeden token
 	// char input1[50] = "456e2 7.89E-2 test1iden _identf";
 	// char expected_result1[2] = {1};
@@ -86,7 +86,7 @@ int main123() {
 
 	// generate_debug_token_arr();
 
-	char* temp = load_inputos("src/input8.8.ifj");
+	char* temp = load_inputos("src/input8.2.ifj");
 	compile(temp);	
 	return 0;
 };
