@@ -508,9 +508,11 @@ bool context_pop(C_Stack* stack) {
 
 		strcat(entry->key, path);
 
-		while(tree_find(stack->global_table, entry->key) != NULL) {
+		if(tree_find(stack->global_table, entry->key) != NULL){
 			path = get_path(stack);
 			memcpy(entry->key + orig_len, path, path_len);
+			tree_insert(stack->global_table, entry);
+		} else {
 			tree_insert(stack->global_table, entry);
 		}
 	}
