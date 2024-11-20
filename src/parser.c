@@ -733,6 +733,21 @@ void prolog() {
 
 	consume(T_LPAR);
 	consume(T_SEMI);
+
+	Entry* read_str = entry_init("*readstr", E_FUNC, (Expr_Type){N_U8, false}, false);
+	Entry* read_int = entry_init("*readi32", E_FUNC, (Expr_Type){N_I32, false}, false);
+	Entry* read_float = entry_init("*readf64", E_FUNC, (Expr_Type){N_F64, false}, false);
+	Entry* write = entry_init("*write", E_FUNC, (Expr_Type){R_VOID, false}, false);
+
+	Function_Arg* arg = malloc(sizeof(Function_Arg));
+	arg->arg_name = "term";
+	arg->type = R_VOID;
+	arr_append(write->as.function_args, (size_t)arg);
+
+	tree_insert(parser->s_table, read_str);
+	tree_insert(parser->s_table, read_int);
+	tree_insert(parser->s_table, read_float);
+	tree_insert(parser->s_table, write);
 }
 
 void func_head() {

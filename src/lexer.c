@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-Token* init_token(char* value, T_Type type, unsigned int length) {
+Token* init_token(const char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));
-	token->value = value;
+	token->value = (char*) value;
 	token->type = type;
 	token->length = length;
 	token->isProcessed = false;
-	token->node == NULL;
+	token->node = NULL;
 	return token;
 }
 
@@ -64,7 +64,7 @@ void lexer_skip_whitespace(Lexer* lexer) {
 
 void lexer_skip_space(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	while(is_whitespace(c)) {
+	while (is_whitespace(c)) {
 		lexer_advance(lexer);
 		c = lexer->input[lexer->idr];
 	}
@@ -123,10 +123,7 @@ bool is_float_token(Token* token) {
 	if (is_num(token->value[i])) {
 		i++;
 		prefix_match++;
-		while (is_num(token->value[i]) && token->value[i] != '0') {
-			if (token->value[i - 1] == '0') {
-				return false;
-			} // cant read another number if 0 was read, need .
+		while (is_num(token->value[i])) {
 			i++;
 		}
 	}
@@ -264,27 +261,24 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	}
 
 	if (type == T_STRING) {
-		if(value[0] == '\\' && value[1] == '\\') {
+		if (value[0] == '\\' && value[1] == '\\') {
 			int last_newline = -1;
-			
-			for(int i=0; i < len; i++) {
+
+			for (int i = 0; i < len; i++) {
 				if (value[i] == '\n' && last_newline == -1) {
 					last_newline = i;
 
-				} else if (value[i] == '\\' && 
-						   value[i+1] == '\\' &&
-						   last_newline != -1) {
-
+				} else if (value[i] == '\\' && value[i + 1] == '\\' && last_newline != -1) {
 					memmove(value + last_newline + 1, value + i + 2, len - (i + 1));
 					i = last_newline;
 					last_newline = -1;
 				}
 			}
 
-			if(last_newline != -1) {
+			if (last_newline != -1) {
 				value[last_newline] = '\0';
 			}
-			
+
 			memmove(value, value + 2, len - 1);
 
 		} else {
@@ -297,24 +291,15 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 
 	if (type == T_BUILDIN) {
 		int last_space = -1;
-		for(int i=3; i < len; i++) {
-			if(is_whitespace(value[i])) {
-				last_space = i;
+		int i, len = strlen(value);
 
-			} else if(last_space != -1 && !is_whitespace(value[i])) {
-				memmove(value + last_space, value + i, len - (i - 1));
-				i = last_space;
-				last_space = -1;
-			}
+		for (i = 3; (value[i] == ' ' || value[i] == '\n' || value[i] == '.'); i++) {
 		}
-		
-		token->length = strlen(token->value);
 
-		memmove(value, value + 3, len - 3);
-		token->length -= 3;
+		memmove(value + 1, value + i, (len - i + 1));
 
-		token->value[0] = '*';
-		token->value[token->length] = '\0';
+		value[0] = '*';
+		token->length = strlen(value);
 		return token;
 	};
 
@@ -330,33 +315,26 @@ Token* get_next_token(Lexer* lexer) {
 	lexer_skip_whitespace(lexer);
 	lexer->idl = lexer->idr;
 	if (lexer->input[lexer->idr] != '\0') {
-		
-		//multiline strings
-		if (lexer->input[lexer->idr]     == '\\' &&
-			lexer->input[lexer->idr + 1] == '\\') {
-
-			while(lexer->input[lexer->idr]     == '\\' &&
-				  lexer->input[lexer->idr + 1] == '\\') {
-
-				while(lexer->input[lexer->idr] != '\n' && 
-					  lexer->input[lexer->idr] != '\0') {
-
+		// multiline strings
+		if (lexer->input[lexer->idr] == '\\' && lexer->input[lexer->idr + 1] == '\\') {
+			while (lexer->input[lexer->idr] == '\\' && lexer->input[lexer->idr + 1] == '\\') {
+				while (lexer->input[lexer->idr] != '\n' && lexer->input[lexer->idr] != '\0') {
 					lexer_advance(lexer);
 				}
 
 				lexer_skip_whitespace(lexer);
 			}
-			
+
 			return find_token_value(lexer, T_STRING);
 		}
 
-		//normal strings
+		// normal strings
 		if (lexer->input[lexer->idr] == '"') {
 			lexer->idl++;
 			lexer_advance(lexer);
-			while (lexer->input[lexer->idr] != '"') { 
+			while (lexer->input[lexer->idr] != '"') {
 				if (lexer->input[lexer->idr] == '\\') {
-					if (lexer->input[lexer->idr+1] == '"') {
+					if (lexer->input[lexer->idr + 1] == '"') {
 						lexer_advance(lexer);
 					}
 				}
@@ -372,7 +350,7 @@ Token* get_next_token(Lexer* lexer) {
 				lexer_advance(lexer);
 			}
 			lexer_skip_space(lexer);
-			if(lexer->input[lexer->idr] == '.') {
+			if (lexer->input[lexer->idr] == '.') {
 				lexer_advance(lexer);
 				lexer_skip_space(lexer);
 				// now scanning inbuild function
@@ -466,14 +444,11 @@ Token* get_next_token(Lexer* lexer) {
 			lexer_advance(lexer);
 			if (lexer->input[lexer->idr - 1] == '=' && lexer->input[lexer->idr] == '=') {
 				lexer_advance(lexer);
-			}
-			else if (lexer->input[lexer->idr - 1] == '<' && lexer->input[lexer->idr] == '=') {
+			} else if (lexer->input[lexer->idr - 1] == '<' && lexer->input[lexer->idr] == '=') {
 				lexer_advance(lexer);
-			}
-			else if (lexer->input[lexer->idr - 1] == '>' && lexer->input[lexer->idr] == '=') {
+			} else if (lexer->input[lexer->idr - 1] == '>' && lexer->input[lexer->idr] == '=') {
 				lexer_advance(lexer);
-			}
-			else if (lexer->input[lexer->idr - 1] == '!' && lexer->input[lexer->idr] == '=') {
+			} else if (lexer->input[lexer->idr - 1] == '!' && lexer->input[lexer->idr] == '=') {
 				lexer_advance(lexer);
 			}
 
@@ -490,180 +465,180 @@ Token* get_next_token(Lexer* lexer) {
 char* print_token(Token* token, FILE* out, bool string) {
 	char* buffer;
 
-	if(string) {
+	if (string) {
 		buffer = calloc(30, sizeof(char));
 		out = fmemopen(buffer, 30, "w");
 	}
 
 	switch (token->type) {
-    case T_ID:
-        fprintf(out, "T_ID");
-        break;
-    case T_F64:
-        fprintf(out, "T_F64");
-        break;
-    case T_I32:
-        fprintf(out, "T_I32");
-        break;
-    case T_U8:
-        fprintf(out, "T_U8");
-        break;
-    case T_DTYPE:
-        fprintf(out, "T_DTYPE");
-        break;
-    case T_DOT:
-        fprintf(out, "T_DOT");
-        break;
-    case T_QUOTATION:
-        fprintf(out, "T_QUOTATION");
-        break;
-    case T_QUESTMARK:
-        fprintf(out, "T_QUESTMARK");
-        break;
-    case T_EXCLEMARK:
-        fprintf(out, "T_EXCLEMARK");
-        break;
-    case T_EXPONENT:
-        fprintf(out, "T_EXPONENT");
-        break;
-    case T_STRING:
-        fprintf(out, "T_STRING");
-        break;
-    case T_COMMENT:
-        fprintf(out, "T_COMMENT");
-        break;
-    case T_BUILDIN:
-        fprintf(out, "T_BUILDIN");
-        break;
-    case T_RPAR:
-        fprintf(out, "T_RPAR");
-        break;
-    case T_LPAR:
-        fprintf(out, "T_LPAR");
-        break;
-    case T_SQRBRACKET:
-        fprintf(out, "T_SQRBRACKET");
-        break;
-    case T_SQLBRACKET:
-        fprintf(out, "T_SQLBRACKET");
-        break;
-    case T_CUYRBRACKET:
-        fprintf(out, "T_CUYRBRACKET");
-        break;
-    case T_CUYLBRACKET:
-        fprintf(out, "T_CUYLBRACKET");
-        break;
-    case T_BAR:
-        fprintf(out, "T_BAR");
-        break;
-    case T_CONST:
-        fprintf(out, "T_CONST");
-        break;
-    case T_IF:
-        fprintf(out, "T_IF");
-        break;
-    case T_ELSE:
-        fprintf(out, "T_ELSE");
-        break;
-    case T_FN:
-        fprintf(out, "T_FN");
-        break;
-    case T_PUB:
-        fprintf(out, "T_PUB");
-        break;
-    case T_RETURN:
-        fprintf(out, "T_RETURN");
-        break;
-    case T_VAR:
-        fprintf(out, "T_VAR");
-        break;
-    case T_VOID:
-        fprintf(out, "T_VOID");
-        break;
-    case T_WHILE:
-        fprintf(out, "T_WHILE");
-        break;
-    case T_IMPORT:
-        fprintf(out, "T_IMPORT");
-        break;
-    case T_SEMI:
-        fprintf(out, "T_SEMI");
-        break;
-    case T_DDOT:
-        fprintf(out, "T_DDOT");
-        break;
-    case T_COMMA:
-        fprintf(out, "T_COMMA");
-        break;
-    case T_UNDER:
-        fprintf(out, "T_UNDER");
-        break;
-    case T_PLUS:
-        fprintf(out, "T_PLUS");
-        break;
-    case T_MINUS:
-        fprintf(out, "T_MINUS");
-        break;
-    case T_MUL:
-        fprintf(out, "T_MUL");
-        break;
-    case T_DIV:
-        fprintf(out, "T_DIV");
-        break;
-    case T_DOLLARLIST:
-        fprintf(out, "T_DOLLARLIST");
-        break;
-    case T_LEFTSHIFTLIST:
-        fprintf(out, "T_LEFTSHIFTLIST");
-        break;
-    case T_RIGHTSHIFTLIST:
-        fprintf(out, "T_RIGHTSHIFTLIST");
-        break;
-    case T_DDEQ:
-        fprintf(out, "T_DDEQ");
-        break;
-    case T_EQUAL:
-        fprintf(out, "T_EQUAL");
-        break;
-    case T_NEQUAL:
-        fprintf(out, "T_NEQUAL");
-        break;
-    case T_GTHAN:
-        fprintf(out, "T_GTHAN");
-        break;
-    case T_GETHAN:
-        fprintf(out, "T_GETHAN");
-        break;
-    case T_STHAN:
-        fprintf(out, "T_STHAN");
-        break;
-    case T_SETHAN:
-        fprintf(out, "T_SETHAN");
-        break;
-    case T_OPERATOR:
-        fprintf(out, "T_OPERATOR");
-        break;
-    case T_UNDEF:
-        fprintf(out, "T_UNDEF");
-        break;
-    case T_NULL:
-        fprintf(out, "T_NULL");
-        break;
-    case T_EOF:
-        fprintf(out, "T_EOF");
-        break;
-    case T_ERR:
-        fprintf(out, "T_ERR");
-        break;
-    case T_PROLOG:
-        fprintf(out, "T_PROLOG");
-        break;
-    default:
-        fprintf(out, "Unknown token");
-        break;
+	case T_ID:
+		fprintf(out, "T_ID");
+		break;
+	case T_F64:
+		fprintf(out, "T_F64");
+		break;
+	case T_I32:
+		fprintf(out, "T_I32");
+		break;
+	case T_U8:
+		fprintf(out, "T_U8");
+		break;
+	case T_DTYPE:
+		fprintf(out, "T_DTYPE");
+		break;
+	case T_DOT:
+		fprintf(out, "T_DOT");
+		break;
+	case T_QUOTATION:
+		fprintf(out, "T_QUOTATION");
+		break;
+	case T_QUESTMARK:
+		fprintf(out, "T_QUESTMARK");
+		break;
+	case T_EXCLEMARK:
+		fprintf(out, "T_EXCLEMARK");
+		break;
+	case T_EXPONENT:
+		fprintf(out, "T_EXPONENT");
+		break;
+	case T_STRING:
+		fprintf(out, "T_STRING");
+		break;
+	case T_COMMENT:
+		fprintf(out, "T_COMMENT");
+		break;
+	case T_BUILDIN:
+		fprintf(out, "T_BUILDIN");
+		break;
+	case T_RPAR:
+		fprintf(out, "T_RPAR");
+		break;
+	case T_LPAR:
+		fprintf(out, "T_LPAR");
+		break;
+	case T_SQRBRACKET:
+		fprintf(out, "T_SQRBRACKET");
+		break;
+	case T_SQLBRACKET:
+		fprintf(out, "T_SQLBRACKET");
+		break;
+	case T_CUYRBRACKET:
+		fprintf(out, "T_CUYRBRACKET");
+		break;
+	case T_CUYLBRACKET:
+		fprintf(out, "T_CUYLBRACKET");
+		break;
+	case T_BAR:
+		fprintf(out, "T_BAR");
+		break;
+	case T_CONST:
+		fprintf(out, "T_CONST");
+		break;
+	case T_IF:
+		fprintf(out, "T_IF");
+		break;
+	case T_ELSE:
+		fprintf(out, "T_ELSE");
+		break;
+	case T_FN:
+		fprintf(out, "T_FN");
+		break;
+	case T_PUB:
+		fprintf(out, "T_PUB");
+		break;
+	case T_RETURN:
+		fprintf(out, "T_RETURN");
+		break;
+	case T_VAR:
+		fprintf(out, "T_VAR");
+		break;
+	case T_VOID:
+		fprintf(out, "T_VOID");
+		break;
+	case T_WHILE:
+		fprintf(out, "T_WHILE");
+		break;
+	case T_IMPORT:
+		fprintf(out, "T_IMPORT");
+		break;
+	case T_SEMI:
+		fprintf(out, "T_SEMI");
+		break;
+	case T_DDOT:
+		fprintf(out, "T_DDOT");
+		break;
+	case T_COMMA:
+		fprintf(out, "T_COMMA");
+		break;
+	case T_UNDER:
+		fprintf(out, "T_UNDER");
+		break;
+	case T_PLUS:
+		fprintf(out, "T_PLUS");
+		break;
+	case T_MINUS:
+		fprintf(out, "T_MINUS");
+		break;
+	case T_MUL:
+		fprintf(out, "T_MUL");
+		break;
+	case T_DIV:
+		fprintf(out, "T_DIV");
+		break;
+	case T_DOLLARLIST:
+		fprintf(out, "T_DOLLARLIST");
+		break;
+	case T_LEFTSHIFTLIST:
+		fprintf(out, "T_LEFTSHIFTLIST");
+		break;
+	case T_RIGHTSHIFTLIST:
+		fprintf(out, "T_RIGHTSHIFTLIST");
+		break;
+	case T_DDEQ:
+		fprintf(out, "T_DDEQ");
+		break;
+	case T_EQUAL:
+		fprintf(out, "T_EQUAL");
+		break;
+	case T_NEQUAL:
+		fprintf(out, "T_NEQUAL");
+		break;
+	case T_GTHAN:
+		fprintf(out, "T_GTHAN");
+		break;
+	case T_GETHAN:
+		fprintf(out, "T_GETHAN");
+		break;
+	case T_STHAN:
+		fprintf(out, "T_STHAN");
+		break;
+	case T_SETHAN:
+		fprintf(out, "T_SETHAN");
+		break;
+	case T_OPERATOR:
+		fprintf(out, "T_OPERATOR");
+		break;
+	case T_UNDEF:
+		fprintf(out, "T_UNDEF");
+		break;
+	case T_NULL:
+		fprintf(out, "T_NULL");
+		break;
+	case T_EOF:
+		fprintf(out, "T_EOF");
+		break;
+	case T_ERR:
+		fprintf(out, "T_ERR");
+		break;
+	case T_PROLOG:
+		fprintf(out, "T_PROLOG");
+		break;
+	default:
+		fprintf(out, "Unknown token");
+		break;
 	}
 
-	if(string) {
+	if (string) {
 		fclose(out);
 	}
 

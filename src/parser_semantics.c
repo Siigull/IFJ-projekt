@@ -64,11 +64,19 @@ Expr_Type sem_check_binary_expression(AST_Node* node) {
         case MINUS:
         case MUL: {
             if (has_float) {
+                if (left_type.type == R_I32) {
+                    node->left->type = F64;
+                    node->left->as.f64 = (double)node->left->as.i32;
+                } else if (right_type.type == R_I32) {
+                    node->right->type = F64;
+                    node->right->as.f64 = (double)node->right->as.i32;
+                }
                 node->as.expr_type = (Expr_Type){R_F64, is_node_const};
                 return (Expr_Type){R_F64, is_node_const};
+            } else if (has_int && !has_float) {
+                node->as.expr_type = (Expr_Type){R_I32, is_node_const};
+                return (Expr_Type){R_I32, is_node_const};
             }
-            node->as.expr_type = (Expr_Type){R_I32, is_node_const};
-            return (Expr_Type){R_I32, is_node_const};
         }
         case DIV: {
             if (has_float && has_int) {
@@ -104,11 +112,31 @@ Expr_Type sem_check_binary_expression(AST_Node* node) {
 }
 
 Expr_Type sem_func_call(AST_Node* node) {
-    if (((AST_Node*)(node->as.func_data->arr->data[0]))->type == STRING) {
-        if (!strcmp(node->as.func_data->var_name, "*string") || !strcmp(node->as.func_data->var_name, "*write")) {
+    
+    Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
+
+    if (node->as.func_data->arr) {
+        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
+            AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
+            check_node(current_node);
+        }
+    }
+
+    if (func_entry != NULL) {
+        size_t expected_params = func_entry->as.function_args->length;
+        size_t actual_params = node->as.func_data->arr->length;
+        if (expected_params != actual_params) {
+            ERROR_RET(ERR_SEM_PARAMS);
+        }
+    }
+
+    if (!strcmp(node->as.func_data->var_name, "*string") || !strcmp(node->as.func_data->var_name, "*write")) {
+        if (((AST_Node*)(node->as.func_data->arr->data[0]))->type == STRING) {
             return (Expr_Type){R_U8, false};
         }
     }
+
+    return func_entry->ret_type;
 }
 
 Expr_Type sem_function_decl(AST_Node* node) {
@@ -147,8 +175,16 @@ Expr_Type sem_var_decl(AST_Node* node) {
     if (declared_type.type != expression_type.type) {
         if (declared_type.type == IMPLICIT) {
             declared_type = expression_type;
+        } else if (expression_type.type == R_STRING) {
+            ERROR_RET(ERR_SEM_TYPE_INFERENCE);
+        } else if (declared_type.type == N_F64 && expression_type.type == R_F64) {
+            expression_type.type = N_F64;
         } else {
-            ERROR_RET(ERR_SEM_TYPE_CONTROL);
+            if (!((declared_type.type == N_F64 && expression_type.type == R_F64) || 
+                (declared_type.type == N_I32 && expression_type.type == R_I32) || 
+                (declared_type.type == N_U8 && expression_type.type == R_U8))) {
+                    ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+            }
         }
     }
 
@@ -161,7 +197,7 @@ Expr_Type sem_var_assignment(AST_Node* node) {
     Expr_Type declared_type = entry->ret_type;
     Expr_Type expression_type = check_node(node->left);
 
-    if (declared_type.type != expression_type.type || expression_type.type == R_U8) {
+    if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
         ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
 
