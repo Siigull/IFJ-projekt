@@ -773,53 +773,92 @@ void prolog() {
 	Entry* length = entry_init ("*length", E_FUNC, (Expr_Type){R_I32, false}, false);
 	Entry* concat = entry_init("*concat", E_FUNC, (Expr_Type){R_U8, false}, false);
 	Entry* sub_string = entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false);
+	Entry* string_cmp = entry_init("*strcmp", E_FUNC, (Expr_Type){R_I32, false}, false);
+	Entry* ord_func = entry_init("*ord", E_FUNC, (Expr_Type){R_I32, false}, false);
+	Entry* chr_func = entry_init("*chr", E_FUNC, (Expr_Type){R_U8, false}, false);
 
 	// write to stdout
 	Function_Arg* arg_write = malloc(sizeof(Function_Arg));
-	arg_write->arg_name = "term";
+	arg_write->arg_name = malloc(sizeof(char) * 5);
+	strcpy(arg_write->arg_name, "term");
 	arg_write->type = R_VOID;
 	arr_append(write->as.function_args, (size_t)arg_write);
 
 	// int to float
 	Function_Arg* arg_int_to_float = malloc(sizeof(Function_Arg));
-	arg_int_to_float->arg_name = "term";
+	arg_int_to_float->arg_name = malloc(sizeof(char) * 5);
+	strcpy(arg_int_to_float->arg_name, "term");
 	arg_int_to_float->type = R_I32;
 	arr_append(int_to_float->as.function_args, (size_t)arg_int_to_float);
 
 	// float to int
 	Function_Arg* arg_float_to_int = malloc(sizeof(Function_Arg));
-	arg_float_to_int->arg_name = "term";
+	arg_float_to_int->arg_name = malloc(sizeof(char) * 5);
+	strcpy(arg_float_to_int->arg_name, "term");
 	arg_float_to_int->type = R_F64;
 	arr_append(float_to_int->as.function_args, (size_t)arg_float_to_int);
 
 	// string
 	Function_Arg* arg_string = malloc(sizeof(Function_Arg));
-	arg_string->arg_name = "term";
+	arg_string->arg_name = malloc(sizeof(char) * 5);
+	strcpy(arg_string->arg_name, "term");
 	arg_string->type = R_STRING;
 	arr_append(string_func->as.function_args, (size_t)arg_string);
 
 	// length of string
 	Function_Arg* arg_length = malloc(sizeof(Function_Arg));
-	arg_length->arg_name = "term";
+	arg_length->arg_name = malloc(sizeof(char));
+	strcpy(arg_length->arg_name, "s");
 	arg_length->type = R_U8;
+	arr_append(length->as.function_args, (size_t)arg_length);
 	
 	// string concatenation
 	Function_Arg* arg_concat = malloc(sizeof(Function_Arg));
-	arg_concat->arg_name = "term";
+	arg_concat->arg_name = malloc(sizeof(char));
+	strcpy(arg_concat->arg_name, "s");
 	arg_concat->type = R_U8;
 	arr_append(concat->as.function_args, (size_t)arg_concat);
 	arr_append(concat->as.function_args, (size_t)arg_concat);
 
 	// substring
 	Function_Arg* arg_sub_string = malloc(sizeof(Function_Arg));
-	arg_sub_string->arg_name = "term";
+	arg_sub_string->arg_name = malloc(sizeof(char));
+	strcpy(arg_sub_string->arg_name, "s");
 	arg_sub_string->type = R_U8;
 	arr_append(sub_string->as.function_args, (size_t)arg_sub_string);
 	Function_Arg* arg_sub_string_int = malloc(sizeof(Function_Arg));
-	arg_sub_string_int->arg_name = "i";
+	arg_sub_string_int->arg_name = malloc(sizeof(char));
+	strcpy(arg_sub_string_int->arg_name, "i");
 	arg_sub_string_int->type = R_I32;
 	arr_append(sub_string->as.function_args, (size_t)arg_sub_string_int);
 	arr_append(sub_string->as.function_args, (size_t)arg_sub_string_int);
+
+	// string compare
+	Function_Arg* arg_string_cmp = malloc(sizeof(Function_Arg));
+	arg_string_cmp->arg_name = malloc(sizeof(char));
+	strcpy(arg_string_cmp->arg_name, "s");
+	arg_string_cmp->type = R_U8;
+	arr_append(string_cmp->as.function_args, (size_t)arg_string_cmp);
+	arr_append(string_cmp->as.function_args, (size_t)arg_string_cmp);
+
+	// ord
+	Function_Arg* arg_ord_func = malloc(sizeof(Function_Arg));
+	arg_ord_func->arg_name = malloc(sizeof(char));
+	strcpy(arg_ord_func->arg_name, "s");
+	arg_ord_func->type = R_U8;
+	arr_append(ord_func->as.function_args, (size_t)arg_ord_func);
+	Function_Arg* arg_ord_func_int = malloc(sizeof(Function_Arg));
+	arg_ord_func_int->arg_name = malloc(sizeof(char));
+	strcpy(arg_ord_func_int->arg_name, "i");
+	arg_ord_func_int->type = R_I32;
+	arr_append(ord_func->as.function_args, (size_t)arg_ord_func_int);
+
+	// chr
+	Function_Arg* arg_chr_func = malloc(sizeof(Function_Arg));
+	arg_chr_func->arg_name = malloc(sizeof(char));
+	strcpy(arg_chr_func->arg_name, "i");
+	arg_chr_func->type = R_I32;
+	arr_append(chr_func->as.function_args, (size_t)arg_chr_func);
 
 	tree_insert(parser->s_table, read_str);
 	tree_insert(parser->s_table, read_int);
@@ -831,6 +870,9 @@ void prolog() {
 	tree_insert(parser->s_table, length);
 	tree_insert(parser->s_table, concat);
 	tree_insert(parser->s_table, sub_string);
+	tree_insert(parser->s_table, string_cmp);
+	tree_insert(parser->s_table, ord_func);
+	tree_insert(parser->s_table, chr_func);
 }
 
 void func_head() {
@@ -914,7 +956,7 @@ void parse(char* orig_input) {
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
 		check_node(node);
-        generate_graph(node, graph_filename);
+        //generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }
 	

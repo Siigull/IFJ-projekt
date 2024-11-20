@@ -8,13 +8,13 @@ pub fn main() void {
     ifj .write(str2); ifj.write("\n");
     
     ifj.write("Zadejte serazenou posloupnost malych pismen a-h:\n");
-    //var newInput = ifj.readstr();
+    var newInput = ifj.readstr();
     var all: []u8 = ifj.string("");
-    var integer: i32 = ifj.strcmp("bbcdbxcvxbcve", "abcd");
+    var integer: i32 = ifj.strcmp(ifj.string("bbcdbxcvxbcve"), ifj.string("abcd"));
     ifj.write(integer); ifj.write("\n");
 
-    var str3 = ifj.substring(", ktery jeste trochu obohatime", 0, 5);
-    ifj.write(str3);
+    var str3 : i32 = ifj.substring(ifj.string(", ktery jeste trochu obohatime"), 0, 5);
+    ifj.write(str3); ifj.write("\n");
  
-    //ifj.write(newInput);
+    ifj.write(newInput); ifj.write("\n");
 }

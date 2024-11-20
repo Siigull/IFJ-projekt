@@ -21,4 +21,5 @@ pub fn main() void {
     ifj.write(result);           // Print the concatenated result
     ifj.write("\n");
     ifj.write(s3);
+    ifj.write("\n");
 }

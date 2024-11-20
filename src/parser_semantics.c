@@ -173,7 +173,7 @@ Expr_Type sem_var_decl(AST_Node* node) {
 
     if (declared_type.type != expression_type.type) {
         if (declared_type.type == IMPLICIT) {
-            declared_type = expression_type;
+            entry->ret_type = expression_type;
         } else if (expression_type.type == R_STRING) {
             ERROR_RET(ERR_SEM_TYPE_INFERENCE);
         } else if (declared_type.type == N_F64 && expression_type.type == R_F64) {
@@ -191,13 +191,15 @@ Expr_Type sem_var_decl(AST_Node* node) {
 }
 
 Expr_Type sem_var_assignment(AST_Node* node) {
-    Entry* entry = tree_find(parser->s_table, node->as.var_name);
-
-    Expr_Type declared_type = entry->ret_type;
     Expr_Type expression_type = check_node(node->left);
+    
+    if (strcmp(node->as.var_name, "_")) {
+        Entry* entry = tree_find(parser->s_table, node->as.var_name);
+        Expr_Type declared_type = entry->ret_type;
 
-    if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
-        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+        if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
+            ERROR_RET(ERR_SEM_TYPE_CONTROL);
+        }
     }
 
     return (Expr_Type){-1, false};
@@ -232,6 +234,36 @@ Expr_Type sem_nnull_var_decl(AST_Node* node) {
 
 Expr_Type sem_return(AST_Node* node) {
     return check_node(node->left);
+}
+
+Expr_Type sem_while(AST_Node* node) {
+    Expr_Type cond_type = check_node(node->left);
+ 
+    if (cond_type.type != R_BOOLEAN && !is_nullable(cond_type)) {
+        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    }
+
+    if (node->as.arr->length > 0) {
+        AST_Node* first_stmt = (AST_Node*)node->as.arr->data[0];
+
+        if (first_stmt->type == NNULL_VAR_DECL) {
+            if (!is_nullable(cond_type)) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL); 
+            }
+
+            for (size_t i = 1; i < node->as.arr->length; i++) {
+                AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+                check_node(stmt);
+            }
+        } else {
+            for (size_t i = 0; i < node->as.arr->length; i++) {
+                AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+                check_node(stmt);
+            }
+        }
+    }
+
+    return (Expr_Type){-1, false};
 }
 
 Expr_Type sem_if(AST_Node* node) {
@@ -295,6 +327,7 @@ Expr_Type check_node(AST_Node* node) {
             return get_literal_type(node);
         // statements
         case IF:             return sem_if(node);
+        case WHILE:          return sem_while(node);
         case FUNC_CALL:      return sem_func_call(node);
         case FUNCTION_DECL:  return sem_function_decl(node);
         case VAR_DECL:       return sem_var_decl(node);

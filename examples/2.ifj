@@ -9,5 +9,6 @@ pub fn main() void {
     i = ifj.f2i(f);
     ifj.write("\n");
     ifj.write(i);
+    ifj.write("\n");
 }
 

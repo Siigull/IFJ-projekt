@@ -35,7 +35,7 @@ pub fn is_prime(n: i32) i32 {
 
 // Main function
 pub fn main() void {
-    var num: i32 = ifj.readi32();   // Input number
+    var num: i32 = 4;   // Input number
     var prime: i32 = is_prime(num);  // Call prime check function
 
     if (prime == 1) {

@@ -15,4 +15,5 @@ pub fn main() void {
     var num: i32 = 5;  // Input number for factorial
     var fact : i32 = factorial(num);     // Variable to store the result
     ifj.write(fact);        // Output the result
+    ifj.write("\n");
 }
