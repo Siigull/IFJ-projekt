@@ -105,7 +105,9 @@ void write_connection(char* last_node, char* current_node,
 }
 
 void write_data(const char* node, const char* data) {
-    fprintf(file, "%s: {tooltip: %s}\n", node, data);
+    if(strlen(data)) {
+        fprintf(file, "%s: {tooltip: %s}\n", node, data);
+    }   
 }
 
 void generate_graph_func_call(AST_Node* node, char* last_node, char* path) {

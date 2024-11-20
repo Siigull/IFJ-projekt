@@ -807,14 +807,14 @@ void prolog() {
 
 	// length of string
 	Function_Arg* arg_length = malloc(sizeof(Function_Arg));
-	arg_length->arg_name = malloc(sizeof(char));
+	arg_length->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_length->arg_name, "s");
 	arg_length->type = R_U8;
 	arr_append(length->as.function_args, (size_t)arg_length);
 	
 	// string concatenation
 	Function_Arg* arg_concat = malloc(sizeof(Function_Arg));
-	arg_concat->arg_name = malloc(sizeof(char));
+	arg_concat->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_concat->arg_name, "s");
 	arg_concat->type = R_U8;
 	arr_append(concat->as.function_args, (size_t)arg_concat);
@@ -822,12 +822,12 @@ void prolog() {
 
 	// substring
 	Function_Arg* arg_sub_string = malloc(sizeof(Function_Arg));
-	arg_sub_string->arg_name = malloc(sizeof(char));
+	arg_sub_string->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_sub_string->arg_name, "s");
 	arg_sub_string->type = R_U8;
 	arr_append(sub_string->as.function_args, (size_t)arg_sub_string);
 	Function_Arg* arg_sub_string_int = malloc(sizeof(Function_Arg));
-	arg_sub_string_int->arg_name = malloc(sizeof(char));
+	arg_sub_string_int->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_sub_string_int->arg_name, "i");
 	arg_sub_string_int->type = R_I32;
 	arr_append(sub_string->as.function_args, (size_t)arg_sub_string_int);
@@ -835,7 +835,7 @@ void prolog() {
 
 	// string compare
 	Function_Arg* arg_string_cmp = malloc(sizeof(Function_Arg));
-	arg_string_cmp->arg_name = malloc(sizeof(char));
+	arg_string_cmp->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_string_cmp->arg_name, "s");
 	arg_string_cmp->type = R_U8;
 	arr_append(string_cmp->as.function_args, (size_t)arg_string_cmp);
@@ -843,19 +843,19 @@ void prolog() {
 
 	// ord
 	Function_Arg* arg_ord_func = malloc(sizeof(Function_Arg));
-	arg_ord_func->arg_name = malloc(sizeof(char));
+	arg_ord_func->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_ord_func->arg_name, "s");
 	arg_ord_func->type = R_U8;
 	arr_append(ord_func->as.function_args, (size_t)arg_ord_func);
 	Function_Arg* arg_ord_func_int = malloc(sizeof(Function_Arg));
-	arg_ord_func_int->arg_name = malloc(sizeof(char));
+	arg_ord_func_int->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_ord_func_int->arg_name, "i");
 	arg_ord_func_int->type = R_I32;
 	arr_append(ord_func->as.function_args, (size_t)arg_ord_func_int);
 
 	// chr
 	Function_Arg* arg_chr_func = malloc(sizeof(Function_Arg));
-	arg_chr_func->arg_name = malloc(sizeof(char));
+	arg_chr_func->arg_name = malloc(sizeof(char) * 2);
 	strcpy(arg_chr_func->arg_name, "i");
 	arg_chr_func->type = R_I32;
 	arr_append(chr_func->as.function_args, (size_t)arg_chr_func);
@@ -955,8 +955,8 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
+        // generate_graph(node, graph_filename);
 		check_node(node);
-        //generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }
 	
@@ -964,7 +964,7 @@ void parse(char* orig_input) {
 }
 
 int compile(char* input) {
-	srand(time(NULL));
+	srand(28980);
 
 	parse(input);
 

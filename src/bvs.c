@@ -13,6 +13,8 @@
 
 #include "bvs.h"
 
+#define HASH_CHARS 8
+
 Entry* entry_init(const char* key, Entry_Type type,
 				  Expr_Type ret_type, bool can_mut) {
 	Entry* entry = malloc(sizeof(Entry));
@@ -241,25 +243,23 @@ Entry* tree_find(Tree* tree, const char* key) {
 	return node->entry;
 }
 
-Entry* tree_pop_traverse(Node** node) {
-	if (*node == NULL) {
+Entry* tree_pop_traverse(Node* node) {
+	if (node == NULL) {
 		return NULL;
 	}
 
-	if((*node)->left == NULL && (*node)->right == NULL) {
-		Entry* entry = (*node)->entry;
-		(*node) = NULL; 
-		return entry;
+	if(node->left == NULL && node->right == NULL) {
+		return node->entry;
 	}
 
-	Entry* entry = tree_pop_traverse(&((*node)->left));
+	Entry* entry = tree_pop_traverse(node->left);
 	if(entry != NULL) return entry;
 
-	return tree_pop_traverse(&((*node)->right));
+	return tree_pop_traverse(node->right);
 }
 
 Entry* tree_pop(Tree* tree) {
-	Entry* entry_old = tree_pop_traverse(&(tree->root));
+	Entry* entry_old = tree_pop_traverse(tree->root);
 	if(entry_old == NULL) {
 		return NULL;
 	}
@@ -267,7 +267,7 @@ Entry* tree_pop(Tree* tree) {
 	Entry* entry = malloc(sizeof(Entry));
 	memcpy(entry, entry_old, sizeof(Entry));
 
-	// tree_delete(tree, entry->key);
+	tree_delete(tree, entry->key);
 
 	return entry;
 }
@@ -471,10 +471,8 @@ void context_push(C_Stack* stack) {
 }
 
 char* get_path() {
-	#define HASH_BITS 8
-
 	const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	char* out = calloc(HASH_BITS + 2, sizeof(char));
+	char* out = calloc(HASH_CHARS + 2, sizeof(char));
 
 	out[0] = '?';
 	for(int i=1; i < 9; i++) {
@@ -483,8 +481,6 @@ char* get_path() {
 	}
 
 	return out;
-
-	#undef HASH_BITS
 }
 
 bool context_pop(C_Stack* stack) {
@@ -493,28 +489,27 @@ bool context_pop(C_Stack* stack) {
 	}
 
 	Entry* entry;
-	char* path = get_path(stack);
-	int path_len = strlen(path);
 	while (true){
 		entry = tree_pop(stack->arr[stack->cur_nest]);
 		if(entry == NULL) {
 			break;
 		}
 
-		int orig_len = strlen(entry->key);
-		char* temp = realloc(entry->key, orig_len + path_len + 2);
-		if(temp == NULL) {
-			exit(99);
-		}
-		entry->key = temp;
-
-		strcat(entry->key, path);
-
 		if(tree_find(stack->global_table, entry->key) != NULL){
-			path = get_path(stack);
-			memcpy(entry->key + orig_len, path, path_len);
-			tree_insert(stack->global_table, entry);
+			int orig_len = strlen(entry->key);
+			entry->key = realloc((char*)entry->key, sizeof(char) * (orig_len + HASH_CHARS + 3));
+			if(entry->key == NULL) {
+				exit(99);
+			}
 
+			while(true) {
+				char* path = get_path(stack);
+				memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 1);
+				if(tree_find(stack->global_table, entry->key) == NULL) { 
+					tree_insert(stack->global_table, entry);
+					break;
+				}
+			}
 		} else {
 			tree_insert(stack->global_table, entry);
 		}
