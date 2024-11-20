@@ -129,7 +129,7 @@ Expr_Type sem_func_call(AST_Node* node) {
             Expr_Type current_expr_type = check_node(current_node);
             Function_Arg* arg_node = (Function_Arg*)func_entry->as.function_args->data[i];
 
-            if (current_expr_type.type != arg_node->type) {
+            if (current_expr_type.type != arg_node->type && arg_node->type != R_VOID) {
                 ERROR_RET(ERR_SEM_PARAMS);    
             }
         }
