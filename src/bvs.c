@@ -18,7 +18,7 @@ Entry* entry_init(const char* key, Entry_Type type,
 	Entry* entry = malloc(sizeof(Entry));
 
 	entry->type = type;
-	entry->key = key;
+	entry->key = (char*)key;
 	entry->ret_type = ret_type;
 
 	if (type == E_FUNC) {
@@ -241,6 +241,35 @@ Entry* tree_find(Tree* tree, const char* key) {
 	return node->entry;
 }
 
+Entry* tree_pop_traverse(Node* node) {
+	if (node == NULL) {
+		return NULL;
+	}
+
+	if(node->left == NULL && node->right == NULL) {
+		return node->entry;
+	}
+
+	Entry* entry = tree_pop_traverse(node->left);
+	if(entry != NULL) return entry;
+
+	return tree_pop_traverse(node->right);
+}
+
+Entry* tree_pop(Tree* tree) {
+	Entry* entry_old = tree_pop_traverse(tree->root);
+	if(entry_old == NULL) {
+		return NULL;
+	}
+	
+	Entry* entry = malloc(sizeof(Entry));
+	memcpy(entry, entry_old, sizeof(Entry));
+
+	tree_delete(tree, entry->key);
+
+	return entry;
+}
+
 Node* transplant(Node* from, Node* to) {
 	if (to->parent->left == to) {
 		to->parent->left = from;
@@ -381,7 +410,15 @@ bool tree_delete(Tree* tree, const char* key) {
 	if (node == NULL)
 		return false;
 
-	node_delete(node);
+	if(tree->root == node){
+		entry_destroy(node->entry);
+		free(node->parent);
+		free(node);
+		tree->root = NULL;
+	
+	} else {
+		node_delete(node);
+	}	
 
 	return true;
 }
@@ -400,6 +437,116 @@ void node_print(Node* node, int depth) {
 
 	node_print(node->left, depth + 1);
 	node_print(node->right, depth + 1);
+}
+
+C_Stack init_c_stack(Tree* global_tree) {
+	C_Stack stack;
+
+	stack.max_nest = 8;
+	stack.arr = malloc(sizeof(Tree*) * stack.max_nest);
+	stack.cur_nest = -1;
+
+	stack.global_table = global_tree;
+
+	return stack;
+}
+
+void context_push(C_Stack* stack) {
+	if(stack->cur_nest >= stack->max_nest - 2) {
+		stack->max_nest *= 2;
+		Tree** data = realloc(stack->arr, stack->max_nest * sizeof(Tree*));
+		
+		if(data == NULL) {
+			free(stack->arr);
+			exit(99);
+		}
+
+		stack->arr = data;
+	}
+
+	stack->cur_nest++;
+	stack->arr[stack->cur_nest] = tree_init();
+}
+
+char* get_path() {
+	#define HASH_BITS 8
+
+	const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	char* out = calloc(HASH_BITS + 2, sizeof(char));
+
+	out[0] = '?';
+	for(int i=1; i < 9; i++) {
+		int base64_index = rand() % 62;
+		out[i] = (char)base64_chars[base64_index];
+	}
+
+	return out;
+
+	#undef HASH_BITS
+}
+
+bool context_pop(C_Stack* stack) {
+	if(stack->cur_nest < 0) {
+		return false;
+	}
+
+	Entry* entry;
+	char* path = get_path(stack);
+	int path_len = strlen(path);
+	while (true){
+		entry = tree_pop(stack->arr[stack->cur_nest]);
+		if(entry == NULL) {
+			break;
+		}
+
+		int orig_len = strlen(entry->key);
+		char* temp = realloc(entry->key, orig_len + path_len + 2);
+		if(temp == NULL) {
+			exit(99);
+		}
+		entry->key = temp;
+
+		strcat(entry->key, path);
+
+		while(tree_find(stack->global_table, entry->key) != NULL) {
+			path = get_path(stack);
+			memcpy(entry->key + orig_len, path, path_len);
+			tree_insert(stack->global_table, entry);
+		}
+	}
+
+	stack->cur_nest--;
+
+	return true;
+}
+
+Entry* context_find(C_Stack* stack, const char* key, bool global) {
+	int cur_nest = stack->cur_nest;
+	
+	while(cur_nest >= 0) {
+		Entry* entry = tree_find(stack->arr[cur_nest], key);
+		
+		if(entry != NULL) {
+			return entry;
+		}
+
+		cur_nest--;
+	}
+
+	if(global) {
+		return tree_find(stack->global_table, key);
+	
+	} else {
+		return NULL;
+	}
+}
+
+void context_put(C_Stack* stack, Entry* entry) {
+	if(stack->cur_nest < 0) {
+		tree_insert(stack->global_table, entry);
+	}
+
+	tree_insert(stack->arr[stack->cur_nest], entry);
 }
 
 void tree_print(Tree* tree) {

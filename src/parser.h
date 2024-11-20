@@ -14,15 +14,22 @@
 #include "error.h"
 #include "string.h"
 #include "codegen.h"
+#include "parser_semantics.h"
+#include "stack.h"
+#include "test_generate_graph.h"
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 
 typedef struct Parser {
     Token* next;
     Token* prev;
 
     Tree* s_table;
+    C_Stack c_stack;
 } Parser;
 
-Arr* parse(char* input);
+void parse(char* input);
 int compile(char* input);
 char* string_to_assembly(const char* string);
 

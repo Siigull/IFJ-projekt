@@ -1,0 +1,18 @@
+const ifj = @import("ifj24.zig");
+
+// Recursive function to calculate factorial of n
+pub fn factorial(n: i32) i32 {
+    if (n == 0) {
+        return 1; // Base case: factorial(0) = 1
+    }
+    else{
+    }
+    return n * factorial(n - 1); // Recursive case
+}
+
+// Main function
+pub fn main() void {
+    var num: i32 = 5;  // Input number for factorial
+    var fact : i32 = factorial(num);     // Variable to store the result
+    ifj.write(fact);        // Output the result
+}

@@ -28,6 +28,8 @@ AST_Node* node_init(AST_Type type) {
             break;
         case VAR_DECL:
             break;
+        default:
+            break;
     }
 
     return node;

@@ -9,8 +9,13 @@ pub fn f(x : i32) i32    // seznam parametru
     }
 }
 
+pub fn p(x2 : i32) i32{
+
+  return 0-1;
+}
+
 pub fn g(x1:i32) i32 {
-  if (x1 > 0) {
+  if (p(x1) + 2 > 0) {
     ifj.write("calling f with "); ifj.write(x1); ifj.write("\n"); 
     const y1 = f(x1); // inicializace konstanty volanim funkce
     return y1; 

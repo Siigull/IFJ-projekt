@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "ast.h"
+#include "error.h"
 /// \todo ’\"’, ’\n’, ’\r’, ’\t’
 
 #define BACKSLASH 92
@@ -102,6 +103,6 @@ typedef struct {
  */
 Lexer* init_lexer(char* input);
 Token* get_next_token(Lexer* lexer);
-Token* init_token(char* value, T_Type type, unsigned int length);
+Token* init_token(const char* value, T_Type type, unsigned int length);
 char* print_token(Token* token, FILE* out, bool string);
 #endif

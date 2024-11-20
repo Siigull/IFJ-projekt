@@ -18,8 +18,9 @@ void test_input(char* input, char* expected_result) {
 char* load_inputos(const char* filepath) {
 	char* input;
 	FILE* f = fopen(filepath, "r");
-	if (f == NULL)
+	if (f == NULL) {
 		return input;
+	}
 
 	char temp;
 	int len = 0;
@@ -80,15 +81,15 @@ void generate_debug_token_arr() {
 	printf("}\n");
 }
 
-int main() {
+int mainasd() {
 	// const ifj = @import("ifj24.zig"); jeden token
 	// char input1[50] = "456e2 7.89E-2 test1iden _identf";
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	// generate_debug_token_arr();
+	generate_debug_token_arr();
 
-	char* temp = load_inputos("examples/funexp.ifj");
+	char* temp = load_inputos("examples/fun.ifj");
 	compile(temp);
 	return 0;
 };

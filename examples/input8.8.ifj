@@ -1,28 +1,29 @@
 const ifj = @import("ifj24.zig");
 
-pub fn f (z : i32) i32    // seznam parametru
+pub fn f (x : i32) i32    // seznam parametru
 { //deklarace funkce; v IFJ24 nejsou blokove komentare
-  if(z<10){return z-1;}else{const q = z - 1; // cannot redefine x (shadowing is forbidden)
+  if(x<10){
+    return x-1;
+  } else {
+    const q = x - 1; // cannot redefine x (shadowing is forbidden)
     ifj.write("calling g with "); ifj.write(q); ifj.write("\n");
-    const res2 = g(q);
-    return res2;
+    const res = g(q);
+    return res;
   }
 }
 
 pub fn g (x : i32) i32 {
   if (x < 10) {
     ifj.write("calling f with "); ifj.write(x); ifj.write("\n"); 
-    const b = f(x); // inicializace konstanty volanim funkce
-    return b; 
+    const y = f(x); // inicializace konstanty volanim funkce
+    return y; 
   } else {
-  
-  return 200;
-  
+    return 200;
   }
 }
 
 pub fn main() void {
-  const res = f(10);
+  const res = f(15);
   ifj.write("res: "); ifj.write(res); ifj.write("\n");
 }
 

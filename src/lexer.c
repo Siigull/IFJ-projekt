@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-Token* init_token(char* value, T_Type type, unsigned int length) {
+Token* init_token(const char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));
-	token->value = value;
+	token->value = (char*)value;
 	token->type = type;
 	token->length = length;
 	token->isProcessed = false;
-	token->node == NULL;
+	token->node = NULL;
 	return token;
 }
 
@@ -30,7 +30,7 @@ void lexer_advance(Lexer* lexer) {
 		lexer->idr++;
 	else {
 		// handle error
-		exit(1);
+		ERROR_RET(1);
 	}
 }
 
@@ -64,7 +64,7 @@ void lexer_skip_whitespace(Lexer* lexer) {
 
 void lexer_skip_space(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
-	while(c == ' ') {
+	while(is_whitespace(c)) {
 		lexer_advance(lexer);
 		c = lexer->input[lexer->idr];
 	}
@@ -237,7 +237,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 			token->type = T_ID;
 			return token;
 		}
-		exit(1);
+		ERROR_RET(1);
 	}
 
 	// OPERATOR TOKENS
@@ -297,24 +297,14 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 
 	if (type == T_BUILDIN) {
 		int last_space = -1;
-		for(int i=3; i < len; i++) {
-			if(value[i] == ' ') {
-				last_space = i;
-
-			} else if(last_space != -1 && value[i] != ' ') {
-				memmove(value + last_space, value + i, len - (i - 1));
-				i = last_space;
-				last_space = -1;
-			}
-		}
+		int i, len = strlen(value);
 		
-		token->length = strlen(token->value);
+		for(i=3; (value[i] == ' ' || value[i] == '\n' || value[i] == '.'); i++) {}
 
-		memmove(value, value + 3, len - 3);
-		token->length -= 3;
-
-		token->value[0] = '*';
-		token->value[token->length] = '\0';
+		memmove(value + 1, value + i, (len - i + 1));
+		
+		value[0] = '*';
+		token->length = strlen(value);
 		return token;
 	};
 
@@ -322,7 +312,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	if (lexer->idr == lexer->input_len) {
 		return init_token("0", T_EOF, 0);
 	} else {
-		exit(1);
+		ERROR_RET(1);
 	}
 } // end of find_token_value
 
@@ -483,7 +473,7 @@ Token* get_next_token(Lexer* lexer) {
 	if (lexer->idr == lexer->input_len) {
 		return init_token("0", T_EOF, 0);
 	} else {
-		exit(1);
+		ERROR_RET(1);
 	}
 } // end of get_next_token
 
