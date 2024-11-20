@@ -89,7 +89,7 @@ int main() {
 
 	generate_debug_token_arr();
 
-	char* temp = load_inputos("src/test.ifj");
+	char* temp = load_inputos("examples/1.ifj");
 	compile(temp);
 	return 0;
 };

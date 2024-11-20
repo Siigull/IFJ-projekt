@@ -115,13 +115,6 @@ Expr_Type sem_func_call(AST_Node* node) {
     
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 
-    if (node->as.func_data->arr) {
-        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
-            AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
-            check_node(current_node);
-        }
-    }
-
     if (func_entry != NULL) {
         size_t expected_params = func_entry->as.function_args->length;
         size_t actual_params = node->as.func_data->arr->length;
@@ -130,9 +123,15 @@ Expr_Type sem_func_call(AST_Node* node) {
         }
     }
 
-    if (!strcmp(node->as.func_data->var_name, "*string") || !strcmp(node->as.func_data->var_name, "*write")) {
-        if (((AST_Node*)(node->as.func_data->arr->data[0]))->type == STRING) {
-            return (Expr_Type){R_U8, false};
+    if (node->as.func_data->arr) {
+        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
+            AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
+            Expr_Type current_expr_type = check_node(current_node);
+            Function_Arg* arg_node = (Function_Arg*)func_entry->as.function_args->data[i];
+
+            if (current_expr_type.type != arg_node->type) {
+                ERROR_RET(ERR_SEM_PARAMS);    
+            }
         }
     }
 

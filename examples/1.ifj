@@ -2,6 +2,7 @@ const ifj = @import("ifj24.zig");
 
 // Main Program
 pub fn main() void {
-    var i : i32 = ifj.readi32();
+    var i : i32 = 10;
+    ifj.string(i);
     ifj.write(i);
 }

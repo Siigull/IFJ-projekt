@@ -767,16 +767,70 @@ void prolog() {
 	Entry* read_int = entry_init("*readi32", E_FUNC, (Expr_Type){N_I32, false}, false);
 	Entry* read_float = entry_init("*readf64", E_FUNC, (Expr_Type){N_F64, false}, false);
 	Entry* write = entry_init("*write", E_FUNC, (Expr_Type){R_VOID, false}, false);
+	Entry* int_to_float = entry_init("*i2f", E_FUNC, (Expr_Type){R_F64, false}, false);
+	Entry* float_to_int = entry_init("*f2i", E_FUNC, (Expr_Type){R_I32, false}, false);
+	Entry* string_func = entry_init("*string", E_FUNC, (Expr_Type){R_U8, false}, false);
+	Entry* length = entry_init ("*length", E_FUNC, (Expr_Type){R_I32, false}, false);
+	Entry* concat = entry_init("*concat", E_FUNC, (Expr_Type){R_U8, false}, false);
+	Entry* sub_string = entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false);
 
-	Function_Arg* arg = malloc(sizeof(Function_Arg));
-	arg->arg_name = "term";
-	arg->type = R_VOID;
-	arr_append(write->as.function_args, (size_t)arg);
+	// write to stdout
+	Function_Arg* arg_write = malloc(sizeof(Function_Arg));
+	arg_write->arg_name = "term";
+	arg_write->type = R_VOID;
+	arr_append(write->as.function_args, (size_t)arg_write);
+
+	// int to float
+	Function_Arg* arg_int_to_float = malloc(sizeof(Function_Arg));
+	arg_int_to_float->arg_name = "term";
+	arg_int_to_float->type = R_I32;
+	arr_append(int_to_float->as.function_args, (size_t)arg_int_to_float);
+
+	// float to int
+	Function_Arg* arg_float_to_int = malloc(sizeof(Function_Arg));
+	arg_float_to_int->arg_name = "term";
+	arg_float_to_int->type = R_F64;
+	arr_append(float_to_int->as.function_args, (size_t)arg_float_to_int);
+
+	// string
+	Function_Arg* arg_string = malloc(sizeof(Function_Arg));
+	arg_string->arg_name = "term";
+	arg_string->type = R_STRING;
+	arr_append(string_func->as.function_args, (size_t)arg_string);
+
+	// length of string
+	Function_Arg* arg_length = malloc(sizeof(Function_Arg));
+	arg_length->arg_name = "term";
+	arg_length->type = R_U8;
+	
+	// string concatenation
+	Function_Arg* arg_concat = malloc(sizeof(Function_Arg));
+	arg_concat->arg_name = "term";
+	arg_concat->type = R_U8;
+	arr_append(concat->as.function_args, (size_t)arg_concat);
+	arr_append(concat->as.function_args, (size_t)arg_concat);
+
+	// substring
+	Function_Arg* arg_sub_string = malloc(sizeof(Function_Arg));
+	arg_sub_string->arg_name = "term";
+	arg_sub_string->type = R_U8;
+	arr_append(sub_string->as.function_args, (size_t)arg_sub_string);
+	Function_Arg* arg_sub_string_int = malloc(sizeof(Function_Arg));
+	arg_sub_string_int->arg_name = "i";
+	arg_sub_string_int->type = R_I32;
+	arr_append(sub_string->as.function_args, (size_t)arg_sub_string_int);
+	arr_append(sub_string->as.function_args, (size_t)arg_sub_string_int);
 
 	tree_insert(parser->s_table, read_str);
 	tree_insert(parser->s_table, read_int);
 	tree_insert(parser->s_table, read_float);
 	tree_insert(parser->s_table, write);
+	tree_insert(parser->s_table, int_to_float);
+	tree_insert(parser->s_table, float_to_int);
+	tree_insert(parser->s_table, string_func);
+	tree_insert(parser->s_table, length);
+	tree_insert(parser->s_table, concat);
+	tree_insert(parser->s_table, sub_string);
 }
 
 void func_head() {
