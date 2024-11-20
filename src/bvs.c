@@ -242,7 +242,7 @@ Entry* tree_find(Tree* tree, const char* key) {
 }
 
 Entry* tree_pop_traverse(Node** node) {
-	if (node == NULL) {
+	if (*node == NULL) {
 		return NULL;
 	}
 
@@ -259,7 +259,7 @@ Entry* tree_pop_traverse(Node** node) {
 }
 
 Entry* tree_pop(Tree* tree) {
-	Entry* entry_old = tree_pop_traverse(tree->root);
+	Entry* entry_old = tree_pop_traverse(&(tree->root));
 	if(entry_old == NULL) {
 		return NULL;
 	}
