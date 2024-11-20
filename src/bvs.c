@@ -241,19 +241,21 @@ Entry* tree_find(Tree* tree, const char* key) {
 	return node->entry;
 }
 
-Entry* tree_pop_traverse(Node* node) {
+Entry* tree_pop_traverse(Node** node) {
 	if (node == NULL) {
 		return NULL;
 	}
 
-	if(node->left == NULL && node->right == NULL) {
-		return node->entry;
+	if((*node)->left == NULL && (*node)->right == NULL) {
+		Entry* entry = (*node)->entry;
+		(*node) = NULL; 
+		return entry;
 	}
 
-	Entry* entry = tree_pop_traverse(node->left);
+	Entry* entry = tree_pop_traverse(&((*node)->left));
 	if(entry != NULL) return entry;
 
-	return tree_pop_traverse(node->right);
+	return tree_pop_traverse(&((*node)->right));
 }
 
 Entry* tree_pop(Tree* tree) {
@@ -265,7 +267,7 @@ Entry* tree_pop(Tree* tree) {
 	Entry* entry = malloc(sizeof(Entry));
 	memcpy(entry, entry_old, sizeof(Entry));
 
-	tree_delete(tree, entry->key);
+	// tree_delete(tree, entry->key);
 
 	return entry;
 }
@@ -512,6 +514,7 @@ bool context_pop(C_Stack* stack) {
 			path = get_path(stack);
 			memcpy(entry->key + orig_len, path, path_len);
 			tree_insert(stack->global_table, entry);
+
 		} else {
 			tree_insert(stack->global_table, entry);
 		}
