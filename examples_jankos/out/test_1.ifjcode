@@ -173,6 +173,7 @@ LABEL main
 	POPS GF@*expression*result
 	MOVE LF@a?FcOOMyxq GF@*expression*result
 
+	DEFVAR LF@val?Hu3WxKOu
 	DEFVAR LF@d?96OdJvkl
 	DEFVAR LF@vysl?1P2JpiCJ
 	DEFVAR LF@vysl_i32?g0eRR2Cm
@@ -180,7 +181,6 @@ LABEL main
 	EQ GF@*expression*result LF@a?FcOOMyxq nil@nil
 	NOT GF@*expression*result GF@*expression*result
 	JUMPIFEQ *else*main*2*0 GF@*expression*result bool@false
-	DEFVAR LF@val?Hu3WxKOu
 	MOVE LF@val?Hu3WxKOu GF@*tmp*res
 	PUSHS LF@val?Hu3WxKOu
 	POPS GF@*expression*result
@@ -229,7 +229,7 @@ LABEL main
 	PUSHS LF@d?96OdJvkl
 	POPS GF@*expression*result
 	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@0
+	PUSHS float@0x0p+0
 	POPS GF@*expression*result
 	MOVE GF@*rhs GF@*expression*result
 	GT GF@*expression*result GF@*lhs GF@*rhs

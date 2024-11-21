@@ -167,12 +167,12 @@ LABEL main
 	POPS GF@*expression*result
 	MOVE LF@y?1P2JpiCJ GF@*expression*result
 
+	DEFVAR LF@b?g0eRR2Cm
 	DEFVAR LF@a?96OdJvkl
 	MOVE GF@*tmp*res LF@y?1P2JpiCJ
 	EQ GF@*expression*result LF@y?1P2JpiCJ nil@nil
 	NOT GF@*expression*result GF@*expression*result
 	JUMPIFEQ *else*main*1*0 GF@*expression*result bool@false
-	DEFVAR LF@b?g0eRR2Cm
 	MOVE LF@b?g0eRR2Cm GF@*tmp*res
 	CREATEFRAME
 	DEFVAR TF@*param0
