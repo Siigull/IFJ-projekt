@@ -330,7 +330,9 @@ void predefine_vars(AST_Node* curr, Tree* symtable){
         if(curr->type == VAR_DECL){
             fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);
         }
-
+        if(curr->type == NNULL_VAR_DECL){
+            fprintf(stdout, "\tDEFVAR LF@%s\n", curr->as.var_name);            
+        }
         if(curr->type == WHILE){
             predefine_vars(curr, symtable);
         }
@@ -364,7 +366,6 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
     Arr* statements = curr->as.arr;
     AST_Node* first = (AST_Node*)((statements->data)[0]);
     if(first->type == NNULL_VAR_DECL){
-        fprintf(stdout, "\tDEFVAR LF@%s\n", first->as.var_name);
         fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
         i = 1;
     }
@@ -393,7 +394,6 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
     Arr* statements = curr->as.arr;
     AST_Node* first = (AST_Node*)((statements->data)[0]);
     if(first->type == NNULL_VAR_DECL){
-        fprintf(stdout, "\tDEFVAR LF@%s\n", first->as.var_name);
         fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
         i = 1;
     }

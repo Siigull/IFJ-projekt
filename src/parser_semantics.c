@@ -35,6 +35,7 @@ Expr_Type get_literal_type(AST_Node* node) {
             entry->was_used = true;
             return entry->ret_type;
         }
+        case NIL: return (Expr_Type){R_NULL, true};
         default: return (Expr_Type){-1, false};
     }
 }
@@ -101,9 +102,11 @@ Expr_Type sem_check_binary_expression(AST_Node* node, const char* func_name) {
                 return (Expr_Type){R_BOOLEAN, is_node_const};
             } else if ((left_type.type == R_I32 && right_type.type == R_F64) || (left_type.type == R_F64 && right_type.type == R_I32)) {
                 if (left_type.type == R_I32) {
-                    left_type.type = R_BOOLEAN;
+                    node->left->type = F64;
+                    node->left->as.f64 = (double)node->left->as.i32;
                 } else if (right_type.type == R_I32) {
-                    right_type.type = R_BOOLEAN;
+                    node->right->type = F64;
+                    node->right->as.f64 = (double)node->right->as.i32;
                 }
                 node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
                 return (Expr_Type){R_BOOLEAN, is_node_const};
@@ -203,7 +206,7 @@ Expr_Type sem_var_assignment(AST_Node* node, const char* func_name) {
         }
 
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
-            ERROR_RET(ERR_SEM_TYPE_CONTROL);
+            if (!is_nullable(declared_type) && expression_type.type == R_NULL) ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
 
         if (entry->as.can_mut) {
@@ -275,7 +278,10 @@ Expr_Type sem_while(AST_Node* node, const char* func_name) {
                 ERROR_RET(ERR_SEM_TYPE_CONTROL); 
             }
 
-            for (size_t i = 0; i < node->as.arr->length; i++) {
+            Entry* nnull_entry = tree_find(parser->s_table, first_stmt->as.var_name);
+            nnull_entry->ret_type = null_to_nnul(cond_type);
+
+            for (size_t i = 1; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, func_name);
             }
@@ -305,7 +311,11 @@ Expr_Type sem_if(AST_Node* node, const char* func_name) {
                 ERROR_RET(ERR_SEM_TYPE_CONTROL); 
             }
 
-            for (size_t i = 0; i < node->as.arr->length; i++) {
+            Entry* nnull_entry = tree_find(parser->s_table, first_stmt->as.var_name);
+            nnull_entry->ret_type = null_to_nnul(cond_type);
+
+
+            for (size_t i = 1; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, func_name);
             }
@@ -348,6 +358,7 @@ Expr_Type check_node(AST_Node* node, const char* func_name) {
         case F64:
         case STRING:
         case ID:
+        case NIL:
             return get_literal_type(node);
         // statements
         case IF:             return sem_if(node, func_name);

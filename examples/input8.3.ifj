@@ -22,8 +22,8 @@ pub fn main() void {
         
         } else {
             ifj.write("Spatne zadana posloupnost, zkuste znovu:\n");
-            all = ifj.concat(all, newInput); // spojuji neplatne vstupy
-            newInput = ifj.string("cicina");
+            all = ifj.concat(all, macicka); // spojuji neplatne vstupy
+            newInput = ifj.readstr();
         }
     }
 }

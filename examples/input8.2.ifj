@@ -5,11 +5,11 @@ const ifj = @import("ifj24.zig");
 pub fn main() void {
     ifj.write("Zadejte cislo pro vypocet faktorialu: ");
     const inp = ifj.readi32();
-    if (inp) {
-        if (inp < 0) {
+    if (inp) |inpOk| {
+        if (inpOk < 0) {
             ifj.write("Faktorial nelze spocitat!\n");
         } else {
-            const vysl = factorial(inp);
+            const vysl = factorial(inpOk);
             ifj.write("Vysledek: "); ifj.write(vysl);
         }
     } else {

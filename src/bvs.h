@@ -29,6 +29,7 @@ typedef enum {
 	N_U8,
 	R_STRING,
 	R_BOOLEAN,
+	R_NULL,
 	IMPLICIT,
 } Ret_Type_;
 

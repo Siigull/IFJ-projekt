@@ -10,7 +10,7 @@ pub fn main() void {
             ifj.write(" nelze spocitat\n");
             
         } else {
-            var d: f64 = ifj.i2f(a);
+            var d: f64 = ifj.i2f(val);
             var vysl: f64 = 1.0;
             while (d > 0) {
                 vysl = vysl * d;
