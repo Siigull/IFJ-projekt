@@ -1,15 +1,10 @@
 const ifj = @import("ifj24.zig");
 
-pub fn sum(x : i32) i32 {
-    var a : i32 = x + x;
-    a = x + x;
-    return a;
+pub fn func() i32 {
+    return;
 }
 
 // Main Program
 pub fn main() void {
-    var i : i32 = 30;
-    i = sum(i);
-    ifj.write(i);
-    return 12;
+    _ = func();
 }

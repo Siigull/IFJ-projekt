@@ -4,7 +4,7 @@
  * @brief Implementation of IFJ24 semantic analysis
  * 
  * @date 2024-11-17
- * @todo implicit float conversion, must have return
+ * @todo implicit float conversion
  */
 
 
@@ -254,13 +254,13 @@ Expr_Type sem_return(AST_Node* node, sem_state* state) {
 
     if (node->left != NULL && entry->ret_type.type == R_VOID) {
         ERROR_RET(ERR_SEM_RET_EXP);
-    }
-
-    if (node->left != NULL) {
+    } else if (node->left == NULL && entry->ret_type.type != R_VOID) {
+        ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
+    } else if (node->left != NULL) {
         Expr_Type expression_type = check_node(node->left, state);
 
         if (expression_type.type != entry->ret_type.type) {
-            ERROR_RET(ERR_SEM_RET_EXP);
+            ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
         }
     }
 
@@ -317,7 +317,6 @@ Expr_Type sem_if(AST_Node* node, sem_state* state) {
 
             Entry* nnull_entry = tree_find(parser->s_table, first_stmt->as.var_name);
             nnull_entry->ret_type = null_to_nnul(cond_type);
-
 
             for (size_t i = 1; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
