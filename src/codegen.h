@@ -147,7 +147,7 @@ void generate_expression(AST_Node* curr, Tree* symtable, int inside_fnc_call);
  * @param nest level of nesting of if statement
  * @param inside_if_loop bool that says if we are nested inside if-else statement or a while loop
  */
-void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop);
+void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int* label_counter);
 
 
 
@@ -161,7 +161,7 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
  * @param stmt_index number of statement the if-else is (index in the function statement array)
  * @param nest level of nesting of if statement
  */
-void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest);
+void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, int* label_counter);
 
 
 
@@ -190,7 +190,7 @@ void generate_return(AST_Node* curr, Tree* symtable);
  * @param nest level of nesting of if statement
  * @param inside_if_loop bool that says if we are nested inside if-else statement or a while loop
  */
-void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop);
+void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int* label_counter);
 
 
 
@@ -260,7 +260,8 @@ void generate_var_assignment(AST_Node* curr, Tree* symtable);
  * @param inside_if_loop bool that says if we are nested inside if-else statement or a while loop
  * @param inside_fnc_call says how many nestings of function calls currently in
  */
-void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int inside_fnc_call);
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int inside_fnc_call
+                        , int* label_counter);
 
 
 

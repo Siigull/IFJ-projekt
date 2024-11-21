@@ -19,6 +19,7 @@ void generate_prolog(){
 
 void builtin_start(char* func_name){
     fprintf(stdout, "LABEL %s\n", func_name);
+    fprintf(stdout, "\tCREATEFRAME\n");
     fprintf(stdout, "\tPUSHFRAME\n");
     return;
 }
@@ -40,28 +41,30 @@ void generate_builtins(){
     //WRITE
     builtin_start("*write");
     fprintf(stdout, "\tDEFVAR LF@*to*write\n");
-    fprintf(stdout, "\tMOVE LF@*to*write LF@*param0\n");
+    fprintf(stdout, "\tPOPS LF@*to*write\n");
     fprintf(stdout, "\tWRITE LF@*to*write\n");
     builtin_end();
 
     //i2f
     builtin_start("*i2f");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tINT2FLOAT LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tPOPS LF@*return*value\n");
+    fprintf(stdout, "\tINT2FLOAT LF@*return*value LF@*return*value\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
 
     //f2i
     builtin_start("*f2i");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tFLOAT2INT LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tPOPS LF@*return*value\n");
+    fprintf(stdout, "\tFLOAT2INT LF@*return*value LF@*return*value\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
 
     //LENGTH
     builtin_start("*length");
     fprintf(stdout, "\tDEFVAR LF@*strlen\n");
-    fprintf(stdout, "\tMOVE LF@*strlen LF@*param0\n");
+    fprintf(stdout, "\tPOPS LF@*strlen\n");
     fprintf(stdout, "\tSTRLEN LF@*strlen LF@*strlen\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*strlen\n");
     builtin_end();
@@ -69,10 +72,10 @@ void generate_builtins(){
     //CONCATENATE
     builtin_start("*concat");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tDEFVAR LF@*first\n");
-    fprintf(stdout, "\tMOVE LF@*first LF@*param0\n");
     fprintf(stdout, "\tDEFVAR LF@*second\n");
-    fprintf(stdout, "\tMOVE LF@*second LF@*param1\n");
+    fprintf(stdout, "\tPOPS LF@*second\n");
+    fprintf(stdout, "\tDEFVAR LF@*first\n");
+    fprintf(stdout, "\tPOPS LF@*first\n");
     fprintf(stdout, "\tCONCAT LF@*return*value LF@*first LF@*second\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
@@ -85,20 +88,25 @@ void generate_builtins(){
     //ord
     builtin_start("*ord");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tSTRI2INT LF@*return*value LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tDEFVAR LF@*second\n");
+    fprintf(stdout, "\tPOPS LF@*second\n");
+    fprintf(stdout, "\tDEFVAR LF@*first\n");
+    fprintf(stdout, "\tPOPS LF@*first\n");
+    fprintf(stdout, "\tSTRI2INT LF@*return*value LF@*first LF@*second\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
 
     //chr
     builtin_start("*chr");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tINT2CHAR LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tPOPS LF@*return*value\n");
+    fprintf(stdout, "\tINT2CHAR LF@*return*value LF@*return*value\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
 
     builtin_start("*string");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
-    fprintf(stdout, "\tMOVE LF@*return*value LF@*param0\n");
+    fprintf(stdout, "\tPOPS LF@*return*value\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
     builtin_end();
 
@@ -106,12 +114,16 @@ void generate_builtins(){
     builtin_start("*strcmp");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
     fprintf(stdout, "\tDEFVAR LF@*res\n");
-    fprintf(stdout, "\tEQ LF@*res LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tDEFVAR LF@*second\n");
+    fprintf(stdout, "\tPOPS LF@*second\n");
+    fprintf(stdout, "\tDEFVAR LF@*first\n");
+    fprintf(stdout, "\tPOPS LF@*first\n");
+    fprintf(stdout, "\tEQ LF@*res LF@*first LF@*second\n");
     fprintf(stdout, "\tJUMPIFEQ *strcmp*skipeq LF@*res bool@false\n");
     fprintf(stdout, "\tMOVE LF@*return*value int@0\n");
     fprintf(stdout, "\tJUMP *strcmp*end\n");
     fprintf(stdout, "\tLABEL *strcmp*skipeq\n");
-    fprintf(stdout, "\tLT LF@*res LF@*param0 LF@*param1\n");
+    fprintf(stdout, "\tLT LF@*res LF@*first LF@*second\n");
     fprintf(stdout, "\tJUMPIFEQ *strcmp*skiplt LF@*res bool@false\n");
     fprintf(stdout, "\tMOVE LF@*return*value int@-1\n");
     fprintf(stdout, "\tJUMP *strcmp*end\n");
@@ -124,31 +136,37 @@ void generate_builtins(){
     //substring
     builtin_start("*substring");
     fprintf(stdout, "\tDEFVAR LF@*return*value\n");
+    fprintf(stdout, "\tDEFVAR LF@*third\n");
+    fprintf(stdout, "\tPOPS LF@*third\n");
+    fprintf(stdout, "\tDEFVAR LF@*second\n");
+    fprintf(stdout, "\tPOPS LF@*second\n");
+    fprintf(stdout, "\tDEFVAR LF@*first\n");
+    fprintf(stdout, "\tPOPS LF@*first\n");
     //checking conditions
-    fprintf(stdout, "\tLT GF@*tmp*res LF@*param1 int@0\n");
+    fprintf(stdout, "\tLT GF@*tmp*res LF@*second int@0\n");
     fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
-    fprintf(stdout, "\tLT GF@*tmp*res LF@*param2 int@0\n");
+    fprintf(stdout, "\tLT GF@*tmp*res LF@*third int@0\n");
     fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
-    fprintf(stdout, "\tGT GF@*tmp*res LF@*param1 LF@*param2\n");
+    fprintf(stdout, "\tGT GF@*tmp*res LF@*second LF@*third\n");
     fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
-    fprintf(stdout, "\tSTRLEN GF@*tmp*res LF@*param0\n");
-    fprintf(stdout, "\tGT GF@*tmp*res LF@*param2 GF@*tmp*res\n");
+    fprintf(stdout, "\tSTRLEN GF@*tmp*res LF@*first\n");
+    fprintf(stdout, "\tGT GF@*tmp*res LF@*third GF@*tmp*res\n");
     fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
-    fprintf(stdout, "\tSTRLEN GF@*tmp*res LF@*param0\n");
-    fprintf(stdout, "\tEQ GF@*expression*result LF@*param1 GF@*tmp*res\n");
-    fprintf(stdout, "\tGT GF@*tmp*res LF@*param1 GF@*tmp*res\n");
+    fprintf(stdout, "\tSTRLEN GF@*tmp*res LF@*first\n");
+    fprintf(stdout, "\tEQ GF@*expression*result LF@*second GF@*tmp*res\n");
+    fprintf(stdout, "\tGT GF@*tmp*res LF@*second GF@*tmp*res\n");
     fprintf(stdout, "\tOR GF@*tmp*res GF@*expression*result GF@*tmp*res\n");
     fprintf(stdout, "\tJUMPIFEQ *substring*err GF@*tmp*res bool@true\n");
 
     fprintf(stdout, "\tMOVE LF@*return*value string@\n");
     fprintf(stdout, "\tDEFVAR LF@*start*index\n");
     fprintf(stdout, "\tDEFVAR LF@*res\n");
-    fprintf(stdout, "\tMOVE LF@*start*index LF@*param1\n");
+    fprintf(stdout, "\tMOVE LF@*start*index LF@*second\n");
     fprintf(stdout, "\tLABEL *substring*while\n");
-    fprintf(stdout, "\tEQ LF@*res LF@*start*index LF@*param2\n");
+    fprintf(stdout, "\tEQ LF@*res LF@*start*index LF@*third\n");
     fprintf(stdout, "\tJUMPIFEQ *substring*loop*end LF@*res bool@true\n");
 
-    fprintf(stdout, "\tGETCHAR LF@*res LF@*param0 LF@*start*index\n");
+    fprintf(stdout, "\tGETCHAR LF@*res LF@*first LF@*start*index\n");
     fprintf(stdout, "\tCONCAT LF@*return*value LF@*return*value LF@*res\n");
 
     fprintf(stdout, "\tADD LF@*start*index LF@*start*index int@1\n");
@@ -343,24 +361,25 @@ void predefine_vars(AST_Node* curr, Tree* symtable){
     }
 }
 
-void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest){
+void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, int* label_counter){
     Arr* statements = curr->as.arr;
     for(int i = 0; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
-        generate_statement(stmt, symtable, func_name, i, nest+1, true, 0);
+        generate_statement(stmt, symtable, func_name, i, nest+1, true, 0, label_counter);
     }
     return;
 }
 
 
-void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop){
+void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int* label_counter){
     if(!inside_if_loop){
         predefine_vars(curr, symtable);
         predefine_vars(curr->right, symtable);
     }
     eval_condition(curr->left, symtable, 0);
+    int tmp = *label_counter;
     // condition is false if evaluated expression is 0
-    fprintf(stdout, "\tJUMPIFEQ *else*%s*%d*%d GF@*expression*result bool@false\n", func_name, stmt_index, nest);
+    fprintf(stdout, "\tJUMPIFEQ *else*%s*%d*%d*%d GF@*expression*result bool@false\n", func_name, stmt_index, nest, tmp);
 
     int i = 0;
     Arr* statements = curr->as.arr;
@@ -372,23 +391,23 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
 
     for(; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
-        generate_statement(stmt, symtable, func_name, i, nest+1, true, 0);
+        generate_statement(stmt, symtable, func_name, i, nest+1, true, 0, label_counter);
     }
-    fprintf(stdout, "\tJUMP *end*of*if*%s*%d*%d\n", func_name, stmt_index, nest);
-
-    fprintf(stdout, "\tLABEL *else*%s*%d*%d\n", func_name, stmt_index, nest);
-    generate_else(curr->right, symtable, func_name, stmt_index, nest);
-    fprintf(stdout, "\tLABEL *end*of*if*%s*%d*%d\n", func_name, stmt_index, nest);
+    fprintf(stdout, "\tJUMP *end*of*if*%s*%d*%d*%d\n", func_name, stmt_index, nest, tmp);
+    fprintf(stdout, "\tLABEL *else*%s*%d*%d*%d\n", func_name, stmt_index, nest, tmp);
+    generate_else(curr->right, symtable, func_name, stmt_index, nest, label_counter);
+    fprintf(stdout, "\tLABEL *end*of*if*%s*%d*%d*%d\n", func_name, stmt_index, nest, tmp);
     return;
 }
 
-void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop){
+void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int* label_counter){
     if(!inside_if_loop) predefine_vars(curr, symtable);
     
-    fprintf(stdout, "\tLABEL *while*%s*%d*%d\n", func_name, stmt_index, nest);
+    int tmp = *label_counter;
+    fprintf(stdout, "\tLABEL *while*%s*%d*%d*%d\n", func_name, stmt_index, nest, tmp);
     eval_condition(curr->left, symtable, 0);
     // condition is false if evaluated expression is 0
-    fprintf(stdout, "\tJUMPIFEQ *end*loop*%s*%d*%d GF@*expression*result bool@false\n", func_name, stmt_index, nest);
+    fprintf(stdout, "\tJUMPIFEQ *end*loop*%s*%d*%d*%d GF@*expression*result bool@false\n", func_name, stmt_index, nest, *label_counter);
 
     int i = 0;
     Arr* statements = curr->as.arr;
@@ -400,11 +419,11 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
 
     for(; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
-        generate_statement(stmt, symtable, func_name, i, nest+1, true, 0);
+        generate_statement(stmt, symtable, func_name, i, nest+1, true, 0, label_counter);
     }
 
-    fprintf(stdout, "\tJUMP *while*%s*%d*%d\n", func_name, stmt_index, nest);
-    fprintf(stdout, "\tLABEL *end*loop*%s*%d*%d\n", func_name, stmt_index, nest);
+    fprintf(stdout, "\tJUMP *while*%s*%d*%d*%d\n", func_name, stmt_index, nest, tmp);
+    fprintf(stdout, "\tLABEL *end*loop*%s*%d*%d*%d\n", func_name, stmt_index, nest, tmp);
     return;
 }
 
@@ -420,24 +439,22 @@ void generate_return(AST_Node* curr, Tree* symtable){
 
 
 void generate_func_call(AST_Node* curr, Tree* symtable, int inside_fnc_call){
-    if(inside_fnc_call > 1){
+    /*if(inside_fnc_call > 1){
         fprintf(stdout, "\tPUSHFRAME\n");
-    }
-
-    fprintf(stdout, "\tCREATEFRAME\n");
+    }*/
     //push all parameters here
     Arr* params = curr->as.func_data->arr;
     for(int i = 0; i < params->length; i++){
         AST_Node* param = (AST_Node*)((params->data)[i]);
-        fprintf(stdout, "\tDEFVAR TF@*param%d\n", i);
+        //fprintf(stdout, "\tDEFVAR TF@*param%d\n", i);
         generate_expression(param, symtable, inside_fnc_call);
-        fprintf(stdout, "\tMOVE TF@*param%d GF@*expression*result\n", i);
+        fprintf(stdout, "\tPUSHS GF@*expression*result\n");
     }
     fprintf(stdout, "\tCALL %s\n", curr->as.func_data->var_name);
 
-    if(inside_fnc_call > 1){
+    /*if(inside_fnc_call > 1){
         fprintf(stdout, "\tPOPFRAME\n");
-    }
+    }*/
 }
 
 
@@ -467,6 +484,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
         fprintf(stdout, "\tPUSHFRAME\n");
     }
     else{
+        fprintf(stdout, "\tCREATEFRAME\n");
         fprintf(stdout, "\tPUSHFRAME\n");
         fprintf(stdout, "\tDEFVAR LF@*return*value\n");
         fprintf(stdout, "\tMOVE LF@*return*value nil@nil\n");
@@ -476,19 +494,22 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     Arr* args = arg_entry->as.function_args;
     // create local variables for all arguments
     // and continuously pop arguments from stack into them
-    for(int i = 0; i < args->length; i++){
+    for(int i = args->length - 1; i >= 0; i--){
         Function_Arg* argument = (Function_Arg*)((args->data)[i]);
         fprintf(stdout, "\tDEFVAR LF@%s\n", argument->arg_name); 
-        fprintf(stdout, "\tMOVE LF@%s LF@*param%d\n", argument->arg_name, i);
+        fprintf(stdout, "\tPOPS LF@%s\n", argument->arg_name);
     }
 
     // statements in as->func_data as an array
     // generate all of them
+    int* label_counter = malloc(sizeof(int));
+    if(label_counter == NULL) ERROR_RET(ERR_INTERN);
+    *label_counter = 0;
     Arr* statements = curr->as.func_data->arr;
     for(int i = 0; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
         if(stmt->type == RETURN && !strcmp(curr->as.func_data->var_name, "main")) break;
-        generate_statement(stmt, symtable, curr->as.func_data->var_name, i, 0, false, 0);
+        generate_statement(stmt, symtable, curr->as.func_data->var_name, i, 0, false, 0, label_counter);
     }
 
     if(main){
@@ -498,17 +519,20 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
 }//generate_function_decl
 
 
-void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int inside_fnc_call){
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, 
+                        int nest, bool inside_if_loop, int inside_fnc_call, int* label_counter){
     //choose which type of statement to generate
     switch(curr->type){
         case IF:
-            generate_if(curr, symtable, func_name, stmt_index, nest, inside_if_loop);
+            *label_counter += 1;
+            generate_if(curr, symtable, func_name, stmt_index, nest, inside_if_loop, label_counter);
             return;
         case RETURN:
             generate_return(curr, symtable);
             return;
         case WHILE:
-            generate_while(curr, symtable, func_name, stmt_index, nest, inside_if_loop);
+            *label_counter += 1;
+            generate_while(curr, symtable, func_name, stmt_index, nest, inside_if_loop, label_counter);
             return;
         case FUNC_CALL:
             generate_func_call(curr, symtable, 1);
