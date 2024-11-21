@@ -302,10 +302,13 @@ void handle_rule(int rule, List* Stack) {
 		char* end;
 		if (processed_token->type == T_I32) {
 			node->as.i32 = strtol(processed_token->value, &end, 10);
+			
 		} else if (processed_token->type == T_F64) {
 			node->as.f64 = strtof(processed_token->value, &end);
+
 		} else if (processed_token->type == T_ID) {
 			node->as.var_name = processed_token->value;
+
 		} else if (processed_token->type == T_STRING) {
 			node->as.string = processed_token->value;
 		}

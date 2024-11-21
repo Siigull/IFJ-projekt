@@ -168,7 +168,9 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	}
 
 	unsigned int len = lexer->idr - lexer->idl;
-	char* value = (char*) malloc(len + 1 + 13); // + 15 for realloc to not change pointer
+
+	char* value = (char*) malloc(len + 1);
+	
 	// load the value
 	for (unsigned int i = 0; i < len; i++) {
 		value[i] = lexer->input[lexer->idl + i];
@@ -231,6 +233,9 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 		}
 
 		if (is_id_token(token)) {
+			value = realloc(value, sizeof(char) * len + 1 + 10);
+			token->value = value;
+
 			token->type = T_ID;
 			return token;
 		}

@@ -37,11 +37,11 @@ char* string_write(const char* string) {
 
 	for (int i = 0; i < len; i++) {
 		if (string[i] < 32 || string[i] == ' ' || string[i] == '#' || string[i] == '\\') {
-			new_len += 3;
+			new_len += 4;
 		}
 	}
 
-	char* new_string = malloc(sizeof(char) * new_len + 1);
+	char* new_string = calloc(new_len + 1, sizeof(char));
 	char* out = new_string;
 
 	for (int i = 0; i < len; i++) {
@@ -54,7 +54,6 @@ char* string_write(const char* string) {
 			new_string += 1;
 		}
 	}
-	new_string[0] = '\0';
 
 	return out;
 }

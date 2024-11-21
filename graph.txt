@@ -4,7 +4,7 @@ IF(0).shape: diamond
 IF(0).style{ fill: "#ffffff" }
 LESS(0).style{ border-radius: 999 }
 IF(0) -> LESS(0) : expr
-LESS(0): {tooltip: NULL}
+LESS(0): {tooltip: rectangle}
 ID(0).style{ border-radius: 999 }
 ID(0): {tooltip: x}
 LESS(0) -> ID(0) : left
@@ -15,7 +15,7 @@ VAR_DECL(0): {tooltip: q?g0eRR2Cm}
 ELSE(0) -> VAR_DECL(0) : body
 -(0).style{ border-radius: 999 }
 VAR_DECL(0) -> -(0) : expr
--(0): {tooltip: NULL}
+-(0): {tooltip: R_I32}
 ID(1).style{ border-radius: 999 }
 ID(1): {tooltip: x}
 -(0) -> ID(1) : left
@@ -50,7 +50,7 @@ RETURN(0) -> ID(4) : expr
 IF(0) -> RETURN(1) : body
 -(1).style{ border-radius: 999 }
 RETURN(1) -> -(1) : expr
--(1): {tooltip: NULL}
+-(1): {tooltip: R_I32}
 ID(5).style{ border-radius: 999 }
 ID(5): {tooltip: x}
 -(1) -> ID(5) : left
@@ -62,7 +62,7 @@ IF(1).shape: diamond
 IF(1).style{ fill: "#ffffff" }
 LESS(1).style{ border-radius: 999 }
 IF(1) -> LESS(1) : expr
-LESS(1): {tooltip: NULL}
+LESS(1): {tooltip: rectangle}
 ID(6).style{ border-radius: 999 }
 ID(6): {tooltip: x}
 LESS(1) -> ID(6) : left

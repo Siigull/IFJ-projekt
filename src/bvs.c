@@ -498,7 +498,6 @@ bool context_pop(C_Stack* stack) {
 		}
 
 		int orig_len = strlen(entry->key);
-		// entry->key = realloc((char*)entry->key, sizeof(char) * (orig_len + HASH_CHARS + 3));
 		if(entry->key == NULL) {
 			exit(99);
 		}
