@@ -15,7 +15,7 @@ pub fn fibonacci (n : i32) i32 {
         //taky nic lololoolloloollolool
         // co je tohle za syntax else bez niceho
     }
-    return fibonacci(n - 1) + fibonacci(n - 2);
+    return fibonacci(n - 1) + fibonacci(n - 2);@
 }
 
 // Main function

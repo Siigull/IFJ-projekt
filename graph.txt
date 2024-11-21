@@ -1,190 +1,195 @@
 root -> FUNC_DECL(0) : functions
 FUNC_DECL(0).shape: rectangle
-FUNC_CALL(0): {tooltip: *write}
-FUNC_CALL(0).shape: rectangle
-FUNC_DECL(0) -> FUNC_CALL(0) : body
-STRING(0).shape: rectangle
-STRING(0).style{ border-radius: 999 }
-STRING(0): {tooltip: Zadejte\\032cislo\\032pro\\032vypocet\\032faktorialu\\010}
-FUNC_CALL(0) -> STRING(0) : args
-VAR_DECL(0): {tooltip: a?mP73H9d6}
+VAR_DECL(0): {tooltip: str1?OTF22H99}
 FUNC_DECL(0) -> VAR_DECL(0) : body
 VAR_DECL(0).shape: rectangle
-FUNC_CALL(1): {tooltip: *readi32}
-FUNC_CALL(1).shape: rectangle
-FUNC_CALL(1).style{ border-radius: 999 }
-VAR_DECL(0) -> FUNC_CALL(1) : expr
-VAR_DECL(1): {tooltip: x?FcOOMyxq}
+FUNC_CALL(0): {tooltip: *string}
+FUNC_CALL(0).shape: rectangle
+FUNC_CALL(0).style{ border-radius: 999 }
+VAR_DECL(0) -> FUNC_CALL(0) : expr
+STRING(0).shape: rectangle
+STRING(0).style{ border-radius: 999 }
+STRING(0): {tooltip: Toto\\032je\\032text\\032v\\032programu\\032jazyka\\032IFJ24}
+FUNC_CALL(0) -> STRING(0) : args
+VAR_DECL(1): {tooltip: str2?mP73H9d6}
 FUNC_DECL(0) -> VAR_DECL(1) : body
 VAR_DECL(1).shape: rectangle
-F64(0).shape: rectangle
-F64(0).style{ border-radius: 999 }
-VAR_DECL(1) -> F64(0) : expr
-VAR_ASSIGNMENT(0): {tooltip: x?FcOOMyxq}
-FUNC_DECL(0) -> VAR_ASSIGNMENT(0) : body
-VAR_ASSIGNMENT(0).shape: rectangle
-ID(0).shape: rectangle
-ID(0).style{ border-radius: 999 }
-ID(0): {tooltip: x}
-VAR_ASSIGNMENT(0) -> ID(0) : expr
-FUNC_DECL(0) -> IF(0) : body
-IF(0).shape: diamond
-IF(0).style{ fill: "#ffffff" }
-ID(1).shape: rectangle
-ID(1).style{ border-radius: 999 }
-ID(1): {tooltip: a}
-IF(0) -> ID(1) : expr
-IF(0) -> ELSE(0) : else
-ELSE(0).shape: rectangle
-FUNC_CALL(2): {tooltip: *write}
-FUNC_CALL(2).shape: rectangle
-ELSE(0) -> FUNC_CALL(2) : body
+FUNC_CALL(1): {tooltip: *string}
+FUNC_CALL(1).shape: rectangle
+FUNC_CALL(1).style{ border-radius: 999 }
+VAR_DECL(1) -> FUNC_CALL(1) : expr
 STRING(1).shape: rectangle
 STRING(1).style{ border-radius: 999 }
-STRING(1): {tooltip: Faktorial\\032pro\\032null\\032nelze\\032spocitat\\010}
-FUNC_CALL(2) -> STRING(1) : args
-IF(0) -> NNUL(0) : body
-NNUL(0).shape: rectangle
-IF(0) -> IF(1) : body
-IF(1).shape: diamond
-IF(1).style{ fill: "#ffffff" }
-LESS(0).shape: rectangle
-LESS(0).style{ border-radius: 999 }
-IF(1) -> LESS(0) : expr
-LESS(0): {tooltip: NULL}
+STRING(1): {tooltip: ,\\032ktery\\032jeste\\032trochu\\032obohatime}
+FUNC_CALL(1) -> STRING(1) : args
+VAR_ASSIGNMENT(0): {tooltip: str2?mP73H9d6}
+FUNC_DECL(0) -> VAR_ASSIGNMENT(0) : body
+VAR_ASSIGNMENT(0).shape: rectangle
+FUNC_CALL(2): {tooltip: *concat}
+FUNC_CALL(2).shape: rectangle
+FUNC_CALL(2).style{ border-radius: 999 }
+VAR_ASSIGNMENT(0) -> FUNC_CALL(2) : expr
+ID(0).shape: rectangle
+ID(0).style{ border-radius: 999 }
+ID(0): {tooltip: str1}
+FUNC_CALL(2) -> ID(0) : args
+ID(1).shape: rectangle
+ID(1).style{ border-radius: 999 }
+ID(1): {tooltip: str2}
+FUNC_CALL(2) -> ID(1) : args
+FUNC_CALL(3): {tooltip: *write}
+FUNC_CALL(3).shape: rectangle
+FUNC_DECL(0) -> FUNC_CALL(3) : body
 ID(2).shape: rectangle
 ID(2).style{ border-radius: 999 }
-ID(2): {tooltip: val}
-LESS(0) -> ID(2) : left
-I32(0).shape: rectangle
-I32(0).style{ border-radius: 999 }
-LESS(0) -> I32(0) : right
-IF(1) -> ELSE(1) : else
-ELSE(1).shape: rectangle
-VAR_DECL(2): {tooltip: d?96OdJvkl}
-ELSE(1) -> VAR_DECL(2) : body
-VAR_DECL(2).shape: rectangle
-FUNC_CALL(3): {tooltip: *i2f}
-FUNC_CALL(3).shape: rectangle
-FUNC_CALL(3).style{ border-radius: 999 }
-VAR_DECL(2) -> FUNC_CALL(3) : expr
-ID(3).shape: rectangle
-ID(3).style{ border-radius: 999 }
-ID(3): {tooltip: val}
-FUNC_CALL(3) -> ID(3) : args
-VAR_DECL(3): {tooltip: vysl?1P2JpiCJ}
-ELSE(1) -> VAR_DECL(3) : body
-VAR_DECL(3).shape: rectangle
-F64(1).shape: rectangle
-F64(1).style{ border-radius: 999 }
-VAR_DECL(3) -> F64(1) : expr
-ELSE(1) -> WHILE(0) : body
-WHILE(0).shape: diamond
-WHILE(0).style{ fill: "#ffffff" }
-MORE(0).shape: rectangle
-MORE(0).style{ border-radius: 999 }
-WHILE(0) -> MORE(0) : expr
-MORE(0): {tooltip: NULL}
-ID(4).shape: rectangle
-ID(4).style{ border-radius: 999 }
-ID(4): {tooltip: d}
-MORE(0) -> ID(4) : left
-I32(1).shape: rectangle
-I32(1).style{ border-radius: 999 }
-MORE(0) -> I32(1) : right
-VAR_ASSIGNMENT(1): {tooltip: vysl?1P2JpiCJ}
-WHILE(0) -> VAR_ASSIGNMENT(1) : body
-VAR_ASSIGNMENT(1).shape: rectangle
-VAR_ASSIGNMENT(1) -> !(0) : expr
-!(0).shape: rectangle
-!(0).style{ border-radius: 999 }
-!(0): {tooltip: NULL}
-ID(5).shape: rectangle
-ID(5).style{ border-radius: 999 }
-ID(5): {tooltip: vysl}
-!(0) -> ID(5) : left
-ID(6).shape: rectangle
-ID(6).style{ border-radius: 999 }
-ID(6): {tooltip: d}
-!(0) -> ID(6) : right
-VAR_ASSIGNMENT(2): {tooltip: d?96OdJvkl}
-WHILE(0) -> VAR_ASSIGNMENT(2) : body
-VAR_ASSIGNMENT(2).shape: rectangle
--(0).shape: rectangle
--(0).style{ border-radius: 999 }
-VAR_ASSIGNMENT(2) -> -(0) : expr
--(0): {tooltip: NULL}
-ID(7).shape: rectangle
-ID(7).style{ border-radius: 999 }
-ID(7): {tooltip: d}
--(0) -> ID(7) : left
-F64(2).shape: rectangle
-F64(2).style{ border-radius: 999 }
--(0) -> F64(2) : right
+ID(2): {tooltip: str1}
+FUNC_CALL(3) -> ID(2) : args
 FUNC_CALL(4): {tooltip: *write}
 FUNC_CALL(4).shape: rectangle
-ELSE(1) -> FUNC_CALL(4) : body
+FUNC_DECL(0) -> FUNC_CALL(4) : body
 STRING(2).shape: rectangle
 STRING(2).style{ border-radius: 999 }
-STRING(2): {tooltip: Vysledek:\\032}
+STRING(2): {tooltip: \\010}
 FUNC_CALL(4) -> STRING(2) : args
 FUNC_CALL(5): {tooltip: *write}
 FUNC_CALL(5).shape: rectangle
-ELSE(1) -> FUNC_CALL(5) : body
-ID(8).shape: rectangle
-ID(8).style{ border-radius: 999 }
-ID(8): {tooltip: vysl}
-FUNC_CALL(5) -> ID(8) : args
+FUNC_DECL(0) -> FUNC_CALL(5) : body
+ID(3).shape: rectangle
+ID(3).style{ border-radius: 999 }
+ID(3): {tooltip: str2}
+FUNC_CALL(5) -> ID(3) : args
 FUNC_CALL(6): {tooltip: *write}
 FUNC_CALL(6).shape: rectangle
-ELSE(1) -> FUNC_CALL(6) : body
+FUNC_DECL(0) -> FUNC_CALL(6) : body
 STRING(3).shape: rectangle
 STRING(3).style{ border-radius: 999 }
-STRING(3): {tooltip: \\032=\\032}
+STRING(3): {tooltip: \\010}
 FUNC_CALL(6) -> STRING(3) : args
-VAR_DECL(4): {tooltip: vysl_i32?g0eRR2Cm}
-ELSE(1) -> VAR_DECL(4) : body
-VAR_DECL(4).shape: rectangle
-FUNC_CALL(7): {tooltip: *f2i}
+FUNC_CALL(7): {tooltip: *write}
 FUNC_CALL(7).shape: rectangle
-FUNC_CALL(7).style{ border-radius: 999 }
-VAR_DECL(4) -> FUNC_CALL(7) : expr
-ID(9).shape: rectangle
-ID(9).style{ border-radius: 999 }
-ID(9): {tooltip: vysl}
-FUNC_CALL(7) -> ID(9) : args
-FUNC_CALL(8): {tooltip: *write}
-FUNC_CALL(8).shape: rectangle
-ELSE(1) -> FUNC_CALL(8) : body
-ID(10).shape: rectangle
-ID(10).style{ border-radius: 999 }
-ID(10): {tooltip: vysl_i32}
-FUNC_CALL(8) -> ID(10) : args
-FUNC_CALL(9): {tooltip: *write}
-FUNC_CALL(9).shape: rectangle
-ELSE(1) -> FUNC_CALL(9) : body
+FUNC_DECL(0) -> FUNC_CALL(7) : body
 STRING(4).shape: rectangle
 STRING(4).style{ border-radius: 999 }
-STRING(4): {tooltip: \\010}
-FUNC_CALL(9) -> STRING(4) : args
-FUNC_CALL(10): {tooltip: *write}
-FUNC_CALL(10).shape: rectangle
-IF(1) -> FUNC_CALL(10) : body
+STRING(4): {tooltip: Zadejte\\032serazenou\\032posloupnost\\032malych\\032pismen\\032a-h:\\010}
+FUNC_CALL(7) -> STRING(4) : args
+VAR_DECL(2): {tooltip: newInput?FcOOMyxq}
+FUNC_DECL(0) -> VAR_DECL(2) : body
+VAR_DECL(2).shape: rectangle
+FUNC_CALL(8): {tooltip: *readstr}
+FUNC_CALL(8).shape: rectangle
+FUNC_CALL(8).style{ border-radius: 999 }
+VAR_DECL(2) -> FUNC_CALL(8) : expr
+VAR_DECL(3): {tooltip: all?Hu3WxKOu}
+FUNC_DECL(0) -> VAR_DECL(3) : body
+VAR_DECL(3).shape: rectangle
+FUNC_CALL(9): {tooltip: *string}
+FUNC_CALL(9).shape: rectangle
+FUNC_CALL(9).style{ border-radius: 999 }
+VAR_DECL(3) -> FUNC_CALL(9) : expr
 STRING(5).shape: rectangle
 STRING(5).style{ border-radius: 999 }
-STRING(5): {tooltip: Faktorial\\032}
-FUNC_CALL(10) -> STRING(5) : args
-FUNC_CALL(11): {tooltip: *write}
-FUNC_CALL(11).shape: rectangle
-IF(1) -> FUNC_CALL(11) : body
-ID(11).shape: rectangle
-ID(11).style{ border-radius: 999 }
-ID(11): {tooltip: val}
-FUNC_CALL(11) -> ID(11) : args
-FUNC_CALL(12): {tooltip: *write}
-FUNC_CALL(12).shape: rectangle
-IF(1) -> FUNC_CALL(12) : body
+FUNC_CALL(9) -> STRING(5) : args
+FUNC_DECL(0) -> WHILE(0) : body
+WHILE(0).shape: diamond
+WHILE(0).style{ fill: "#ffffff" }
+ID(4).shape: rectangle
+ID(4).style{ border-radius: 999 }
+ID(4): {tooltip: newInput}
+WHILE(0) -> ID(4) : expr
+WHILE(0) -> NNUL(0) : body
+NNUL(0).shape: rectangle
+VAR_DECL(4): {tooltip: abcdefgh?96OdJvkl}
+WHILE(0) -> VAR_DECL(4) : body
+VAR_DECL(4).shape: rectangle
+FUNC_CALL(10): {tooltip: *string}
+FUNC_CALL(10).shape: rectangle
+FUNC_CALL(10).style{ border-radius: 999 }
+VAR_DECL(4) -> FUNC_CALL(10) : expr
 STRING(6).shape: rectangle
 STRING(6).style{ border-radius: 999 }
-STRING(6): {tooltip: \\032nelze\\032spocitat\\010}
-FUNC_CALL(12) -> STRING(6) : args
+STRING(6): {tooltip: abcdefgh}
+FUNC_CALL(10) -> STRING(6) : args
+VAR_DECL(5): {tooltip: strcmpResult?g0eRR2Cm}
+WHILE(0) -> VAR_DECL(5) : body
+VAR_DECL(5).shape: rectangle
+FUNC_CALL(11): {tooltip: *strcmp}
+FUNC_CALL(11).shape: rectangle
+FUNC_CALL(11).style{ border-radius: 999 }
+VAR_DECL(5) -> FUNC_CALL(11) : expr
+ID(5).shape: rectangle
+ID(5).style{ border-radius: 999 }
+ID(5): {tooltip: macicka}
+FUNC_CALL(11) -> ID(5) : args
+ID(6).shape: rectangle
+ID(6).style{ border-radius: 999 }
+ID(6): {tooltip: abcdefgh}
+FUNC_CALL(11) -> ID(6) : args
+WHILE(0) -> IF(0) : body
+IF(0).shape: diamond
+IF(0).style{ fill: "#ffffff" }
+==(0).shape: rectangle
+==(0).style{ border-radius: 999 }
+==(0): {tooltip: NULL}
+IF(0) -> ==(0) : expr
+ID(7).shape: rectangle
+ID(7).style{ border-radius: 999 }
+ID(7): {tooltip: strcmpResult}
+==(0) -> ID(7) : left
+I32(0).shape: rectangle
+I32(0).style{ border-radius: 999 }
+==(0) -> I32(0) : right
+IF(0) -> ELSE(0) : else
+ELSE(0).shape: rectangle
+FUNC_CALL(12): {tooltip: *write}
+FUNC_CALL(12).shape: rectangle
+ELSE(0) -> FUNC_CALL(12) : body
+STRING(7).shape: rectangle
+STRING(7).style{ border-radius: 999 }
+STRING(7): {tooltip: Spatne\\032zadana\\032posloupnost,\\032zkuste\\032znovu:\\010}
+FUNC_CALL(12) -> STRING(7) : args
+VAR_ASSIGNMENT(1): {tooltip: all?Hu3WxKOu}
+ELSE(0) -> VAR_ASSIGNMENT(1) : body
+VAR_ASSIGNMENT(1).shape: rectangle
+FUNC_CALL(13): {tooltip: *concat}
+FUNC_CALL(13).shape: rectangle
+FUNC_CALL(13).style{ border-radius: 999 }
+VAR_ASSIGNMENT(1) -> FUNC_CALL(13) : expr
+ID(8).shape: rectangle
+ID(8).style{ border-radius: 999 }
+ID(8): {tooltip: all}
+FUNC_CALL(13) -> ID(8) : args
+ID(9).shape: rectangle
+ID(9).style{ border-radius: 999 }
+ID(9): {tooltip: newInput}
+FUNC_CALL(13) -> ID(9) : args
+VAR_ASSIGNMENT(2): {tooltip: newInput?FcOOMyxq}
+ELSE(0) -> VAR_ASSIGNMENT(2) : body
+VAR_ASSIGNMENT(2).shape: rectangle
+FUNC_CALL(14): {tooltip: *string}
+FUNC_CALL(14).shape: rectangle
+FUNC_CALL(14).style{ border-radius: 999 }
+VAR_ASSIGNMENT(2) -> FUNC_CALL(14) : expr
+STRING(8).shape: rectangle
+STRING(8).style{ border-radius: 999 }
+STRING(8): {tooltip: cicina}
+FUNC_CALL(14) -> STRING(8) : args
+FUNC_CALL(15): {tooltip: *write}
+FUNC_CALL(15).shape: rectangle
+IF(0) -> FUNC_CALL(15) : body
+STRING(9).shape: rectangle
+STRING(9).style{ border-radius: 999 }
+STRING(9): {tooltip: Spravne\\032zadano!\\010}
+FUNC_CALL(15) -> STRING(9) : args
+FUNC_CALL(16): {tooltip: *write}
+FUNC_CALL(16).shape: rectangle
+IF(0) -> FUNC_CALL(16) : body
+ID(10).shape: rectangle
+ID(10).style{ border-radius: 999 }
+ID(10): {tooltip: all}
+FUNC_CALL(16) -> ID(10) : args
+VAR_ASSIGNMENT(3): {tooltip: newInput?FcOOMyxq}
+IF(0) -> VAR_ASSIGNMENT(3) : body
+VAR_ASSIGNMENT(3).shape: rectangle
+NIL(0).shape: rectangle
+NIL(0).style{ border-radius: 999 }
+VAR_ASSIGNMENT(3) -> NIL(0) : expr

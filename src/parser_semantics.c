@@ -4,7 +4,7 @@
  * @brief Implementation of IFJ24 semantic analysis
  * 
  * @date 2024-11-17
- * 
+ * @todo implicit float conversion, nnull declaration
  */
 
 
@@ -206,7 +206,10 @@ Expr_Type sem_var_assignment(AST_Node* node, const char* func_name) {
             ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
 
-        entry->was_used = true;
+        if (entry->as.can_mut) {
+            entry->was_assigned = true;
+            entry->was_used = true;
+        }
     }
 
     return (Expr_Type){-1, false};
@@ -236,7 +239,7 @@ Expr_Type sem_nnull_var_decl(AST_Node* node, const char* func_name) {
 
     // Entry* new_entry = entry_init(node->as.var_name, E_VAR, entry->ret_type, false);
 
-    entry->ret_type = (Expr_Type){R_I32, false};
+    // entry->ret_type = (Expr_Type){R_I32, false};
 
     return (Expr_Type){-1, false}; 
 }
@@ -371,7 +374,7 @@ void check_var_usage_traverse(Node* node) {
     if (node == NULL) return;
     Entry* entry = node->entry;
 
-    if (entry->type == E_VAR && !entry->was_used) {
+    if (entry->type == E_VAR && (!entry->was_used || (entry->as.can_mut && !entry->was_assigned))) {
         ERROR_RET(ERR_SEM_MODIF_VAR);
     }
 

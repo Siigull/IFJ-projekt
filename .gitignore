@@ -4,3 +4,5 @@
 *.dSYM
 /build/
 kokot.txt
+graph.txt
+prog.code

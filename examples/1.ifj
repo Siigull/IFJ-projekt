@@ -2,7 +2,6 @@ const ifj = @import("ifj24.zig");
 
 // Main Program
 pub fn main() void {
-    var i : i32 = 10;
-    const j : i32 = i + 10;
-    ifj.write(j);
+    var i : i32 = 30;
+    i = 20;
 }

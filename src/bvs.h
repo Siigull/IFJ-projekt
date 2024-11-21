@@ -49,6 +49,7 @@ typedef struct Entry {
 	Expr_Type ret_type;
 	bool has_null;
 	bool was_used;
+	bool was_assigned;
 
 	union {
 		Arr* function_args;
@@ -78,7 +79,7 @@ typedef struct Context_Stack {
 } C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Expr_Type ret_type, bool can_mut, bool was_used);
+				  Expr_Type ret_type, bool can_mut, bool was_used, bool was_assigned);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);
