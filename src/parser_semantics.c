@@ -220,14 +220,10 @@ Expr_Type sem_var_assignment(AST_Node* node, sem_state* state) {
             ERROR_RET(ERR_SEM_ASSIGN_NON_MODIF);
         }
 
-        if (expression_type.type == R_NULL) {
-            if (!is_nullable(declared_type)) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL);
-            }
-        }
-
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
-            ERROR_RET(ERR_SEM_TYPE_CONTROL);
+            if (!(is_nullable(declared_type) && expression_type.type == R_NULL)) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+            }
         }
 
         if (entry->as.can_mut) {

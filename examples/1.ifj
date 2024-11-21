@@ -1,10 +1,7 @@
 const ifj = @import("ifj24.zig");
 
-pub fn func() void {
-    return;
-}
-
 // Main Program
 pub fn main() void {
-    func();
+    var a : i32 = 5;
+    a = 2.5;
 }

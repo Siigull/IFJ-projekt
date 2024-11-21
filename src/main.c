@@ -31,7 +31,7 @@ char* load_input(){
 	return input;
 }
 
-int main123() {
+int main() {
 	char* input = load_input();
 	return compile(input);
 }
