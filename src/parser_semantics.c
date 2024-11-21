@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file parser_semantics.c
  * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @brief Implementation of IFJ24 semantic analysis
@@ -14,6 +15,15 @@ extern Parser* parser;
 
 //TODO(Sigull) Once expr parser is fleshed out add
 //             functions for expr, literals, binary...
+void check_func_call_stmt(AST_Node* node) {
+    if (node->type == FUNC_CALL) {
+        Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
+        if (func_entry->ret_type.type != R_VOID) {
+            ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
+        }
+    }
+}
+
 bool is_nullable(Expr_Type type) {
     switch(type.type) {
         case N_F64: 
@@ -161,8 +171,9 @@ Expr_Type sem_function_decl(AST_Node* node, sem_state* state) {
 
     if (node->as.func_data->arr) {
         for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
-            AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
-            check_node(current_node, state);
+            AST_Node* stmt = (AST_Node*)node->as.func_data->arr->data[i];
+            check_node(stmt, state);
+            check_func_call_stmt(stmt);
         }
     }
 
@@ -180,9 +191,9 @@ Expr_Type sem_var_decl(AST_Node* node, sem_state* state) {
     Expr_Type expression_type = check_node(node->left, state);
 
     if (declared_type.type != expression_type.type) {
-        if (declared_type.type == IMPLICIT) {
+        if (declared_type.type == IMPLICIT && expression_type.type != R_NULL) {
             entry->ret_type = expression_type;
-        } else if (expression_type.type == R_STRING) {
+        } else if (expression_type.type == R_STRING || (declared_type.type == IMPLICIT && expression_type.type == R_NULL)) {
             ERROR_RET(ERR_SEM_TYPE_INFERENCE);
         } else if (declared_type.type == N_F64 && expression_type.type == R_F64) {
             expression_type.type = N_F64;
@@ -209,8 +220,14 @@ Expr_Type sem_var_assignment(AST_Node* node, sem_state* state) {
             ERROR_RET(ERR_SEM_ASSIGN_NON_MODIF);
         }
 
+        if (expression_type.type == R_NULL) {
+            if (!is_nullable(declared_type)) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
+            }
+        }
+
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
-            if (!is_nullable(declared_type) && expression_type.type == R_NULL) ERROR_RET(ERR_SEM_TYPE_CONTROL);
+            ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
 
         if (entry->as.can_mut) {
@@ -226,6 +243,7 @@ Expr_Type sem_else(AST_Node* node, sem_state* state) {
     for (size_t i = 0; i < node->as.arr->length; i++) {
         AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
         check_node(stmt, state);
+        check_func_call_stmt(stmt);
     }
     
     return (Expr_Type){-1, false};
@@ -255,7 +273,7 @@ Expr_Type sem_return(AST_Node* node, sem_state* state) {
     if (node->left != NULL && entry->ret_type.type == R_VOID) {
         ERROR_RET(ERR_SEM_RET_EXP);
     } else if (node->left == NULL && entry->ret_type.type != R_VOID) {
-        ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
+        ERROR_RET(ERR_SEM_RET_EXP);
     } else if (node->left != NULL) {
         Expr_Type expression_type = check_node(node->left, state);
 
@@ -288,11 +306,13 @@ Expr_Type sem_while(AST_Node* node, sem_state* state) {
             for (size_t i = 1; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, state);
+                check_func_call_stmt(stmt);
             }
         } else {
             for (size_t i = 0; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, state);
+                check_func_call_stmt(stmt);
             }
         }
     }
@@ -321,11 +341,13 @@ Expr_Type sem_if(AST_Node* node, sem_state* state) {
             for (size_t i = 1; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, state);
+                check_func_call_stmt(stmt);
             }
         } else {
             for (size_t i = 0; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, state);
+                check_func_call_stmt(stmt);
             }
         }
     }

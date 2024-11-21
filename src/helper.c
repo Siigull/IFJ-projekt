@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file helper.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @brief 

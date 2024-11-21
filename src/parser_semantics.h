@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file parser_semantics.h
  * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @brief Header file of IFJ24 semantic analysis
@@ -16,6 +17,7 @@
 typedef struct sem_state {
     const char* func_name;
     bool seen_return;
+    bool assigned_func_call;
 } sem_state;
 
 void parse_check(AST_Node* node, sem_state* state);

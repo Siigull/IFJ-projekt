@@ -1,3 +1,13 @@
+/**
+ * IFJ PROJEKT 2024
+ * @file lexer.c
+ * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
+ * @brief Implementation of lexer for IFJ 2024
+ * 
+ * @date 2024-09-21
+ * 
+ */
+
 #include "lexer.h"
 #include <ctype.h>
 #include <stdbool.h>

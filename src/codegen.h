@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file codegen.h
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @brief Header file for IFJ24 code generator

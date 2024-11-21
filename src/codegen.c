@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file codegen.c
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @brief Implementation of IFJ24 code generator, generates from given AST

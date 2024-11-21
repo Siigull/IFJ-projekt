@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file bvs.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @brief Function and struct definition of red-black tree

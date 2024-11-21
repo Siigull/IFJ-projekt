@@ -9,7 +9,7 @@ pub fn lol(x : i32, y : i32) i32 {
     return l1;
 }
 pub fn main() void {
-    var num1 = 5;
-    var num2 = 2;
-    lol(foo(num2, lol(num2, num1)), num2);
+    const num1 = 5;
+    const num2 = 2;
+    _ = lol(foo(num2, lol(num2, num1)), num2);
 }

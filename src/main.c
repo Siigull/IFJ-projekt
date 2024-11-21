@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file main.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @author David Bujzaš
@@ -30,7 +31,7 @@ char* load_input(){
 	return input;
 }
 
-int main() {
+int main123() {
 	char* input = load_input();
 	return compile(input);
 }
