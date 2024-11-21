@@ -1,4 +1,19 @@
 root -> FUNC_DECL(0) : functions
+FUNC_DECL(0).shape: rectangle
+FUNC_CALL(0): {tooltip: *write}
+FUNC_CALL(0).shape: rectangle
+FUNC_DECL(0) -> FUNC_CALL(0) : body
+STRING(0).shape: rectangle
+STRING(0).style{ border-radius: 999 }
+STRING(0): {tooltip: Zadejte\\032cislo\\032pro\\032vypocet\\032faktorialu\\010}
+FUNC_CALL(0) -> STRING(0) : args
+VAR_DECL(0): {tooltip: a?FcOOMyxq}
+FUNC_DECL(0) -> VAR_DECL(0) : body
+VAR_DECL(0).shape: rectangle
+FUNC_CALL(1): {tooltip: *readi32}
+FUNC_CALL(1).shape: rectangle
+FUNC_CALL(1).style{ border-radius: 999 }
+VAR_DECL(0) -> FUNC_CALL(1) : expr
 FUNC_DECL(0) -> IF(0) : body
 IF(0).shape: diamond
 IF(0).style{ fill: "#ffffff" }

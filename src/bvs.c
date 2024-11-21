@@ -244,23 +244,25 @@ Entry* tree_find(Tree* tree, const char* key) {
 	return node->entry;
 }
 
-Entry* tree_pop_traverse(Node* node) {
-	if (node == NULL) {
+Entry* tree_pop_traverse(Node** node) {
+	if (*node == NULL) {
 		return NULL;
 	}
 
-	if(node->left == NULL && node->right == NULL) {
-		return node->entry;
+	if((*node)->left == NULL && (*node)->right == NULL) {
+		Entry* entry = (*node)->entry;
+		(*node) = NULL; 
+		return entry;
 	}
 
-	Entry* entry = tree_pop_traverse(node->left);
+	Entry* entry = tree_pop_traverse(&((*node)->left));
 	if(entry != NULL) return entry;
 
-	return tree_pop_traverse(node->right);
+	return tree_pop_traverse(&((*node)->right));
 }
 
 Entry* tree_pop(Tree* tree) {
-	Entry* entry_old = tree_pop_traverse(tree->root);
+	Entry* entry_old = tree_pop_traverse(&(tree->root));
 	if(entry_old == NULL) {
 		return NULL;
 	}
@@ -268,7 +270,7 @@ Entry* tree_pop(Tree* tree) {
 	Entry* entry = malloc(sizeof(Entry));
 	memcpy(entry, entry_old, sizeof(Entry));
 
-	tree_delete(tree, entry->key);
+	// tree_delete(tree, entry->key);
 
 	return entry;
 }
@@ -506,6 +508,7 @@ bool context_pop(C_Stack* stack) {
 		while(true) {
 			char* path = get_path(stack);
 			memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 2);
+			
 			if(tree_find(stack->global_table, entry->key) == NULL) { 
 				tree_insert(stack->global_table, entry);
 				break;

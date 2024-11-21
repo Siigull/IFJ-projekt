@@ -157,156 +157,129 @@ LABEL *substring
 	LABEL *substring*err
 	MOVE LF@*return*value nil@nil
 	JUMP *substring*loop*end
-LABEL f
-	PUSHFRAME
-	DEFVAR LF@*return*value
-	MOVE LF@*return*value nil@nil
-	DEFVAR LF@x?1P2JpiCJ
-	MOVE LF@x?1P2JpiCJ LF@*param0
-	DEFVAR LF@q?g0eRR2Cm
-	DEFVAR LF@res?96OdJvkl
-	PUSHS LF@x?1P2JpiCJ
-	POPS GF@*expression*result
-	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@10
-	POPS GF@*expression*result
-	MOVE GF@*rhs GF@*expression*result
-	LT GF@*expression*result GF@*lhs GF@*rhs
-	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*f*0*0 GF@*expression*result bool@false
-	PUSHS LF@x?1P2JpiCJ
-	PUSHS int@1
-	SUBS
-	POPS GF@*expression*result
-	MOVE GF@*return*val GF@*expression*result
-	POPFRAME
-	RETURN
-
-	JUMP *end*of*if*f*0*0
-	LABEL *else*f*0*0
-	PUSHS LF@x?1P2JpiCJ
-	PUSHS int@1
-	SUBS
-	POPS GF@*expression*result
-	MOVE LF@q?g0eRR2Cm GF@*expression*result
-
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS string@calling\032g\032with\032
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS LF@q?g0eRR2Cm
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS string@\010
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS LF@q?g0eRR2Cm
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL g
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@res?96OdJvkl GF@*expression*result
-
-	PUSHS LF@res?96OdJvkl
-	POPS GF@*expression*result
-	MOVE GF@*return*val GF@*expression*result
-	POPFRAME
-	RETURN
-
-	LABEL *end*of*if*f*0*0
-LABEL g
-	PUSHFRAME
-	DEFVAR LF@*return*value
-	MOVE LF@*return*value nil@nil
-	DEFVAR LF@x?FcOOMyxq
-	MOVE LF@x?FcOOMyxq LF@*param0
-	DEFVAR LF@y?Hu3WxKOu
-	PUSHS LF@x?FcOOMyxq
-	POPS GF@*expression*result
-	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@10
-	POPS GF@*expression*result
-	MOVE GF@*rhs GF@*expression*result
-	LT GF@*expression*result GF@*lhs GF@*rhs
-	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*g*0*0 GF@*expression*result bool@false
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS string@calling\032f\032with\032
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS LF@x?FcOOMyxq
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS string@\010
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL *write
-	CREATEFRAME
-	DEFVAR TF@*param0
-	PUSHS LF@x?FcOOMyxq
-	POPS GF@*expression*result
-	MOVE TF@*param0 GF@*expression*result
-	CALL f
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@y?Hu3WxKOu GF@*expression*result
-
-	PUSHS LF@y?Hu3WxKOu
-	POPS GF@*expression*result
-	MOVE GF@*return*val GF@*expression*result
-	POPFRAME
-	RETURN
-
-	JUMP *end*of*if*g*0*0
-	LABEL *else*g*0*0
-	PUSHS int@200
-	POPS GF@*expression*result
-	MOVE GF@*return*val GF@*expression*result
-	POPFRAME
-	RETURN
-
-	LABEL *end*of*if*g*0*0
 LABEL main
 	CREATEFRAME
 	PUSHFRAME
-	DEFVAR LF@res?mP73H9d6
 	CREATEFRAME
 	DEFVAR TF@*param0
-	PUSHS int@15
+	PUSHS string@Zadejte\032cislo\032pro\032vypocet\032faktorialu\010
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
-	CALL f
+	CALL *write
+	DEFVAR LF@a?FcOOMyxq
+	CREATEFRAME
+	CALL *readi32
 	PUSHS GF@*return*val
 	POPS GF@*expression*result
-	MOVE LF@res?mP73H9d6 GF@*expression*result
+	MOVE LF@a?FcOOMyxq GF@*expression*result
 
+	DEFVAR LF@d?96OdJvkl
+	DEFVAR LF@vysl?1P2JpiCJ
+	DEFVAR LF@vysl_i32?g0eRR2Cm
+	MOVE GF@*tmp*res LF@a?FcOOMyxq
+	EQ GF@*expression*result LF@a?FcOOMyxq nil@nil
+	NOT GF@*expression*result GF@*expression*result
+	JUMPIFEQ *else*main*2*0 GF@*expression*result bool@false
+	DEFVAR LF@val?Hu3WxKOu
+	MOVE LF@val?Hu3WxKOu GF@*tmp*res
+	PUSHS LF@val?Hu3WxKOu
+	POPS GF@*expression*result
+	MOVE GF@*lhs GF@*expression*result
+	PUSHS int@0
+	POPS GF@*expression*result
+	MOVE GF@*rhs GF@*expression*result
+	LT GF@*expression*result GF@*lhs GF@*rhs
+	MOVE GF@*tmp*res GF@*expression*result
+	JUMPIFEQ *else*main*1*1 GF@*expression*result bool@false
 	CREATEFRAME
 	DEFVAR TF@*param0
-	PUSHS string@res:\032
+	PUSHS string@Faktorial\032
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
 	CREATEFRAME
 	DEFVAR TF@*param0
-	PUSHS LF@res?mP73H9d6
+	PUSHS LF@val?Hu3WxKOu
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@\032nelze\032spocitat\010
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	JUMP *end*of*if*main*1*1
+	LABEL *else*main*1*1
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@val?Hu3WxKOu
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *i2f
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@d?96OdJvkl GF@*expression*result
+
+	PUSHS float@0x1p+0
+	POPS GF@*expression*result
+	MOVE LF@vysl?1P2JpiCJ GF@*expression*result
+
+	LABEL *while*main*2*2
+	PUSHS LF@d?96OdJvkl
+	POPS GF@*expression*result
+	MOVE GF@*lhs GF@*expression*result
+	PUSHS int@0
+	POPS GF@*expression*result
+	MOVE GF@*rhs GF@*expression*result
+	GT GF@*expression*result GF@*lhs GF@*rhs
+	MOVE GF@*tmp*res GF@*expression*result
+	JUMPIFEQ *end*loop*main*2*2 GF@*expression*result bool@false
+	PUSHS LF@vysl?1P2JpiCJ
+	PUSHS LF@d?96OdJvkl
+	MULS
+	POPS GF@*expression*result
+	MOVE LF@vysl?1P2JpiCJ GF@*expression*result
+
+	PUSHS LF@d?96OdJvkl
+	PUSHS float@0x1p+0
+	SUBS
+	POPS GF@*expression*result
+	MOVE LF@d?96OdJvkl GF@*expression*result
+
+	JUMP *while*main*2*2
+	LABEL *end*loop*main*2*2
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@Vysledek:\032
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@vysl?1P2JpiCJ
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@\032=\032
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@vysl?1P2JpiCJ
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *f2i
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@vysl_i32?g0eRR2Cm GF@*expression*result
+
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS LF@vysl_i32?g0eRR2Cm
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
@@ -316,6 +289,16 @@ LABEL main
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
+	LABEL *end*of*if*main*1*1
+	JUMP *end*of*if*main*2*0
+	LABEL *else*main*2*0
+	CREATEFRAME
+	DEFVAR TF@*param0
+	PUSHS string@Faktorial\032pro\032null\032nelze\032spocitat\010
+	POPS GF@*expression*result
+	MOVE TF@*param0 GF@*expression*result
+	CALL *write
+	LABEL *end*of*if*main*2*0
 	POPFRAME
 	EXIT int@0
 

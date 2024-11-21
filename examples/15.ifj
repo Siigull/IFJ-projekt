@@ -12,8 +12,10 @@ pub fn replace_char(s: []u8, old_char: i32, new_char: i32) []u8 {
             var new_str: []u8 = ifj.chr(new_char);
             result = ifj.concat(result, new_str);
         } else {
-            var original_char: []u8 = ifj.substring(s, i, i + 1);
-            result = ifj.concat(result, original_char);
+            var original_char: ?[]u8 = ifj.substring(s, i, i + 1);
+            if(original_char) |og| {
+                result = ifj.concat(result, og);
+            }
         }
         i = i + 1;
     }

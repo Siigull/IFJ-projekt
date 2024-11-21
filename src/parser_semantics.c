@@ -230,13 +230,13 @@ Expr_Type sem_nnull_var_decl(AST_Node* node, const char* func_name) {
 
     //TODO(Sigull) This has to be from if node not this one
 
-    if (!is_nullable(entry->ret_type)) {
-        ERROR_RET(ERR_SEM_TYPE_CONTROL);
-    }
+    // if (!is_nullable(entry->ret_type)) {
+    //     ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    // }
 
-    Entry* new_entry = entry_init(node->as.var_name, E_VAR, entry->ret_type, false, false);
+    // Entry* new_entry = entry_init(node->as.var_name, E_VAR, entry->ret_type, false);
 
-    entry->ret_type = null_to_nnul(entry->ret_type);
+    entry->ret_type = (Expr_Type){R_I32, false};
 
     return (Expr_Type){-1, false}; 
 }

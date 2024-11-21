@@ -12,6 +12,8 @@ for file in "$EXAMPLES_DIR"/*; do
         echo "Processing file: $file"
         
         ./bin/app < "$file" > out.txt
+        RETVAL=$?
+        echo "Return value of ./bin/app: $RETVAL"
         if [[ $? -ne 0 ]]; then
             echo "Error running ./bin/app for $file. Skipping."
             continue
