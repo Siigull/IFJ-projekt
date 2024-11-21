@@ -23,9 +23,9 @@ pub fn replace_char(s: []u8, old_char: i32, new_char: i32) []u8 {
 
 // Main function
 pub fn main() void {
-    var input: []u8 = ifj.readstr();  // Read input string
-    var old_char: f64 = ifj.f2i(ifj.i2f(ifj.ord(ifj.readstr(), 0)));  // kristepane
-    var new_char: i32 = ifj.ord(ifj.readstr(), 0);  // Read replacement character
+    var input: []u8 = ifj.string("krasa");  // Read input string
+    var old_char: i32 = ifj.f2i(ifj.i2f(ifj.ord(ifj.string("k"), 0)));  // kristepane
+    var new_char: i32 = ifj.ord(ifj.string("h"), 0);  // Read replacement character
 
     var modified: []u8 = replace_char(input, old_char, new_char);
 

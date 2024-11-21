@@ -22,7 +22,6 @@ pub fn main() void {
     var input: []u8 = ifj.string("hello");  // Input string
     var reversed_string: []u8 = reverse_string(input);             // Variable to store reversed string
 
-    reversed_string = reverse_string(input);  // Call the reverse function
     ifj.write(reversed_string);               // Output the reversed string
 
     return;

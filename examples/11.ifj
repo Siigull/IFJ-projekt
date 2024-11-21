@@ -11,8 +11,8 @@ pub fn max(a: i32, b: i32) i32 {
 
 // Main function
 pub fn main() void {
-    var num1: i32 = ifj.readi32();  // Input first number
-    var num2: i32 = ifj.readi32();  // Input second number
+    var num1: i32 = 5;  // Input first number
+    var num2: i32 = 6;  // Input second number
     var result: i32 = max(num1, num2);  // Find the maximum number
 
     ifj.write("Maximum: ");

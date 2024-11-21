@@ -955,8 +955,8 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
-        // generate_graph(node, graph_filename);
-		check_node(node);
+        generate_graph(node, graph_filename);
+		check_node(node, node->as.func_data->var_name);
         arr_append(nodes, (size_t)node);
     }
 	

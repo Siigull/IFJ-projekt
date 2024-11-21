@@ -15,7 +15,7 @@ pub fn reverse_number(n: i32) i32 {
 
 // Main function
 pub fn main() void {
-    var in: i32 = ifj.readi32();  // Input number
+    var in: i32 = 32;  // Input number
     var result: i32 = reverse_number(in);  // Reverse the number
 
     ifj.write("Reversed number: ");

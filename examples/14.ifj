@@ -33,7 +33,7 @@ pub fn count_vowels(s: []u8) i32 {
 
 // Main function
 pub fn main() void {
-    var input: []u8 = ifj.readstr();  // Read input string
+    var input: []u8 = ifj.string("abcde");  // Read input string
     var vowel_count: i32 = count_vowels(input);
 
     ifj.write("Input string: ");

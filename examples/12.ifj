@@ -15,7 +15,7 @@ pub fn sum_of_digits(n: i32) i32 {
 
 // Main function
 pub fn main() void {
-    var in: i32 = ifj.readi32();  // Input number
+    var in: i32 = 12;  // Input number
     var result: i32 = sum_of_digits(in);  // Calculate sum of digits
 
     ifj.write("Sum of digits: ");

@@ -31,7 +31,7 @@ pub fn sum_even_up_to(n: i32) i32 {
 
 // Main function
 pub fn main() void {
-    var num: i32 = ifj.readi32();   // Read input number
+    var num: i32 = 10;   // Read input number
     var result: i32 = is_even(num);  // Check if number is even
     var suma : i32 = sum_even_up_to(num);
 
