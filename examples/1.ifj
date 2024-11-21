@@ -4,4 +4,5 @@ const ifj = @import("ifj24.zig");
 pub fn main() void {
     var i : i32 = 30;
     i = 20;
+    ifj.write(i);
 }

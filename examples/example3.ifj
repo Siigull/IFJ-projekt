@@ -27,7 +27,7 @@ pub fn main() void {
         } else {
             ifj.write("Spatne zadana posloupnost, zkuste znovu:\n");
             all = ifj.concat(all, inpOK); // spojuji neplatne vstupy
-            newInput = ifj.string("uplne novy stringos");
+            newInput = ifj.readstr();
         }
     }
 }

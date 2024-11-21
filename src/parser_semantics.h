@@ -26,7 +26,6 @@ Expr_Type sem_function_decl(AST_Node* node, const char* func_name);
 Expr_Type sem_var_decl(AST_Node* node, const char* func_name);
 Expr_Type sem_var_assignment(AST_Node* node, const char* func_name);
 Expr_Type sem_else(AST_Node* node, const char* func_name);
-Expr_Type sem_nnull_var_decl(AST_Node* node, const char* func_name);
 Expr_Type sem_return(AST_Node* node, const char* func_name);
 Expr_Type sem_if(AST_Node* node, const char* func_name);
 Expr_Type sem_while(AST_Node* node, const char* func_name);

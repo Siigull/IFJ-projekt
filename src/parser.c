@@ -936,7 +936,7 @@ void parse(char* orig_input) {
     }
 	// if main is not declared, throw error
 	if (!tree_find(parser->s_table, "main")) {
-		ERROR_RET(ERR_SEM_OTHER);
+		ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 	}
 
     // Second pass

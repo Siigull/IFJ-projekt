@@ -144,7 +144,7 @@ Expr_Type sem_func_call(AST_Node* node, const char* func_name) {
 
 Expr_Type sem_function_decl(AST_Node* node, const char* func_name) {
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
-    
+
     if (func_entry->as.function_args) {
         for (size_t i = 0; i < func_entry->as.function_args->length; i++) {
             Function_Arg* current = (Function_Arg*)func_entry->as.function_args->data[i];
@@ -232,8 +232,6 @@ Expr_Type null_to_nnul(Expr_Type type) {
 }
 
 Expr_Type sem_nnull_var_decl(AST_Node* node, const char* func_name) {
-    Entry* entry = tree_find(parser->s_table, node->as.var_name);
-
     //TODO(Sigull) This has to be from if node not this one
 
     // if (!is_nullable(entry->ret_type)) {
@@ -378,6 +376,14 @@ Expr_Type check_node(AST_Node* node, const char* func_name) {
 }
 
 void check_semantics(AST_Node* node, const char* func_name) {
+    if (!strcmp(func_name, "main")) {
+        Entry* func_entry = tree_find(parser->s_table, func_name);
+        Expr_Type func_type = func_entry->ret_type;
+
+        if (func_type.type != R_VOID || func_entry->as.function_args->length != 0) {
+            ERROR_RET(ERR_SEM_PARAMS);
+        }
+    }
     check_node(node, func_name);
 }
 
