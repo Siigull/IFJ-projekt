@@ -1,11 +1,12 @@
 /**
- 
-@file expressionparser.h
-@author Martin Vaculik (xvaculm00)
-@brief
-@version 0.1
-@date 2024-09-30*
-@copyright Copyright (c) 2024**/
+ * IFJ PROJEKT 2024
+ * @file expressionparser.h
+ * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
+ * @brief Header file of expression parser for IFJ 2024
+ * 
+ * @date 2024-10-15
+ * 
+ */
 
 #ifndef EXPRESSIONPARSER_H
 #define EXPRESSIONPARSER_H
@@ -15,6 +16,8 @@
 #include "stack.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <errno.h>
+#include <limits.h>
 #define TABLE_SIZE 14
 
 typedef enum {

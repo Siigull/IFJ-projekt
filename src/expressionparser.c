@@ -1,6 +1,15 @@
+/**
+ * IFJ PROJEKT 2024
+ * @file expressionparser.c
+ * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
+ * @brief Implementation of expression parser for IFJ 2024
+ * 
+ * @date 2024-10-15
+ * 
+ */
+
 #include "expressionparser.h"
-#include <errno.h>
-#include <limits.h>
+
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
 	//   id +  -  *  /  (  )  $  ==

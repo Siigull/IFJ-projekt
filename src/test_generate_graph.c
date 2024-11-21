@@ -1,6 +1,14 @@
+/**
+ * IFJ PROJEKT 2024
+ * @file test_generate_graph.c
+ * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
+ * @brief Visual representation of tree for IFJ 2024
+ * 
+ * @date 2024-11-13
+ * 
+ */
+
 #include "test_generate_graph.h"
-#include <stdio.h>
-#include <string.h>
 
 int func_call_count = 0;
 int func_decl_count = 0;

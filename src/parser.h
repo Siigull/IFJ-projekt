@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <time.h>
 
 typedef struct Parser {
     Token* next;

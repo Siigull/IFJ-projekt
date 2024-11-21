@@ -1,3 +1,13 @@
+/**
+ * IFJ PROJEKT 2024
+ * @file stack.c
+ * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
+ * @brief Header file of stack for IFJ 2024
+ * 
+ * @date 2024-10-08
+ * 
+ */
+
 #ifndef __LIST_H__
 #define __LIST_H__
 

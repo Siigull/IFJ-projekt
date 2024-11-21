@@ -1,10 +1,11 @@
 /**
+ * IFJ PROJEKT 2024
  * @file lexer.h
- * @brief Lexer implementation header file
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
- *
- *
- *
+ * @brief Header file of lexer for IFJ 2024
+ * 
+ * @date 2024-09-21
+ * 
  */
 
 #ifndef LEXER_H

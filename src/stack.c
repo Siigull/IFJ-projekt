@@ -1,5 +1,14 @@
-#include "stack.h"
+/**
+ * IFJ PROJEKT 2024
+ * @file stack.c
+ * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
+ * @brief Implemenation of stack for IFJ 2024
+ * 
+ * @date 2024-10-08
+ * 
+ */
 
+#include "stack.h"
 
 void List_init(List *list ) {
 	//setting all values of the doubly linked list to NULL or zero
