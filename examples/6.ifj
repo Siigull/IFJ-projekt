@@ -20,7 +20,7 @@ pub fn fibonacci (n : i32) i32 {
 
 // Main function
 pub fn main() void {
-    var num: i32 = 5;   // Input for Fibonacci index
+    var num: i32 = 1;   // Input for Fibonacci index
     var fib: i32 = fibonacci(num);       // Variable to store the result
     ifj.write("\n");
     ifj.write(fib);       // Output the result

@@ -32,6 +32,7 @@ Expr_Type get_literal_type(AST_Node* node) {
         case STRING: return (Expr_Type){R_STRING, true};
         case ID: {
             Entry* entry = tree_find(parser->s_table, node->as.var_name);
+            entry->was_used = true;
             return entry->ret_type;
         }
         default: return (Expr_Type){-1, false};
@@ -204,6 +205,8 @@ Expr_Type sem_var_assignment(AST_Node* node, const char* func_name) {
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
             ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
+
+        entry->was_used = true;
     }
 
     return (Expr_Type){-1, false};
@@ -231,7 +234,7 @@ Expr_Type sem_nnull_var_decl(AST_Node* node, const char* func_name) {
         ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
 
-    Entry* new_entry = entry_init(node->as.var_name, E_VAR, entry->ret_type, false);
+    Entry* new_entry = entry_init(node->as.var_name, E_VAR, entry->ret_type, false, false);
 
     entry->ret_type = null_to_nnul(entry->ret_type);
 
@@ -358,6 +361,27 @@ Expr_Type check_node(AST_Node* node, const char* func_name) {
             printf("Unknown node type\n"); return (Expr_Type){-1, false};
         }
     }
+}
+
+void check_semantics(AST_Node* node, const char* func_name) {
+    check_node(node, func_name);
+}
+
+void check_var_usage_traverse(Node* node) {
+    if (node == NULL) return;
+    Entry* entry = node->entry;
+
+    if (entry->type == E_VAR && !entry->was_used) {
+        ERROR_RET(ERR_SEM_MODIF_VAR);
+    }
+
+    check_var_usage_traverse(node->left);
+    check_var_usage_traverse(node->right);
+}
+
+void check_var_usage(Tree* table) {
+    if (table == NULL) return;
+    check_var_usage_traverse(table->root);
 }
 
 // all errors are exits my brotha

@@ -16,7 +16,7 @@
 #define HASH_CHARS 8
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Expr_Type ret_type, bool can_mut) {
+				  Expr_Type ret_type, bool can_mut, bool was_used) {
 	Entry* entry = malloc(sizeof(Entry));
 
 	entry->type = type;
@@ -27,6 +27,7 @@ Entry* entry_init(const char* key, Entry_Type type,
 		entry->as.function_args = arr_init();
 	} else if (type == E_VAR) {
 		entry->as.can_mut = can_mut;
+		entry->was_used = was_used;
 	}
 
 	return entry;

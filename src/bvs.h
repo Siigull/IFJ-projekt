@@ -48,6 +48,7 @@ typedef struct Entry {
 	const char* key; // TODO(Sigull): change const char* string to our own type
 	Expr_Type ret_type;
 	bool has_null;
+	bool was_used;
 
 	union {
 		Arr* function_args;
@@ -77,7 +78,7 @@ typedef struct Context_Stack {
 } C_Stack;
 
 Entry* entry_init(const char* key, Entry_Type type,
-				  Expr_Type ret_type, bool can_mut);
+				  Expr_Type ret_type, bool can_mut, bool was_used);
 
 Tree* tree_init();
 void tree_destroy(Tree* tree);

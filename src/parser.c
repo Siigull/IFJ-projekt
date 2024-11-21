@@ -459,7 +459,7 @@ AST_Node* _while() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -493,7 +493,7 @@ AST_Node* _if() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -538,6 +538,7 @@ AST_Node* var_decl() {
 	AST_Node* node = node_init(VAR_DECL);
 
 	bool can_mut;
+	bool was_used = false;
 
 	if (check(T_VAR)) {
 		advance();
@@ -557,7 +558,7 @@ AST_Node* var_decl() {
 		ret_type = type();
 	}
 
-	Entry* entry = entry_init(node->as.var_name, E_VAR, (Expr_Type){ret_type, false}, can_mut);
+	Entry* entry = entry_init(node->as.var_name, E_VAR, (Expr_Type){ret_type, false}, can_mut, was_used);
 
 	if (context_find(&(parser->c_stack), node->as.var_name, true) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
@@ -720,7 +721,7 @@ AST_Node* func_decl() {
         consume(T_DDOT);
 		Ret_Type_ r_type = type();
 
-		Entry* entry = entry_init(var_name, E_VAR, (Expr_Type){r_type, false}, false);
+		Entry* entry = entry_init(var_name, E_VAR, (Expr_Type){r_type, false}, false, false);
 		(*args++)->arg_name = var_name;
 		context_put(&(parser->c_stack), entry);
 
@@ -763,19 +764,19 @@ void prolog() {
 	consume(T_LPAR);
 	consume(T_SEMI);
 
-	Entry* read_str = entry_init("*readstr", E_FUNC, (Expr_Type){N_U8, false}, false);
-	Entry* read_int = entry_init("*readi32", E_FUNC, (Expr_Type){N_I32, false}, false);
-	Entry* read_float = entry_init("*readf64", E_FUNC, (Expr_Type){N_F64, false}, false);
-	Entry* write = entry_init("*write", E_FUNC, (Expr_Type){R_VOID, false}, false);
-	Entry* int_to_float = entry_init("*i2f", E_FUNC, (Expr_Type){R_F64, false}, false);
-	Entry* float_to_int = entry_init("*f2i", E_FUNC, (Expr_Type){R_I32, false}, false);
-	Entry* string_func = entry_init("*string", E_FUNC, (Expr_Type){R_U8, false}, false);
-	Entry* length = entry_init ("*length", E_FUNC, (Expr_Type){R_I32, false}, false);
-	Entry* concat = entry_init("*concat", E_FUNC, (Expr_Type){R_U8, false}, false);
-	Entry* sub_string = entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false);
-	Entry* string_cmp = entry_init("*strcmp", E_FUNC, (Expr_Type){R_I32, false}, false);
-	Entry* ord_func = entry_init("*ord", E_FUNC, (Expr_Type){R_I32, false}, false);
-	Entry* chr_func = entry_init("*chr", E_FUNC, (Expr_Type){R_U8, false}, false);
+	Entry* read_str = entry_init("*readstr", E_FUNC, (Expr_Type){N_U8, false}, false, false);
+	Entry* read_int = entry_init("*readi32", E_FUNC, (Expr_Type){N_I32, false}, false, false);
+	Entry* read_float = entry_init("*readf64", E_FUNC, (Expr_Type){N_F64, false}, false, false);
+	Entry* write = entry_init("*write", E_FUNC, (Expr_Type){R_VOID, false}, false, false);
+	Entry* int_to_float = entry_init("*i2f", E_FUNC, (Expr_Type){R_F64, false}, false, false);
+	Entry* float_to_int = entry_init("*f2i", E_FUNC, (Expr_Type){R_I32, false}, false, false);
+	Entry* string_func = entry_init("*string", E_FUNC, (Expr_Type){R_U8, false}, false, false);
+	Entry* length = entry_init ("*length", E_FUNC, (Expr_Type){R_I32, false}, false, false);
+	Entry* concat = entry_init("*concat", E_FUNC, (Expr_Type){R_U8, false}, false, false);
+	Entry* sub_string = entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false, false);
+	Entry* string_cmp = entry_init("*strcmp", E_FUNC, (Expr_Type){R_I32, false}, false, false);
+	Entry* ord_func = entry_init("*ord", E_FUNC, (Expr_Type){R_I32, false}, false, false);
+	Entry* chr_func = entry_init("*chr", E_FUNC, (Expr_Type){R_U8, false}, false, false);
 
 	// write to stdout
 	Function_Arg* arg_write = malloc(sizeof(Function_Arg));
@@ -885,7 +886,7 @@ void func_head() {
         ERROR_RET(ERR_SEM_REDEF);
     }
 
-    Entry* entry = entry_init(func_name, E_FUNC, (Expr_Type){R_VOID, false}, false);
+    Entry* entry = entry_init(func_name, E_FUNC, (Expr_Type){R_VOID, false}, false, false);
 
     consume(T_RPAR);
     while(check(T_ID)) {
@@ -955,11 +956,12 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
-		check_node(node, node->as.func_data->var_name);
         generate_graph(node, graph_filename);
+		check_semantics(node, node->as.func_data->var_name);
         arr_append(nodes, (size_t)node);
     }
 	
+	check_var_usage(parser->s_table);
     generate_code(nodes, parser->s_table);
 }
 
