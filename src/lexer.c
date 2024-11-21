@@ -223,14 +223,14 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 		// first we look if we start with number, if yes number is decided
 		if (is_num(value[0])) {
 			if (is_num_token(token)) {
-				if(token->length != 1 && (value[1] == '0' && value[0] == '0')) {
+				if(token->length != 1 && (value[0] == '0')) {
 					exit(1);
 				}
 				token->type = T_I32;
 				return token;
 			}
 			if (is_float_token(token)) {
-				if(token->length != 1 && (value[1] == '0' && value[0] == '0')) {
+				if(token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e')) {
 					exit(1);
 				}
 				token->type = T_F64;

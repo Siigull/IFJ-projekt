@@ -4,6 +4,8 @@ const ifj = @import("ifj24.zig");
 pub fn main() void {
     ifj.write("Zadejte cislo pro vypocet faktorialu\n");
     const a = ifj.readi32();
+    var x : f64 = 0e5;
+    x = x;
     if (a) |val| {
         if (val < 0) {
             ifj.write("Faktorial ");

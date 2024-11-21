@@ -87,9 +87,10 @@ int main() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
+
 	generate_debug_token_arr();
 
-	char* temp = load_inputos("examples/5.ifj");
+	char* temp = load_inputos("src/test.ifj");
 	compile(temp);
 	return 0;
 };
