@@ -13,22 +13,27 @@
 #include "parser.h"
 #include <stdio.h>
 
-void parse_check(AST_Node* node, const char* func_name);
-void check_semantics(AST_Node* node, const char* func_name);
+typedef struct sem_state {
+    const char* func_name;
+    bool seen_return;
+} sem_state;
+
+void parse_check(AST_Node* node, sem_state* state);
+void check_semantics(AST_Node* node);
 void check_var_usage_traverse(Node* node);
 void check_var_usage(Tree* table);
 bool is_nullable(Expr_Type type);
 bool is_numeric_type(Expr_Type type);
-Expr_Type check_node(AST_Node* node, const char* func_name);
-Expr_Type sem_check_binary_expression(AST_Node* , const char* func_name);
-Expr_Type sem_func_call(AST_Node* node, const char* func_name);
-Expr_Type sem_function_decl(AST_Node* node, const char* func_name);
-Expr_Type sem_var_decl(AST_Node* node, const char* func_name);
-Expr_Type sem_var_assignment(AST_Node* node, const char* func_name);
-Expr_Type sem_else(AST_Node* node, const char* func_name);
-Expr_Type sem_return(AST_Node* node, const char* func_name);
-Expr_Type sem_if(AST_Node* node, const char* func_name);
-Expr_Type sem_while(AST_Node* node, const char* func_name);
+Expr_Type check_node(AST_Node* node, sem_state* state);
+Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state);
+Expr_Type sem_func_call(AST_Node* node, sem_state* state);
+Expr_Type sem_function_decl(AST_Node* node, sem_state* state);
+Expr_Type sem_var_decl(AST_Node* node, sem_state* state);
+Expr_Type sem_var_assignment(AST_Node* node, sem_state* state);
+Expr_Type sem_else(AST_Node* node, sem_state* state);
+Expr_Type sem_return(AST_Node* node, sem_state* state);
+Expr_Type sem_if(AST_Node* node, sem_state* state);
+Expr_Type sem_while(AST_Node* node, sem_state* state);
 Expr_Type get_literal_type(AST_Node* node);
 
 #endif
