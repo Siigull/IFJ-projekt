@@ -188,7 +188,7 @@ AST_Node* string() {
 		} else {
 			Entry* entry = context_find(&(parser->c_stack), token->value, false);
 			if(entry != NULL) {
-				token->value = entry->key;
+				token->value = (char*)entry->key;
 			} else {
 				ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 			}

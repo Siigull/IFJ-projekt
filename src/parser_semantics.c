@@ -225,6 +225,8 @@ Expr_Type null_to_nnul(Expr_Type type) {
 Expr_Type sem_nnull_var_decl(AST_Node* node, const char* func_name) {
     Entry* entry = tree_find(parser->s_table, node->as.var_name);
 
+    //TODO(Sigull) This has to be from if node not this one
+
     if (!is_nullable(entry->ret_type)) {
         ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
@@ -267,7 +269,7 @@ Expr_Type sem_while(AST_Node* node, const char* func_name) {
                 ERROR_RET(ERR_SEM_TYPE_CONTROL); 
             }
 
-            for (size_t i = 1; i < node->as.arr->length; i++) {
+            for (size_t i = 0; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, func_name);
             }

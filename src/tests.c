@@ -89,11 +89,7 @@ int main() {
 
 	generate_debug_token_arr();
 
-<<<<<<< HEAD
 	char* temp = load_inputos("examples/input8.8.ifj");
-=======
-	char* temp = load_inputos("examples/example1.ifj");
->>>>>>> 9b64eb2 (nnul fix)
 	compile(temp);
 	return 0;
 };

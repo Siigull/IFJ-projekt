@@ -480,6 +480,8 @@ char* get_path() {
 		out[i] = (char)base64_chars[base64_index];
 	}
 
+	out[9] = '\0';
+
 	return out;
 }
 
@@ -495,23 +497,19 @@ bool context_pop(C_Stack* stack) {
 			break;
 		}
 
-		if(tree_find(stack->global_table, entry->key) != NULL){
-			int orig_len = strlen(entry->key);
-			entry->key = realloc((char*)entry->key, sizeof(char) * (orig_len + HASH_CHARS + 3));
-			if(entry->key == NULL) {
-				exit(99);
-			}
+		int orig_len = strlen(entry->key);
+		// entry->key = realloc((char*)entry->key, sizeof(char) * (orig_len + HASH_CHARS + 3));
+		if(entry->key == NULL) {
+			exit(99);
+		}
 
-			while(true) {
-				char* path = get_path(stack);
-				memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 1);
-				if(tree_find(stack->global_table, entry->key) == NULL) { 
-					tree_insert(stack->global_table, entry);
-					break;
-				}
+		while(true) {
+			char* path = get_path(stack);
+			memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 2);
+			if(tree_find(stack->global_table, entry->key) == NULL) { 
+				tree_insert(stack->global_table, entry);
+				break;
 			}
-		} else {
-			tree_insert(stack->global_table, entry);
 		}
 	}
 

@@ -11,7 +11,7 @@ LESS(0) -> ID(0) : left
 I32(0).style{ border-radius: 999 }
 LESS(0) -> I32(0) : right
 IF(0) -> ELSE(0) : else
-VAR_DECL(0): {tooltip: q}
+VAR_DECL(0): {tooltip: q?g0eRR2Cm}
 ELSE(0) -> VAR_DECL(0) : body
 -(0).style{ border-radius: 999 }
 VAR_DECL(0) -> -(0) : expr
@@ -36,7 +36,7 @@ ELSE(0) -> FUNC_CALL(2) : body
 STRING(1).style{ border-radius: 999 }
 STRING(1): {tooltip: \\010}
 FUNC_CALL(2) -> STRING(1) : args
-VAR_DECL(1): {tooltip: res}
+VAR_DECL(1): {tooltip: res?96OdJvkl}
 ELSE(0) -> VAR_DECL(1) : body
 FUNC_CALL(3): {tooltip: g}
 VAR_DECL(1) -> FUNC_CALL(3) : expr
@@ -87,7 +87,7 @@ IF(1) -> FUNC_CALL(6) : body
 STRING(3).style{ border-radius: 999 }
 STRING(3): {tooltip: \\010}
 FUNC_CALL(6) -> STRING(3) : args
-VAR_DECL(2): {tooltip: y}
+VAR_DECL(2): {tooltip: y?Hu3WxKOu}
 IF(1) -> VAR_DECL(2) : body
 FUNC_CALL(7): {tooltip: f}
 VAR_DECL(2) -> FUNC_CALL(7) : expr
@@ -98,3 +98,25 @@ IF(1) -> RETURN(3) : body
 ID(9).style{ border-radius: 999 }
 ID(9): {tooltip: y}
 RETURN(3) -> ID(9) : expr
+root -> FUNC_DECL(2) : functions
+VAR_DECL(3): {tooltip: res?mP73H9d6}
+FUNC_DECL(2) -> VAR_DECL(3) : body
+FUNC_CALL(8): {tooltip: f}
+VAR_DECL(3) -> FUNC_CALL(8) : expr
+I32(5).style{ border-radius: 999 }
+FUNC_CALL(8) -> I32(5) : args
+FUNC_CALL(9): {tooltip: *write}
+FUNC_DECL(2) -> FUNC_CALL(9) : body
+STRING(4).style{ border-radius: 999 }
+STRING(4): {tooltip: res:\\032}
+FUNC_CALL(9) -> STRING(4) : args
+FUNC_CALL(10): {tooltip: *write}
+FUNC_DECL(2) -> FUNC_CALL(10) : body
+ID(10).style{ border-radius: 999 }
+ID(10): {tooltip: res}
+FUNC_CALL(10) -> ID(10) : args
+FUNC_CALL(11): {tooltip: *write}
+FUNC_DECL(2) -> FUNC_CALL(11) : body
+STRING(5).style{ border-radius: 999 }
+STRING(5): {tooltip: \\010}
+FUNC_CALL(11) -> STRING(5) : args
