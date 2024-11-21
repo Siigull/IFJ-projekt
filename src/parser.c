@@ -761,6 +761,9 @@ void prolog() {
 	consume(T_RPAR);
 	consume(T_STRING);
 	char* prolog_file = parser->prev->value;
+	if(strcmp(prolog_file, "ifj24.zig")) {
+		ERROR_RET(ERR_PARSE);
+	}
 
 	consume(T_LPAR);
 	consume(T_SEMI);
@@ -934,10 +937,6 @@ void parse(char* orig_input) {
         }
         advance();
     }
-	// if main is not declared, throw error
-	if (!tree_find(parser->s_table, "main")) {
-		ERROR_RET(ERR_SEM_OTHER);
-	}
 
     // Second pass
     // Normal parsing
@@ -948,6 +947,11 @@ void parse(char* orig_input) {
 
     prolog();
 
+	// if main is not declared, throw error
+	if (!tree_find(parser->s_table, "main")) {
+		ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+	}
+
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
@@ -957,7 +961,7 @@ void parse(char* orig_input) {
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
-		check_semantics(node, node->as.func_data->var_name);
+		check_semantics(node);
         generate_graph(node, graph_filename);
         arr_append(nodes, (size_t)node);
     }
