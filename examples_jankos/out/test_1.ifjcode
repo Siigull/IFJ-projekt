@@ -166,29 +166,20 @@ LABEL main
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
-	DEFVAR LF@a?mP73H9d6
+	DEFVAR LF@a?FcOOMyxq
 	CREATEFRAME
 	CALL *readi32
 	PUSHS GF@*return*val
 	POPS GF@*expression*result
-	MOVE LF@a?mP73H9d6 GF@*expression*result
-
-	DEFVAR LF@x?FcOOMyxq
-	PUSHS float@0x0p+0
-	POPS GF@*expression*result
-	MOVE LF@x?FcOOMyxq GF@*expression*result
-
-	PUSHS LF@x?FcOOMyxq
-	POPS GF@*expression*result
-	MOVE LF@x?FcOOMyxq GF@*expression*result
+	MOVE LF@a?FcOOMyxq GF@*expression*result
 
 	DEFVAR LF@d?96OdJvkl
 	DEFVAR LF@vysl?1P2JpiCJ
 	DEFVAR LF@vysl_i32?g0eRR2Cm
-	MOVE GF@*tmp*res LF@a?mP73H9d6
-	EQ GF@*expression*result LF@a?mP73H9d6 nil@nil
+	MOVE GF@*tmp*res LF@a?FcOOMyxq
+	EQ GF@*expression*result LF@a?FcOOMyxq nil@nil
 	NOT GF@*expression*result GF@*expression*result
-	JUMPIFEQ *else*main*4*0 GF@*expression*result bool@false
+	JUMPIFEQ *else*main*2*0 GF@*expression*result bool@false
 	DEFVAR LF@val?Hu3WxKOu
 	MOVE LF@val?Hu3WxKOu GF@*tmp*res
 	PUSHS LF@val?Hu3WxKOu
@@ -299,15 +290,15 @@ LABEL main
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
 	LABEL *end*of*if*main*1*1
-	JUMP *end*of*if*main*4*0
-	LABEL *else*main*4*0
+	JUMP *end*of*if*main*2*0
+	LABEL *else*main*2*0
 	CREATEFRAME
 	DEFVAR TF@*param0
 	PUSHS string@Faktorial\032pro\032null\032nelze\032spocitat\010
 	POPS GF@*expression*result
 	MOVE TF@*param0 GF@*expression*result
 	CALL *write
-	LABEL *end*of*if*main*4*0
+	LABEL *end*of*if*main*2*0
 	POPFRAME
 	EXIT int@0
 
