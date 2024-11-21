@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 root -> FUNC_DECL(0) : functions
 FUNC_DECL(0).shape: rectangle
 VAR_DECL(0): {tooltip: l2?96OdJvkl}
@@ -91,4 +89,3 @@ ID(9).shape: rectangle
 ID(9).style{ border-radius: 999 }
 ID(9): {tooltip: num2}
 FUNC_CALL(0) -> ID(9) : args
->>>>>>> c0379bf (add headers and fix func call semantics)

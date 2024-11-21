@@ -21,6 +21,7 @@ typedef struct sem_state {
 } sem_state;
 
 void parse_check(AST_Node* node, sem_state* state);
+void check_func_call_stmt(AST_Node* node);
 void check_semantics(AST_Node* node);
 void check_var_usage_traverse(Node* node);
 void check_var_usage(Tree* table);
