@@ -381,6 +381,7 @@ Expr_Type check_node(AST_Node* node, sem_state* state) {
 }
 
 void check_semantics(AST_Node* node) {
+    // First pass
     sem_state state;
     state.func_name = node->as.func_data->var_name;
     state.seen_return = false;
@@ -395,6 +396,9 @@ void check_semantics(AST_Node* node) {
     }
 
     check_node(node, &state);
+
+    // Second pass
+    
 }
 
 void check_var_usage_traverse(Node* node) {

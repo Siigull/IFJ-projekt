@@ -724,6 +724,9 @@ AST_Node* func_decl() {
 
 		Entry* entry = entry_init(var_name, E_VAR, (Expr_Type){r_type, false}, false, false, false);
 		(*args++)->arg_name = var_name;
+		if(context_find(&(parser->c_stack), entry->key, true) != NULL) {
+			ERROR_RET(ERR_SEM_REDEF);
+		}
 		context_put(&(parser->c_stack), entry);
 
 		if (!check(T_COMMA)) {
