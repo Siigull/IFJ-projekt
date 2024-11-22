@@ -397,7 +397,7 @@ Expr_Type check_node(AST_Node* node, sem_state* state) {
         case RETURN:         return sem_return(node, state);
         
         default:{
-            printf("Unknown node type\n"); return (Expr_Type){-1, false};
+            fprintf(stderr ,"Unknown node type\n"); return (Expr_Type){-1, false};
         }
     }
 }

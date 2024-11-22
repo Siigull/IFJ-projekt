@@ -468,7 +468,7 @@ void generate_graph_node(AST_Node* node, char* last_node, char* path) {
         case MUL:            generate_graph_mul(node, last_node, path); break;
         case DIV:            generate_graph_div(node, last_node, path); break;
         
-        default:             printf("Unknown node type!\n"); break;
+        default:             fprintf(stderr, "Unknown node type!\n"); break;
     }
 
     if(is_expr(node)) {
