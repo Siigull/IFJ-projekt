@@ -1,0 +1,14 @@
+root -> FUNC_DECL(0) : functions
+FUNC_DECL(0).shape: rectangle
+VAR_DECL(0): {tooltip: a?96OdJvkl}
+FUNC_DECL(0) -> VAR_DECL(0) : body
+VAR_DECL(0).shape: rectangle
+NIL(0).shape: rectangle
+NIL(0).style{ border-radius: 999 }
+VAR_DECL(0) -> NIL(0) : expr
+VAR_ASSIGNMENT(0): {tooltip: a?96OdJvkl}
+FUNC_DECL(0) -> VAR_ASSIGNMENT(0) : body
+VAR_ASSIGNMENT(0).shape: rectangle
+I32(0).shape: rectangle
+I32(0).style{ border-radius: 999 }
+VAR_ASSIGNMENT(0) -> I32(0) : expr

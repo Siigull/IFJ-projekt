@@ -200,7 +200,8 @@ Expr_Type sem_var_decl(AST_Node* node, sem_state* state) {
         } else {
             if (!((declared_type.type == N_F64 && expression_type.type == R_F64) || 
                 (declared_type.type == N_I32 && expression_type.type == R_I32) || 
-                (declared_type.type == N_U8 && expression_type.type == R_U8))) {
+                (declared_type.type == N_U8 && expression_type.type == R_U8) ||
+                (is_nullable(declared_type) && expression_type.type == R_NULL))) {
                     ERROR_RET(ERR_SEM_TYPE_CONTROL);   
             }
         }
@@ -221,8 +222,11 @@ Expr_Type sem_var_assignment(AST_Node* node, sem_state* state) {
         }
 
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
-            if (!(is_nullable(declared_type) && expression_type.type == R_NULL)) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+            if (!((declared_type.type == N_F64 && expression_type.type == R_F64) || 
+                (declared_type.type == N_I32 && expression_type.type == R_I32) || 
+                (declared_type.type == N_U8 && expression_type.type == R_U8) ||
+                (is_nullable(declared_type) && expression_type.type == R_NULL))) {
+                    ERROR_RET(ERR_SEM_TYPE_CONTROL);   
             }
         }
 
