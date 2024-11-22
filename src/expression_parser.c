@@ -3,16 +3,16 @@
  * @file expressionparser.c
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief Implementation of expression parser for IFJ 2024
- * 
+ *
  * @date 2024-10-15
- * 
+ *
  */
 
 #include "expression_parser.h"
 
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
-	//   id +  -  *  /  (  )  $  ==
+	//   id +  -  *  /  (  )  $  == != <  >  <= >=
 	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
 	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
 	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
@@ -21,12 +21,12 @@ int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 	{R, R, R, R, R, R, M, N, N, N, N, N, N, N}, // (
 	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
 	{R, R, R, R, R, R, N, R, R, R, R, R, R, R}, // $
-	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // ==
-	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // !=
-	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // <
-	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // >
-	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // <=
-	{R, R, R, R, R, L, R, L, N, N, N, N, N, N}, // >=
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // ==
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // !=
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // <
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // <=
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >=
 };
 
 const char* type_to_string(T_Type type) {
@@ -212,17 +212,17 @@ void adjust_stack_else(List* Stack, AST_Node* middle_node) {
 }
 
 bool is_nonTerm(T_Type type, bool isProcessed) {
-    if (type == T_LEFTSHIFTLIST || type == T_RIGHTSHIFTLIST || isProcessed == true) {
-        return false;
-    } else if (type == T_ID || type == T_PLUS || type == T_MINUS || type == T_MUL ||
-               type == T_DIV || type == T_LPAR || type == T_RPAR || type == T_DOLLARLIST ||
-               type == T_I32 || type == T_F64 || type == T_STRING || type == T_DDEQ ||
-               type == T_GETHAN || type == T_GTHAN || type == T_SETHAN || type == T_STHAN ||
-               type == T_NEQUAL || type == T_BUILDIN) {
-        return true;
-    } else {
-        ERROR_RET(2);
-    }
+	if (type == T_LEFTSHIFTLIST || type == T_RIGHTSHIFTLIST || isProcessed == true) {
+		return false;
+	} else if (type == T_ID || type == T_PLUS || type == T_MINUS || type == T_MUL ||
+			   type == T_DIV || type == T_LPAR || type == T_RPAR || type == T_DOLLARLIST ||
+			   type == T_I32 || type == T_F64 || type == T_STRING || type == T_DDEQ ||
+			   type == T_GETHAN || type == T_GTHAN || type == T_SETHAN || type == T_STHAN ||
+			   type == T_NEQUAL || type == T_BUILDIN) {
+		return true;
+	} else {
+		ERROR_RET(2);
+	}
 }
 
 bool is_id(T_Type type) {
@@ -311,7 +311,7 @@ void handle_rule(int rule, List* Stack) {
 		char* end;
 		if (processed_token->type == T_I32) {
 			node->as.i32 = strtol(processed_token->value, &end, 10);
-			
+
 		} else if (processed_token->type == T_F64) {
 			node->as.f64 = strtof(processed_token->value, &end);
 
