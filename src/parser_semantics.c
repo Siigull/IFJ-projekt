@@ -24,6 +24,10 @@ void check_func_call_stmt(AST_Node* node) {
     }
 }
 
+Expr_Type null_to_nnul(Expr_Type type) {
+    return (Expr_Type){type.type - 1, type.is_const_literal};
+}
+
 bool is_nullable(Expr_Type type) {
     switch(type.type) {
         case N_F64: 
@@ -77,14 +81,23 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
         case MUL: {
             if (has_float) {
                 if (left_type.type == R_I32) {
+                    if(node->left->type == ID) {
+                        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+                    }
                     node->left->type = F64;
                     node->left->as.f64 = (double)node->left->as.i32;
+
                 } else if (right_type.type == R_I32) {
+                    if(node->right->type == ID) {
+                        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+                    }
                     node->right->type = F64;
                     node->right->as.f64 = (double)node->right->as.i32;
                 }
+
                 node->as.expr_type = (Expr_Type){R_F64, is_node_const};
                 return (Expr_Type){R_F64, is_node_const};
+
             } else if (has_int && !has_float) {
                 node->as.expr_type = (Expr_Type){R_I32, is_node_const};
                 return (Expr_Type){R_I32, is_node_const};
@@ -110,14 +123,23 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
             if (left_type.type == right_type.type) {
                 node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
                 return (Expr_Type){R_BOOLEAN, is_node_const};
+
             } else if ((left_type.type == R_I32 && right_type.type == R_F64) || (left_type.type == R_F64 && right_type.type == R_I32)) {
                 if (left_type.type == R_I32) {
+                    if(node->left->type == ID) {
+                        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+                    }
                     node->left->type = F64;
                     node->left->as.f64 = (double)node->left->as.i32;
+
                 } else if (right_type.type == R_I32) {
+                    if(node->right->type == ID) {
+                        ERROR_RET(ERR_SEM_TYPE_CONTROL);
+                    }
                     node->right->type = F64;
                     node->right->as.f64 = (double)node->right->as.i32;
                 }
+
                 node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
                 return (Expr_Type){R_BOOLEAN, is_node_const};
             }
@@ -193,10 +215,13 @@ Expr_Type sem_var_decl(AST_Node* node, sem_state* state) {
     if (declared_type.type != expression_type.type) {
         if (declared_type.type == IMPLICIT && expression_type.type != R_NULL) {
             entry->ret_type = expression_type;
+
         } else if (expression_type.type == R_STRING || (declared_type.type == IMPLICIT && expression_type.type == R_NULL)) {
             ERROR_RET(ERR_SEM_TYPE_INFERENCE);
-        } else if (declared_type.type == N_F64 && expression_type.type == R_F64) {
-            expression_type.type = N_F64;
+
+        } else if (null_to_nnul(declared_type).type == expression_type.type) {
+        } else if (declared_type.type == R_F64 && expression_type.type == R_I32) {
+
         } else {
             if (!((declared_type.type == N_F64 && expression_type.type == R_F64) || 
                 (declared_type.type == N_I32 && expression_type.type == R_I32) || 
@@ -247,10 +272,6 @@ Expr_Type sem_else(AST_Node* node, sem_state* state) {
     }
     
     return (Expr_Type){-1, false};
-}
-
-Expr_Type null_to_nnul(Expr_Type type) {
-    return (Expr_Type){type.type - 1, type.is_const_literal};
 }
 
 Expr_Type sem_nnull_var_decl(AST_Node* node, sem_state* state) {
@@ -424,6 +445,14 @@ Ret val_if(AST_Node* node) {
     return (Ret){R_VOID, 0};
 }
 
+bool can_implicit(Ret val) {
+    if(val.type == R_F64) {
+        return (val.as.f64 - (int)val.as.f64) == 0.0;
+    }
+
+    return false;
+}
+
 Ret val_literal_type(AST_Node* node) {
     Ret t;
     t.type = R_VOID;
@@ -437,8 +466,13 @@ Ret val_literal_type(AST_Node* node) {
         }
         case F64:
         {
+
             t.type = R_F64;
-            t.as.i32 = node->as.f64;
+            t.as.f64 = node->as.f64;
+            if(can_implicit(t)) {
+                t.type = R_I32;
+                t.as.i32 = t.as.f64;
+            }
             break;
         }
         case STRING: 
@@ -446,6 +480,11 @@ Ret val_literal_type(AST_Node* node) {
 
         case ID: {
             Entry* entry = tree_find(parser->s_table, node->as.var_name);
+            
+            if(is_nullable(entry->ret_type)) {
+                return t;
+            }
+
             entry->was_used = true;
             if(entry->is_const_val) {
                 t.type = entry->ret_type.type;
@@ -463,20 +502,12 @@ Ret val_literal_type(AST_Node* node) {
     return t;
 }
 
-bool can_implicit(Ret val) {
-    if(val.type == R_F64) {
-        return (val.as.f64 - (int)val.as.f64) == 0.0;
-    }
-
-    return false;
-}
-
 Ret val_binary_expression(AST_Node* node) {
     Ret ret_left = check_node_2(node->left);
     Ret ret_right = check_node_2(node->right);
 
-    bool has_float = ret_left.type == R_F64 || ret_left.type == R_F64;
-    bool has_int = ret_left.type == R_I32 || ret_left.type == R_I32;
+    bool has_float = ret_left.type == R_F64 || ret_right.type == R_F64;
+    bool has_int = ret_left.type == R_I32 || ret_right.type == R_I32;
 
     if(ret_left.type == R_VOID || ret_right.type == R_VOID) {
         return (Ret){R_VOID, 0};
@@ -485,24 +516,47 @@ Ret val_binary_expression(AST_Node* node) {
     bool is_node_const = node->as.expr_type.is_const_literal;
 
     switch (node->type) {
-        case PLUS:
-        case MINUS:
-        case MUL: {
-            if (has_float) {
-                if (ret_left.type == R_I32) {
-                    if(can_implicit(ret_right)) {
-                        ret_right.type = R_I32;
-                        ret_right.as.i32 = (int)ret_right.as.f64;
-                    }
-
-                } else if (ret_right.type == R_I32) {
-                    if(can_implicit(ret_left)) {
-                        ret_left.type = R_I32;
-                        ret_left.as.i32 = (int)ret_left.as.f64;
-                    }
+        case PLUS: {
+            if(ret_left.type == R_F64) {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 + ret_right.as.f64;
+                } else {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 + ret_right.as.i32;
+                }
+            } else {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = (double)ret_left.as.i32 + (double)ret_right.as.f64;
+                } else {
+                    node->type = I32;
+                    node->as.i32 = ret_left.as.i32 + ret_right.as.i32;
                 }
             }
-
+            break;
+        }
+        case MINUS: {
+            if(ret_left.type == R_F64) {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 - ret_right.as.f64;
+                } else {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 - ret_right.as.i32;
+                }
+            } else {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.i32 - ret_right.as.f64;
+                } else {
+                    node->type = I32;
+                    node->as.i32 = ret_left.as.i32 - ret_right.as.i32;
+                }
+            }
+            break;
+        }
+        case MUL: {
             if(ret_left.type == R_F64) {
                 if(ret_right.type == R_F64) {
                     node->type = F64;
@@ -517,37 +571,30 @@ Ret val_binary_expression(AST_Node* node) {
                     node->as.f64 = ret_left.as.i32 * ret_right.as.f64;
                 } else {
                     node->type = I32;
-                    node->as.f64 = ret_left.as.i32 * ret_right.as.i32;
+                    node->as.i32 = ret_left.as.i32 * ret_right.as.i32;
                 }
             }
+            break;
         }
-        case DIV: {
-            if (has_float && has_int) {
-                if (ret_left.type == R_I32) {
-                    if(can_implicit(ret_left)) {
-                        ret_left.type = R_I32;
-                        ret_left.as.i32 = (int)ret_left.as.f64;
-                    } else {
-                        return (Ret){R_VOID, 0};
-                    }
-
-                } else if (ret_right.type == R_I32) {
-                    if(can_implicit(ret_right)) {
-                        ret_right.type = R_I32;
-                        ret_right.as.i32 = (int)ret_right.as.f64;
-                    } else {
-                        return (Ret){R_VOID, 0};
-                    }
+        case DIV: {   
+            if(ret_left.type == R_F64) {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 / ret_right.as.f64;
+                } else {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 / (double)ret_right.as.i32;
+                }
+            } else {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = (double)ret_left.as.i32 / ret_right.as.f64;
+                } else {
+                    node->type = I32;
+                    node->as.i32 = ret_left.as.i32 / ret_right.as.i32;
                 }
             }
-            
-            else if (has_float) {
-                node->type = F64;
-                node->as.f64 = ret_left.as.f64 * ret_left.as.f64; 
-            } else {
-                node->type = I32;
-                node->as.i32 = ret_left.as.i32 * ret_left.as.i32; 
-            }
+            break;
         }
         case ISEQ:
         case ISNEQ:
@@ -565,7 +612,7 @@ Ret val_binary_expression(AST_Node* node) {
 
     } else {
         ret_left.type = R_F64;
-        ret_left.as.i32 = node->as.f64;
+        ret_left.as.f64 = node->as.f64;
     }
 
     return ret_left;

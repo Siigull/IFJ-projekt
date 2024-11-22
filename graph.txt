@@ -1,14 +1,38 @@
 root -> FUNC_DECL(0) : functions
 FUNC_DECL(0).shape: rectangle
-VAR_DECL(0): {tooltip: a?96OdJvkl}
+VAR_DECL(0): {tooltip: a?g0eRR2Cm}
 FUNC_DECL(0) -> VAR_DECL(0) : body
 VAR_DECL(0).shape: rectangle
-NIL(0).shape: rectangle
-NIL(0).style{ border-radius: 999 }
-VAR_DECL(0) -> NIL(0) : expr
-VAR_ASSIGNMENT(0): {tooltip: a?96OdJvkl}
-FUNC_DECL(0) -> VAR_ASSIGNMENT(0) : body
-VAR_ASSIGNMENT(0).shape: rectangle
+I32(0): {tooltip: 5}
 I32(0).shape: rectangle
 I32(0).style{ border-radius: 999 }
-VAR_ASSIGNMENT(0) -> I32(0) : expr
+VAR_DECL(0) -> I32(0) : expr
+VAR_DECL(1): {tooltip: b?96OdJvkl}
+FUNC_DECL(0) -> VAR_DECL(1) : body
+VAR_DECL(1).shape: rectangle
+F64(0): {tooltip: 5.500000}
+F64(0).shape: rectangle
+F64(0).style{ border-radius: 999 }
+VAR_DECL(1) -> F64(0) : expr
+FUNC_DECL(0) -> WHILE(0) : body
+WHILE(0).shape: diamond
+WHILE(0).style{ fill: "#ffffff" }
+LESS(0).shape: rectangle
+LESS(0).style{ border-radius: 999 }
+WHILE(0) -> LESS(0) : expr
+LESS(0): {tooltip: rectangle}
+ID(0).shape: rectangle
+ID(0).style{ border-radius: 999 }
+ID(0): {tooltip: b}
+LESS(0) -> ID(0) : left
+F64(1): {tooltip: 1.000000}
+F64(1).shape: rectangle
+F64(1).style{ border-radius: 999 }
+LESS(0) -> F64(1) : right
+VAR_ASSIGNMENT(0): {tooltip: b?96OdJvkl}
+FUNC_DECL(0) -> VAR_ASSIGNMENT(0) : body
+VAR_ASSIGNMENT(0).shape: rectangle
+ID(1).shape: rectangle
+ID(1).style{ border-radius: 999 }
+ID(1): {tooltip: b}
+VAR_ASSIGNMENT(0) -> ID(1) : expr

@@ -276,7 +276,7 @@ LABEL factorial
 	DEFVAR LF@result?03VlBjVE
 	PUSHS int@0
 	PUSHS int@1
-	PUSHS int@0
+	PUSHS int@-1
 	POPS GF@*expression*result
 	MOVE LF@result?03VlBjVE GF@*expression*result
 

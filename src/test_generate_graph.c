@@ -263,6 +263,10 @@ void generate_graph_i32(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "I32", I32_count++);
 
+    char data[30];
+    sprintf(data, "%d", node->as.i32);
+
+    write_data(current_node, data);
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
 } 
@@ -271,6 +275,10 @@ void generate_graph_f64(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "F64", F64_count++);
 
+    char data[30];
+    sprintf(data, "%lf", node->as.f64);
+
+    write_data(current_node, data);
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
 } 

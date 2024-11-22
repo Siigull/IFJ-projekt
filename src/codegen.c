@@ -384,11 +384,14 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
 
     int i = 0;
     Arr* statements = curr->as.arr;
-    AST_Node* first = (AST_Node*)((statements->data)[0]);
-    if(first->type == NNULL_VAR_DECL){
-        fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
-        i = 1;
+    if(statements->length != 0) {
+        AST_Node* first = (AST_Node*)((statements->data)[0]);
+        if(first->type == NNULL_VAR_DECL){
+            fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
+            i = 1;
+        }
     }
+    
 
     for(; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
@@ -412,10 +415,12 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
 
     int i = 0;
     Arr* statements = curr->as.arr;
-    AST_Node* first = (AST_Node*)((statements->data)[0]);
-    if(first->type == NNULL_VAR_DECL){
-        fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
-        i = 1;
+    if(statements->length != 0) {
+        AST_Node* first = (AST_Node*)((statements->data)[0]);
+        if(first->type == NNULL_VAR_DECL){
+            fprintf(stdout, "\tMOVE LF@%s GF@*tmp*res\n", first->as.var_name);
+            i = 1;
+        }
     }
 
     for(; i < statements->length; i++){
