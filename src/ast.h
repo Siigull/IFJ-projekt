@@ -9,7 +9,7 @@
 
 #ifndef AST_H
 #define AST_H
-#include "bvs.h"
+#include "symtable.h"
 #include "helper.h"
 
 typedef enum {

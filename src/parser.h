@@ -9,7 +9,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "expressionparser.h"
+#include "expression_parser.h"
 #include "helper.h"
 #include "ast.h"
 #include "error.h"
@@ -17,7 +17,7 @@
 #include "codegen.h"
 #include "parser_semantics.h"
 #include "stack.h"
-#include "test_generate_graph.h"
+// #include "test_generate_graph.h"
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>

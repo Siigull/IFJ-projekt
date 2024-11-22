@@ -3,16 +3,14 @@ EXE = app
 CC = gcc
 LD = gcc
 
-CFLAGS = -g
+CFLAGS = 
 DEPFLAGS = -MMD -MP
 LDFLAGS = 
 LDLIBS = 
 
-BIN = bin
-OBJ = obj
-SRC = src
-
-FILES_TO_ZIP = src/main.* src/lexer.* src/stack.* src/ast.* src/symtable.* src/codegen.* src/expression_parser.* src/helper.* src/parser_semantics.* src/parser.* src/error.* src/Makefile src/rozdeleni src/rozsireni src/dokumentace.pdf
+BIN = .
+OBJ = .
+SRC = .
 
 ifeq ($(CLANG_FORMAT),)
 CLANG_FORMAT := clang-format
@@ -70,8 +68,5 @@ format:
 .PHONY: format-fix
 format-fix:
 	@find $(SOURCE_DIR) -type f -regex '.*\.\(c\|h\)' -print0 | xargs -0 $(CLANG_FORMAT) -i
-
-zip:
-	zip -j -r xvaculm00.zip $(FILES_TO_ZIP)
 
 -include $(DEPENDS)

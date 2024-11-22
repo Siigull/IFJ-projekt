@@ -1,14 +1,14 @@
 /**
  * IFJ PROJEKT 2024
- * @file bvs.h
+ * @file symtable.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @brief Function and struct definition of red-black tree
  * @date 2024-09-21
  *
  */
 
-#ifndef BVS_H
-#define BVS_H
+#ifndef SYMTABLE_H
+#define SYMTABLE_H
 
 #include <stdbool.h>
 #include "helper.h"
@@ -105,4 +105,4 @@ void context_put(C_Stack* stack, Entry* entry);
 
 void tree_print(Tree* tree);
 
-#endif /* BVS_H */
+#endif /* SYMTABLE_H */

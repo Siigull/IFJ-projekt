@@ -1,6 +1,6 @@
 /**
  * IFJ PROJEKT 2024
- * @file bvs.c
+ * @file symtable.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief Implementation of red-black tree and helper function for creation and deletion of entries
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bvs.h"
+#include "symtable.h"
 
 #define HASH_CHARS 8
 
