@@ -207,7 +207,7 @@ LABEL main
 	DEFVAR LF@result?ot5pSQsQ
 	PUSHS LF@a?Hu3WxKOu
 	PUSHS LF@b?TxyavRV7
-	ADDS
+	PUSHS int@1764
 	POPS GF@*expression*result
 	MOVE LF@result?ot5pSQsQ GF@*expression*result
 

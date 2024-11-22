@@ -23,6 +23,7 @@ Entry* entry_init(const char* key, Entry_Type type,
 	entry->type = type;
 	entry->key = (char*)key;
 	entry->ret_type = ret_type;
+	entry->is_const_val = false;
 
 	if (type == E_FUNC) {
 		entry->as.function_args = arr_init();

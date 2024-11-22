@@ -402,7 +402,289 @@ Expr_Type check_node(AST_Node* node, sem_state* state) {
     }
 }
 
+typedef struct {
+    Ret_Type_ type;
+
+    union {
+        int i32;
+        double f64;
+    }as;
+} Ret;
+
+Ret check_node_2(AST_Node* node);
+
+Ret val_if(AST_Node* node) {
+    check_node_2(node->left);
+
+    for (size_t i = 0; i < node->as.arr->length; i++) {
+        AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+        check_node_2(stmt);
+    }
+
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_literal_type(AST_Node* node) {
+    Ret t;
+    t.type = R_VOID;
+
+    switch(node->type) {
+        case I32: 
+        {
+            t.type = R_I32;
+            t.as.i32 = node->as.i32;
+            break;
+        }
+        case F64:
+        {
+            t.type = R_F64;
+            t.as.i32 = node->as.f64;
+            break;
+        }
+        case STRING: 
+            break;
+
+        case ID: {
+            Entry* entry = tree_find(parser->s_table, node->as.var_name);
+            entry->was_used = true;
+            if(entry->is_const_val) {
+                t.type = entry->ret_type.type;
+                if(t.type == R_I32) {
+                    t.as.i32 = entry->const_val.i32;
+                } else {
+                    t.as.f64 = entry->const_val.f64;
+                }
+            }
+        }
+        default: 
+            break;
+    }
+
+    return t;
+}
+
+bool can_implicit(Ret val) {
+    if(val.type == R_F64) {
+        return (val.as.f64 - (int)val.as.f64) == 0.0;
+    }
+
+    return false;
+}
+
+Ret val_binary_expression(AST_Node* node) {
+    Ret ret_left = check_node_2(node->left);
+    Ret ret_right = check_node_2(node->right);
+
+    bool has_float = ret_left.type == R_F64 || ret_left.type == R_F64;
+    bool has_int = ret_left.type == R_I32 || ret_left.type == R_I32;
+
+    if(ret_left.type == R_VOID || ret_right.type == R_VOID) {
+        return (Ret){R_VOID, 0};
+    }
+
+    bool is_node_const = node->as.expr_type.is_const_literal;
+
+    switch (node->type) {
+        case PLUS:
+        case MINUS:
+        case MUL: {
+            if (has_float) {
+                if (ret_left.type == R_I32) {
+                    if(can_implicit(ret_right)) {
+                        ret_right.type = R_I32;
+                        ret_right.as.i32 = (int)ret_right.as.f64;
+                    }
+
+                } else if (ret_right.type == R_I32) {
+                    if(can_implicit(ret_left)) {
+                        ret_left.type = R_I32;
+                        ret_left.as.i32 = (int)ret_left.as.f64;
+                    }
+                }
+            }
+
+            if(ret_left.type == R_F64) {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 * ret_right.as.f64;
+                } else {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.f64 * ret_right.as.i32;
+                }
+            } else {
+                if(ret_right.type == R_F64) {
+                    node->type = F64;
+                    node->as.f64 = ret_left.as.i32 * ret_right.as.f64;
+                } else {
+                    node->type = I32;
+                    node->as.f64 = ret_left.as.i32 * ret_right.as.i32;
+                }
+            }
+        }
+        case DIV: {
+            if (has_float && has_int) {
+                if (ret_left.type == R_I32) {
+                    if(can_implicit(ret_left)) {
+                        ret_left.type = R_I32;
+                        ret_left.as.i32 = (int)ret_left.as.f64;
+                    } else {
+                        return (Ret){R_VOID, 0};
+                    }
+
+                } else if (ret_right.type == R_I32) {
+                    if(can_implicit(ret_right)) {
+                        ret_right.type = R_I32;
+                        ret_right.as.i32 = (int)ret_right.as.f64;
+                    } else {
+                        return (Ret){R_VOID, 0};
+                    }
+                }
+            }
+            
+            else if (has_float) {
+                node->type = F64;
+                node->as.f64 = ret_left.as.f64 * ret_left.as.f64; 
+            } else {
+                node->type = I32;
+                node->as.i32 = ret_left.as.i32 * ret_left.as.i32; 
+            }
+        }
+        case ISEQ:
+        case ISNEQ:
+        case ISLESS:
+        case ISLESSEQ:
+        case ISMORE:
+        case ISMOREEQ:
+        default:
+            break;
+    }
+
+    if(node->type == I32) {
+        ret_left.type = R_I32;
+        ret_left.as.i32 = node->as.i32;
+
+    } else {
+        ret_left.type = R_F64;
+        ret_left.as.i32 = node->as.f64;
+    }
+
+    return ret_left;
+}
+
+Ret val_func_call(AST_Node* node) {
+    Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
+
+    if(func_entry == NULL || func_entry->type == E_FUNC) {
+        return (Ret){R_VOID, 0}; 
+    }   
+
+    for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
+        AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
+        check_node_2(current_node);
+    }
+
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_function_decl(AST_Node* node) {
+    if (node->as.func_data->arr) {
+        for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
+            AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
+            check_node_2(current_node);
+        }
+    }
+
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_var_decl(AST_Node* node) {
+    Entry* entry = tree_find(parser->s_table, node->as.var_name);
+
+    Ret ret = check_node_2(node->left);
+    if(ret.type != R_VOID && entry->as.can_mut == false) {
+        entry->is_const_val = true;
+        if(ret.type == R_I32) {
+            entry->const_val.i32 = ret.as.i32;
+
+        } else {
+            entry->const_val.f64 = ret.as.f64;
+        }
+    }
+
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_var_assignment(AST_Node* node) {
+    Ret ret = check_node_2(node->left);
+
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_else(AST_Node* node) {
+    for (size_t i = 0; i < node->as.arr->length; i++) {
+        AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
+        check_node_2(stmt);
+    }
+    
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_nnull_var_decl(AST_Node* node) {
+    return (Ret){R_VOID, 0};
+}
+
+Ret val_return(AST_Node* node) {
+    check_node_2(node->left);
+
+    return (Ret){R_VOID, 0};
+}
+
+Ret check_node_2(AST_Node* node) {
+    if (node == NULL) {
+        return (Ret){R_VOID, 0};
+    }
+
+    switch(node->type) {
+        // binary expressions
+        case PLUS:
+        case MINUS:
+        case MUL:
+        case DIV:
+        case ISEQ:
+        case ISNEQ:
+        case ISLESS:
+        case ISLESSEQ:
+        case ISMORE:
+        case ISMOREEQ:
+            return val_binary_expression(node);
+        case I32:
+        case F64:
+        case STRING:
+        case ID:
+        case NIL:
+            return val_literal_type(node);
+        // statements
+        case IF:             return val_if(node);
+        case WHILE:          return val_if(node);
+        case FUNC_CALL:      return val_func_call(node);
+        case FUNCTION_DECL:  return val_function_decl(node);
+        case VAR_DECL:       return val_var_decl(node);
+        case VAR_ASSIGNMENT: return val_var_assignment(node);
+        case ELSE:           return val_else(node);
+        case NNULL_VAR_DECL: return val_nnull_var_decl(node);
+        case RETURN:         return val_return(node);
+        
+        default:{
+            fprintf(stderr, "Unknown node type\n"); return (Ret){R_VOID, 0};
+        }
+    }
+}
+
 void check_semantics(AST_Node* node) {
+    // First pass
+    check_node_2(node);
+
+    // Second pass
     sem_state state;
     state.func_name = node->as.func_data->var_name;
     state.seen_return = false;

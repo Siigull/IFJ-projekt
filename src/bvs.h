@@ -53,6 +53,12 @@ typedef struct Entry {
 	bool was_used;
 	bool was_assigned;
 
+	bool is_const_val;
+	union {
+		int i32;
+		double f64;
+	} const_val;
+
 	union {
 		Arr* function_args;
 		bool can_mut;

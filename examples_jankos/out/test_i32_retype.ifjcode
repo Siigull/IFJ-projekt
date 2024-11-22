@@ -208,7 +208,7 @@ LABEL main
 	NOT GF@*expression*result GF@*expression*result
 	JUMPIFEQ *else*main*2*0*1 GF@*expression*result bool@false
 	MOVE LF@B?g0eRR2Cm GF@*tmp*res
-	PUSHS float@-0x1.d87812cp+30
+	PUSHS float@-0x1.ae673dp+28
 	PUSHS LF@B?g0eRR2Cm
 	ADDS
 	POPS GF@*expression*result

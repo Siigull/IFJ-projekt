@@ -657,9 +657,9 @@ AST_Node* stmt() {
 			consume(T_SEMI);
 			return node;
 
-            } else {
-                ERROR_RET(ERR_PARSE);
-            }
+        } else {
+            ERROR_RET(ERR_PARSE);
+        }
 
 	case T_BUILDIN:
 		advance();
