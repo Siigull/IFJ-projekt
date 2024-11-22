@@ -487,10 +487,15 @@ Ret val_literal_type(AST_Node* node) {
 
             entry->was_used = true;
             if(entry->is_const_val) {
+               
                 t.type = entry->ret_type.type;
                 if(t.type == R_I32) {
+                    node->type = I32;
+                    node->as.i32 = entry->const_val.i32;
                     t.as.i32 = entry->const_val.i32;
                 } else {
+                    node->type = F64;
+                    node->as.f64 = entry->const_val.f64;
                     t.as.f64 = entry->const_val.f64;
                 }
             }

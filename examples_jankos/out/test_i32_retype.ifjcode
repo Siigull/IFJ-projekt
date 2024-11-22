@@ -190,6 +190,11 @@ LABEL *substring
 LABEL main
 	CREATEFRAME
 	PUSHFRAME
+	DEFVAR LF@a?Hu3WxKOu
+	PUSHS int@5
+	POPS GF@*expression*result
+	MOVE LF@a?Hu3WxKOu GF@*expression*result
+
 	DEFVAR LF@b?1P2JpiCJ
 	CALL *readf64
 	PUSHS GF@*return*val
@@ -201,7 +206,7 @@ LABEL main
 	MOVE GF@*tmp*res LF@b?1P2JpiCJ
 	EQ GF@*expression*result LF@b?1P2JpiCJ nil@nil
 	NOT GF@*expression*result GF@*expression*result
-	JUMPIFEQ *else*main*1*0*1 GF@*expression*result bool@false
+	JUMPIFEQ *else*main*2*0*1 GF@*expression*result bool@false
 	MOVE LF@B?g0eRR2Cm GF@*tmp*res
 	PUSHS float@0x1.4p+2
 	PUSHS LF@B?g0eRR2Cm
@@ -213,13 +218,13 @@ LABEL main
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write
-	JUMP *end*of*if*main*1*0*1
-	LABEL *else*main*1*0*1
+	JUMP *end*of*if*main*2*0*1
+	LABEL *else*main*2*0*1
 	PUSHS float@0x1.4cccccp+2
 	POPS GF@*expression*result
 	MOVE LF@b?1P2JpiCJ GF@*expression*result
 
-	LABEL *end*of*if*main*1*0*1
+	LABEL *end*of*if*main*2*0*1
 	POPFRAME
 	EXIT int@0
 
