@@ -8,6 +8,10 @@
 
 #include "parser.h"
 
+#if DEBUG
+	#include "test_generate_graph.h"
+#endif
+
 Lexer* lexer;
 Parser* parser;
 Token* debug_token_array;
@@ -972,7 +976,9 @@ void parse(char* orig_input) {
     while(parser->next->type != T_EOF) {
         AST_Node* node = decl();
 		check_semantics(node);
-        // generate_graph(node, graph_filename);
+#if DEBUG
+        generate_graph(node, graph_filename);
+#endif
         arr_append(nodes, (size_t)node);
     }
 	

@@ -1,0 +1,11 @@
+const ifj = @import("ifj24.zig");
+
+pub fn main() void {
+    const x = 1;
+    if(x == 1) {
+        ifj.write("1");
+ 
+    } else {
+       ifj.write(x);
+    }
+}

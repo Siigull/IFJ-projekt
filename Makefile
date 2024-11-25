@@ -3,7 +3,11 @@ EXE = app
 CC = gcc
 LD = gcc
 
-CFLAGS = -g
+ifeq ($(DEBUG), 1)
+    CFLAGS = -g -DDEBUG
+else
+    CFLAGS = -g
+endif
 DEPFLAGS = -MMD -MP
 LDFLAGS = 
 LDLIBS = 
