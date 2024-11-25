@@ -3,7 +3,7 @@
  * @file parser_semantics.c
  * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @brief Implementation of IFJ24 semantic analysis
- * 
+ *
  * @date 2024-11-17
  * @todo implicit float conversion
  */
@@ -17,8 +17,8 @@ extern Parser* parser;
 //             functions for expr, literals, binary...
 
 bool is_nullable_decl(Expr_Type declaration, Expr_Type expression) {
-    if (!((declaration.type == N_F64 && expression.type == R_F64) || 
-                (declaration.type == N_I32 && expression.type == R_I32) || 
+    if (!((declaration.type == N_F64 && expression.type == R_F64) ||
+                (declaration.type == N_I32 && expression.type == R_I32) ||
                 (declaration.type == N_U8 && expression.type == R_U8) ||
                 (is_nullable(declaration) && expression.type == R_NULL))) {
                     return false;
@@ -41,7 +41,7 @@ Expr_Type null_to_nnul(Expr_Type type) {
 
 bool is_nullable(Expr_Type type) {
     switch(type.type) {
-        case N_F64: 
+        case N_F64:
         case N_I32:
         case N_U8:
             return true;
@@ -81,7 +81,7 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
     bool has_float = (left_type.type == R_F64 || right_type.type == R_F64);
 
     if (left_type.is_const_literal == true && left_type.is_const_literal == true) {
-        node->as.expr_type.is_const_literal = true;    
+        node->as.expr_type.is_const_literal = true;
     }
 
     bool is_node_const = node->as.expr_type.is_const_literal;
@@ -159,7 +159,7 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
 }
 
 Expr_Type sem_func_call(AST_Node* node, sem_state* state) {
-    
+
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 
     if (func_entry == NULL) {
@@ -182,7 +182,7 @@ Expr_Type sem_func_call(AST_Node* node, sem_state* state) {
 
             if (current_expr_type.type != arg_node->type && arg_node->type != R_VOID) {
                 if (!is_nullable_decl((Expr_Type){arg_node->type, false}, current_expr_type)) {
-                    ERROR_RET(ERR_SEM_PARAMS);    
+                    ERROR_RET(ERR_SEM_PARAMS);
                 }
             }
         }
@@ -230,7 +230,7 @@ Expr_Type sem_var_decl(AST_Node* node, sem_state* state) {
     Expr_Type expression_type = check_node(node->left, state);
 
     if (declared_type.type != expression_type.type) {
-        if (declared_type.type == IMPLICIT && expression_type.type != R_NULL) {
+        if (declared_type.type == IMPLICIT && expression_type.type != R_NULL && expression_type.type != R_VOID) {
             entry->ret_type = expression_type;
 
         } else if (expression_type.type == R_STRING || (declared_type.type == IMPLICIT && expression_type.type == R_NULL)) {
@@ -241,7 +241,7 @@ Expr_Type sem_var_decl(AST_Node* node, sem_state* state) {
 
         } else {
             if (!is_nullable_decl(declared_type, expression_type)) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
         }
     }
@@ -262,7 +262,7 @@ Expr_Type sem_var_assignment(AST_Node* node, sem_state* state) {
 
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
             if (!is_nullable_decl(declared_type, expression_type)) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
         }
 
@@ -281,7 +281,7 @@ Expr_Type sem_else(AST_Node* node, sem_state* state) {
         check_node(stmt, state);
         check_func_call_stmt(stmt);
     }
-    
+
     return (Expr_Type){-1, false};
 }
 
@@ -296,7 +296,7 @@ Expr_Type sem_nnull_var_decl(AST_Node* node, sem_state* state) {
 
     // entry->ret_type = (Expr_Type){R_I32, false};
 
-    return (Expr_Type){-1, false}; 
+    return (Expr_Type){-1, false};
 }
 
 Expr_Type sem_return(AST_Node* node, sem_state* state) {
@@ -311,7 +311,7 @@ Expr_Type sem_return(AST_Node* node, sem_state* state) {
 
         if (expression_type.type != entry->ret_type.type) {
             if (!is_nullable_decl(expression_type, entry->ret_type)) {
-                ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);   
+                ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
             }
         }
     }
@@ -321,7 +321,7 @@ Expr_Type sem_return(AST_Node* node, sem_state* state) {
 
 Expr_Type sem_while(AST_Node* node, sem_state* state) {
     Expr_Type cond_type = check_node(node->left, state);
- 
+
     if (cond_type.type != R_BOOLEAN && !is_nullable(cond_type)) {
         ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
@@ -331,7 +331,7 @@ Expr_Type sem_while(AST_Node* node, sem_state* state) {
 
         if (first_stmt->type == NNULL_VAR_DECL) {
             if (!is_nullable(cond_type)) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL); 
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
 
             Entry* nnull_entry = tree_find(parser->s_table, first_stmt->as.var_name);
@@ -356,7 +356,7 @@ Expr_Type sem_while(AST_Node* node, sem_state* state) {
 
 Expr_Type sem_if(AST_Node* node, sem_state* state) {
     Expr_Type cond_type = check_node(node->left, state);
- 
+
     if (cond_type.type != R_BOOLEAN && !is_nullable(cond_type)) {
         ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
@@ -366,7 +366,7 @@ Expr_Type sem_if(AST_Node* node, sem_state* state) {
 
         if (first_stmt->type == NNULL_VAR_DECL) {
             if (!is_nullable(cond_type)) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL); 
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
 
             Entry* nnull_entry = tree_find(parser->s_table, first_stmt->as.var_name);
@@ -389,7 +389,7 @@ Expr_Type sem_if(AST_Node* node, sem_state* state) {
     if (node->right == NULL) {
         ERROR_RET(ERR_PARSE);
     }
-    
+
     check_node(node->right, state);
 
     return (Expr_Type){-1, false};
@@ -429,7 +429,7 @@ Expr_Type check_node(AST_Node* node, sem_state* state) {
         case ELSE:           return sem_else(node, state);
         case NNULL_VAR_DECL: return sem_nnull_var_decl(node, state);
         case RETURN:         return sem_return(node, state);
-        
+
         default:{
             fprintf(stderr ,"Unknown node type\n"); return (Expr_Type){-1, false};
         }
@@ -471,7 +471,7 @@ Ret val_literal_type(AST_Node* node) {
     t.type = R_VOID;
 
     switch(node->type) {
-        case I32: 
+        case I32:
         {
             t.type = R_I32;
             t.as.i32 = node->as.i32;
@@ -488,19 +488,19 @@ Ret val_literal_type(AST_Node* node) {
             }
             break;
         }
-        case STRING: 
+        case STRING:
             break;
 
         case ID: {
             Entry* entry = tree_find(parser->s_table, node->as.var_name);
-            
+
             if(is_nullable(entry->ret_type)) {
                 return t;
             }
 
             entry->was_used = true;
             if(entry->is_const_val) {
-               
+
                 t.type = entry->ret_type.type;
                 if(t.type == R_I32) {
                     node->type = I32;
@@ -511,13 +511,13 @@ Ret val_literal_type(AST_Node* node) {
                     node->type = F64;
                     node->as.f64 = entry->const_val.f64;
                     t.as.f64 = entry->const_val.f64;
-                
+
                 } else {
                     return (Ret){R_VOID, 0};
                 }
             }
         }
-        default: 
+        default:
             break;
     }
 
@@ -566,10 +566,10 @@ Ret val_binary_expression(AST_Node* node) {
         }
         case DIV: {
             Ret left_og;
-            memcpy(&left_og, &ret_left, sizeof(Ret));   
+            memcpy(&left_og, &ret_left, sizeof(Ret));
             OPERATE(ret_left, ret_right, /);
             // div floor
-            if(ret_left.type == R_I32 && 
+            if(ret_left.type == R_I32 &&
                left_og.as.i32 != 0 &&
                ret_left.as.i32 <= 0) {
                 if(left_og.as.i32 % ret_right.as.i32) {
@@ -607,8 +607,8 @@ Ret val_func_call(AST_Node* node) {
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 
     if(func_entry == NULL || func_entry->type == E_FUNC) {
-        return (Ret){R_VOID, 0}; 
-    }   
+        return (Ret){R_VOID, 0};
+    }
 
     for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
         AST_Node* current_node = (AST_Node*)node->as.func_data->arr->data[i];
@@ -633,11 +633,11 @@ Ret val_var_decl(AST_Node* node) {
     Entry* entry = tree_find(parser->s_table, node->as.var_name);
 
     Ret ret = check_node_2(node->left);
-    if(ret.type != R_VOID && 
-       ret.type != entry->ret_type.type && 
+    if(ret.type != R_VOID &&
+       ret.type != entry->ret_type.type &&
        entry->ret_type.type != IMPLICIT) {
         if (!is_nullable_decl(entry->ret_type, (Expr_Type){ret.type, false})) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
     }
 
@@ -667,7 +667,7 @@ Ret val_else(AST_Node* node) {
         AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
         check_node_2(stmt);
     }
-    
+
     return (Ret){R_VOID, 0};
 }
 
@@ -715,7 +715,7 @@ Ret check_node_2(AST_Node* node) {
         case ELSE:           return val_else(node);
         case NNULL_VAR_DECL: return val_nnull_var_decl(node);
         case RETURN:         return val_return(node);
-        
+
         default:{
             fprintf(stderr, "Unknown node type\n"); return (Ret){R_VOID, 0};
         }

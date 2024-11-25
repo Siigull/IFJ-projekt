@@ -2,8 +2,8 @@
  * IFJ PROJEKT 2024
  * @file parser.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief 
- * 
+ * @brief
+ *
  */
 
 #include "parser.h"
@@ -210,7 +210,7 @@ AST_Node* string() {
          AST_Node* node = string();
          return node;
 
-     } else if (check(T_I32) || check(T_F64) || 
+     } else if (check(T_I32) || check(T_F64) ||
                 check(T_U8)  || check(T_NULL)) {
         advance();
 
@@ -242,7 +242,7 @@ bool check_operator() {
              return true;
          }
      }
-    
+
      return false;
  }
 
@@ -284,7 +284,7 @@ AST_Node* literal() {
         char* end;
         AST_Node* node = node_init(I32);
         node->as.i32 = strtol(parser->prev->value, &end, 10);
-        if(errno == ERANGE || *end != '\0' || 
+        if(errno == ERANGE || *end != '\0' ||
            node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
             ERROR_RET(ERR_SEM_OTHER);
         }
@@ -300,7 +300,7 @@ AST_Node* literal() {
             ERROR_RET(ERR_SEM_OTHER);
         }
         return node;
-    
+
     } else if (check(T_NULL)) {
         advance();
         AST_Node* node = node_init(NIL);
@@ -538,7 +538,7 @@ Ret_Type_ type() {
 	if(check(T_QUESTMARK)){
 		advance();
 	}
-	
+
 	Ret_Type_ type = get_ret_type();
 	advance();
 
@@ -675,7 +675,7 @@ AST_Node* stmt() {
 		return _return();
 
 	case T_WHILE:
-		return _while();	
+		return _while();
 
         default:
             // TODO(Sigull) Add error message
@@ -830,7 +830,7 @@ void prolog() {
 	strcpy(arg_length->arg_name, "s");
 	arg_length->type = R_U8;
 	arr_append(length->as.function_args, (size_t)arg_length);
-	
+
 	// string concatenation
 	Function_Arg* arg_concat = malloc(sizeof(Function_Arg));
 	arg_concat->arg_name = malloc(sizeof(char) * 2);
@@ -928,7 +928,7 @@ void func_head() {
 
     if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
-    } 
+    }
     entry->ret_type = (Expr_Type){type(), false};
 
     tree_insert(parser->s_table, entry);
@@ -981,7 +981,7 @@ void parse(char* orig_input) {
 #endif
         arr_append(nodes, (size_t)node);
     }
-	
+
 	check_var_usage(parser->s_table);
     generate_code(nodes, parser->s_table);
 }

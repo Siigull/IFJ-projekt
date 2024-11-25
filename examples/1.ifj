@@ -1,12 +1,9 @@
 const ifj = @import("ifj24.zig");
 
-pub fn kokot(bomba : i32) i32 {
-  return bomba;
-}
-
+pub fn void_fnc() void {}
 
 // Main Program
 pub fn main() void {
-  const x = kokot(3);
-  ifj.write(x);
+	var bomba = 1;
+	bomba = void_fnc();
 }
