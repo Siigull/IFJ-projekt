@@ -1,7 +1,7 @@
 const ifj = @import("ifj24.zig");
 
 pub fn comparestring (a : []u8, b : []u8 ) i32{
-    if(strcmp(a, b) == 0){
+    if(ifj.strcmp(a, b) == 0){
         return 1;
     }
     else{
