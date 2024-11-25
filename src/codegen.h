@@ -173,7 +173,7 @@ void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int st
  * @param curr return node with expression array
  * @param symtable symbolic table
  */
-void generate_return(AST_Node* curr, Tree* symtable);
+void generate_return(AST_Node* curr, Tree* symtable, const char* func_name);
 
 
 

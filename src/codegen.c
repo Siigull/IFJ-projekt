@@ -434,13 +434,19 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
 }
 
 
-void generate_return(AST_Node* curr, Tree* symtable){
-    if(curr->left != NULL){
-        generate_expression(curr->left, symtable, 0);
-        fprintf(stdout, "\tMOVE GF@*return*val GF@*expression*result\n");
+void generate_return(AST_Node* curr, Tree* symtable, const char* func_name){
+    if(!strcmp(func_name, "main")){
+        fprintf(stdout, "\tPOPFRAME\n");
+        fprintf(stdout, "\tEXIT int@0\n");
     }
-    fprintf(stdout, "\tPOPFRAME\n");
-    fprintf(stdout, "\tRETURN\n\n");
+    else{
+        if(curr->left != NULL){
+            generate_expression(curr->left, symtable, 0);
+            fprintf(stdout, "\tMOVE GF@*return*val GF@*expression*result\n");
+        }
+        fprintf(stdout, "\tPOPFRAME\n");
+        fprintf(stdout, "\tRETURN\n\n");
+    }
 }
 
 
@@ -521,6 +527,11 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     if(main){
         fprintf(stdout, PROG_END);
     }
+    else if(arg_entry->ret_type.type == R_VOID){
+        fprintf(stdout, "\tPOPFRAME\n");
+        fprintf(stdout, "\tRETURN\n");
+    }
+
     return;
 }//generate_function_decl
 
@@ -534,7 +545,7 @@ void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, i
             generate_if(curr, symtable, func_name, stmt_index, nest, inside_if_loop, label_counter);
             return;
         case RETURN:
-            generate_return(curr, symtable);
+            generate_return(curr, symtable, func_name);
             return;
         case WHILE:
             *label_counter += 1;
