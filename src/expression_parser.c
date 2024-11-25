@@ -18,15 +18,15 @@ int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
 	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // *
 	{R, L, L, L, L, R, L, L, L, L, L, L, L, L}, // /
-	{R, R, R, R, R, R, M, N, N, N, N, N, N, N}, // (
+	{R, R, R, R, R, R, M, R, R, R, R, R, R, R}, // (
 	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
 	{R, R, R, R, R, R, N, R, R, R, R, R, R, R}, // $
-	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // ==
-	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // !=
-	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // <
-	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >
-	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // <=
-	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >=
+	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // ==
+	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // !=
+	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // <
+	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // >
+	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // <=
+	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // >=
 };
 
 const char* type_to_string(T_Type type) {
