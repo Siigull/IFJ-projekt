@@ -520,7 +520,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     Arr* statements = curr->as.func_data->arr;
     for(int i = 0; i < statements->length; i++){
         AST_Node* stmt = (AST_Node*)((statements->data)[i]);
-        if(stmt->type == RETURN && !strcmp(curr->as.func_data->var_name, "main")) break;
+        //if(stmt->type == RETURN && !strcmp(curr->as.func_data->var_name, "main")) break;
         generate_statement(stmt, symtable, curr->as.func_data->var_name, i, 0, false, 0, label_counter);
     }
 
