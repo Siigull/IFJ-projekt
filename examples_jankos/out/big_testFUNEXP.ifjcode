@@ -492,8 +492,7 @@ LABEL main
 	PUSHS GF@*expression*result
 	CALL *write
 	POPFRAME
-	RETURN
-
+	EXIT int@0
 	LABEL *end*of*if*main*1*1*7
 	JUMP *end*of*if*main*34*0*6
 	LABEL *else*main*34*0*6
@@ -502,8 +501,7 @@ LABEL main
 	PUSHS GF@*expression*result
 	CALL *write
 	POPFRAME
-	RETURN
-
+	EXIT int@0
 	LABEL *end*of*if*main*34*0*6
 	PUSHS string@Testovaci\032program\032ukonceny\032uspesne.\010
 	POPS GF@*expression*result
