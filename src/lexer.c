@@ -3,9 +3,9 @@
  * @file lexer.c
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief Implementation of lexer for IFJ 2024
- * 
+ *
  * @date 2024-09-21
- * 
+ *
  */
 
 #include "lexer.h"
@@ -172,6 +172,10 @@ bool is_float_token(Token* token) {
 };
 
 Token* find_token_value(Lexer* lexer, T_Type type) {
+	if (type == T_U8) {
+		Token* token = init_token("[]u8", T_DTYPE, 4);
+		return token;
+	}
 	if (type == T_EOF) {
 		Token* token = init_token("0", T_EOF, 0);
 		return token;
@@ -180,7 +184,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	unsigned int len = lexer->idr - lexer->idl;
 
 	char* value = (char*) malloc(len + 1);
-	
+
 	// load the value
 	for (unsigned int i = 0; i < len; i++) {
 		value[i] = lexer->input[lexer->idl + i];
@@ -233,14 +237,14 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 		// first we look if we start with number, if yes number is decided
 		if (is_num(value[0])) {
 			if (is_num_token(token)) {
-				if(token->length != 1 && (value[0] == '0')) {
+				if (token->length != 1 && (value[0] == '0')) {
 					exit(1);
 				}
 				token->type = T_I32;
 				return token;
 			}
 			if (is_float_token(token)) {
-				if(token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e')) {
+				if (token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e')) {
 					exit(1);
 				}
 				token->type = T_F64;
@@ -415,13 +419,23 @@ Token* get_next_token(Lexer* lexer) {
 				return find_token_value(lexer, T_UNDEF);
 			}
 		}
-		if (lexer->input[lexer->idr] == '[' && lexer->input[lexer->idr + 1] == ']' &&
-			lexer->input[lexer->idr + 2] == 'u' && lexer->input[lexer->idr + 3] == '8') {
+
+		if (lexer->input[lexer->idr] == '[') {
 			lexer_advance(lexer);
-			lexer_advance(lexer);
-			lexer_advance(lexer);
-			lexer_advance(lexer);
-			return find_token_value(lexer, T_UNDEF);
+			lexer_skip_whitespace(lexer);
+			if (lexer->input[lexer->idr] == ']') {
+				lexer_advance(lexer);
+				lexer_skip_whitespace(lexer);
+				if (lexer->input[lexer->idr] == 'u' && lexer->input[lexer->idr + 1] == '8') {
+					lexer_advance(lexer);
+					lexer_advance(lexer);
+				} else {
+					ERROR_RET(1);
+				}
+			} else {
+				ERROR_RET(1);
+			}
+			return find_token_value(lexer, T_U8);
 		};
 		// handling brackets
 		char brackets[6] = {'(', ')', '[', ']', '{', '}'};
