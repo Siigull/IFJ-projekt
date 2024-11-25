@@ -16,15 +16,15 @@ pub fn main() void{
     const c: []u8 = ifj.string("Deadly prijde o body");
      if(comparestring(a, b) == 1){
          if(comparestring(b, c) == 0){
-            return 2;
+            ifj.write(2);
          }
          else{
-            return 5;
+            ifj.write(5);
          }
          
      }
      else{
-         return 3;
+         ifj.write(1);
      }
 }  
 
