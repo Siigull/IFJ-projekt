@@ -10,7 +10,7 @@ pub fn comparestring (a : []u8, b : []u8 ) i32{
 }
 
 
-pub fn main() i32{
+pub fn main() void{
     const a: []u8 = ifj.string("David prijde o body");
     const b: []u8 = ifj.string("David prijde o body");
     const c: []u8 = ifj.string("Deadly prijde o body");
