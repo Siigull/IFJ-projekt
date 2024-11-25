@@ -500,7 +500,7 @@ Ret val_literal_type(AST_Node* node) {
                     t.as.f64 = entry->const_val.f64;
                 
                 } else {
-                    exit(99);
+                    return (Ret){R_VOID, 0};
                 }
             }
         }
@@ -515,7 +515,7 @@ Ret val_binary_expression(AST_Node* node) {
 #define OPERATE(left, right, op)             \
     if((left).type == R_F64) {               \
         if((right).type == R_F64) {          \
-            (left).as.f64 = (left).as.f64 op (right).as.i32; \
+            (left).as.f64 = (left).as.f64 op (right).as.f64; \
             (left).type = R_F64;             \
         } else {                             \
             (left).as.f64 = (left).as.f64 op (double)(right).as.i32; \
@@ -523,7 +523,7 @@ Ret val_binary_expression(AST_Node* node) {
         }                                    \
     } else {                                 \
         if((right).type == R_F64) {          \
-            (left).as.f64 = (double)(left).as.i32 op (double)(right).as.f64; \
+            (left).as.f64 = (double)(left).as.i32 op (right).as.f64; \
             (left).type = R_F64;             \
         } else {                             \
             (left).as.i32 = (left).as.i32 op (right).as.i32; \
@@ -537,8 +537,6 @@ Ret val_binary_expression(AST_Node* node) {
     if(ret_left.type == R_VOID || ret_right.type == R_VOID) {
         return (Ret){R_VOID, 0};
     }
-
-    bool is_node_const = node->as.expr_type.is_const_literal;
 
     switch (node->type) {
         case PLUS: {
@@ -612,7 +610,13 @@ Ret val_var_decl(AST_Node* node) {
     Entry* entry = tree_find(parser->s_table, node->as.var_name);
 
     Ret ret = check_node_2(node->left);
-    if(ret.type != R_VOID && entry->as.can_mut == false) {
+    if(ret.type != R_VOID && 
+       ret.type != entry->ret_type.type && 
+       entry->ret_type.type != IMPLICIT) {
+        ERROR_RET(ERR_SEM_TYPE_CONTROL); 
+    }
+
+    if(ret.type != R_VOID && entry->as.can_mut == false && !is_nullable(entry->ret_type)) {
         entry->is_const_val = true;
         if(ret.type == R_I32) {
             entry->const_val.i32 = ret.as.i32;
@@ -620,7 +624,7 @@ Ret val_var_decl(AST_Node* node) {
 
         } else {
             entry->const_val.f64 = ret.as.f64;
-            entry->ret_type = (Expr_Type){F64, true};
+            entry->ret_type = (Expr_Type){R_F64, true};
         }
     }
 
