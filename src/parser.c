@@ -23,6 +23,14 @@ AST_Node* func_call();
 AST_Node* stmt();
 Ret_Type_ get_ret_type();
 
+Expr_Type null_to_nnul(Expr_Type type) {
+    if(type.type == N_I32 || type.type == N_F64 || type.type == N_U8) {
+        return (Expr_Type){type.type - 1, type.is_const_literal};
+    }
+
+    return type;
+}
+
 void parser_reset() {
     parser->next = NULL;
     parser->prev = NULL;

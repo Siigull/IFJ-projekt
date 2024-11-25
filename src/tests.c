@@ -90,7 +90,7 @@ int main123() {
 
 	generate_debug_token_arr();
 
-	char* temp = load_inputos("examples/1.ifj");
+	char* temp = load_inputos("examples_jankos/in/test_null_def.ifj");
 	compile(temp);
 	return 0;
 };
