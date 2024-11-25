@@ -1,40 +1,44 @@
 root -> FUNC_DECL(0) : functions
 FUNC_DECL(0).shape: rectangle
-VAR_DECL(0): {tooltip: x?96OdJvkl}
+VAR_DECL(0): {tooltip: a?96OdJvkl}
 FUNC_DECL(0) -> VAR_DECL(0) : body
 VAR_DECL(0).shape: rectangle
-I32(0): {tooltip: 1}
+I32(0): {tooltip: 5}
 I32(0).shape: rectangle
 I32(0).style{ border-radius: 999 }
 VAR_DECL(0) -> I32(0) : expr
-FUNC_DECL(0) -> IF(0) : body
-IF(0).shape: diamond
-IF(0).style{ fill: "#ffffff" }
-==(0).shape: rectangle
-==(0).style{ border-radius: 999 }
-==(0): {tooltip: rectangle}
-IF(0) -> ==(0) : expr
-I32(1): {tooltip: 1}
+VAR_DECL(1): {tooltip: b?FcOOMyxq}
+FUNC_DECL(0) -> VAR_DECL(1) : body
+VAR_DECL(1).shape: rectangle
+F64(0): {tooltip: 2.500000}
+F64(0).shape: rectangle
+F64(0).style{ border-radius: 999 }
+VAR_DECL(1) -> F64(0) : expr
+VAR_DECL(2): {tooltip: c?g0eRR2Cm}
+FUNC_DECL(0) -> VAR_DECL(2) : body
+VAR_DECL(2).shape: rectangle
+I32(1): {tooltip: 10}
 I32(1).shape: rectangle
 I32(1).style{ border-radius: 999 }
-==(0) -> I32(1) : left
-I32(2): {tooltip: 1}
-I32(2).shape: rectangle
-I32(2).style{ border-radius: 999 }
-==(0) -> I32(2) : right
-IF(0) -> ELSE(0) : else
-ELSE(0).shape: rectangle
+VAR_DECL(2) -> I32(1) : expr
+VAR_DECL(3): {tooltip: d?Hu3WxKOu}
+FUNC_DECL(0) -> VAR_DECL(3) : body
+VAR_DECL(3).shape: rectangle
+F64(1): {tooltip: 7.300000}
+F64(1).shape: rectangle
+F64(1).style{ border-radius: 999 }
+VAR_DECL(3) -> F64(1) : expr
+VAR_DECL(4): {tooltip: result?1P2JpiCJ}
+FUNC_DECL(0) -> VAR_DECL(4) : body
+VAR_DECL(4).shape: rectangle
+F64(2): {tooltip: 42.150001}
+F64(2).shape: rectangle
+F64(2).style{ border-radius: 999 }
+VAR_DECL(4) -> F64(2) : expr
 FUNC_CALL(0): {tooltip: *write}
 FUNC_CALL(0).shape: rectangle
-ELSE(0) -> FUNC_CALL(0) : body
+FUNC_DECL(0) -> FUNC_CALL(0) : body
 ID(0).shape: rectangle
 ID(0).style{ border-radius: 999 }
-ID(0): {tooltip: x}
+ID(0): {tooltip: result}
 FUNC_CALL(0) -> ID(0) : args
-FUNC_CALL(1): {tooltip: *write}
-FUNC_CALL(1).shape: rectangle
-IF(0) -> FUNC_CALL(1) : body
-STRING(0).shape: rectangle
-STRING(0).style{ border-radius: 999 }
-STRING(0): {tooltip: 1}
-FUNC_CALL(1) -> STRING(0) : args

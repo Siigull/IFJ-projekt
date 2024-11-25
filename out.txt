@@ -190,31 +190,53 @@ LABEL *substring
 LABEL main
 	CREATEFRAME
 	PUSHFRAME
-	DEFVAR LF@x?96OdJvkl
-	PUSHS int@1
+	DEFVAR LF@a?96OdJvkl
+	PUSHS int@5
 	POPS GF@*expression*result
-	MOVE LF@x?96OdJvkl GF@*expression*result
+	MOVE LF@a?96OdJvkl GF@*expression*result
 
-	PUSHS int@1
+	DEFVAR LF@b?FcOOMyxq
+	PUSHS float@0x1.4p+1
 	POPS GF@*expression*result
-	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@1
+	MOVE LF@b?FcOOMyxq GF@*expression*result
+
+	DEFVAR LF@c?g0eRR2Cm
+	PUSHS int@10
 	POPS GF@*expression*result
-	MOVE GF@*rhs GF@*expression*result
-	EQ GF@*expression*result GF@*lhs GF@*rhs
-	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*main*1*0*1 GF@*expression*result bool@false
-	PUSHS string@1
+	MOVE LF@c?g0eRR2Cm GF@*expression*result
+
+	DEFVAR LF@d?Hu3WxKOu
+	PUSHS float@0x1.d33334p+2
+	POPS GF@*expression*result
+	MOVE LF@d?Hu3WxKOu GF@*expression*result
+
+	DEFVAR LF@result?1P2JpiCJ
+	PUSHS int@5
+	PUSHS float@0x1.4p+1
+	PUSHS float@0x1.ep+2
+	PUSHS int@10
+	PUSHS int@3
+	PUSHS int@7
+	PUSHS float@0x1.a4p+5
+	PUSHS float@0x1p+1
+	PUSHS float@0x1.a4p+4
+	PUSHS float@0x1.d33334p+2
+	PUSHS int@3
+	PUSHS float@0x1.5e6667p+4
+	PUSHS float@0x1.8133338p+5
+	PUSHS int@10
+	PUSHS int@5
+	PUSHS int@15
+	PUSHS float@0x1.4p+1
+	PUSHS float@0x1.8p+2
+	PUSHS float@0x1.5133338p+5
+	POPS GF@*expression*result
+	MOVE LF@result?1P2JpiCJ GF@*expression*result
+
+	PUSHS LF@result?1P2JpiCJ
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write
-	JUMP *end*of*if*main*1*0*1
-	LABEL *else*main*1*0*1
-	PUSHS LF@x?96OdJvkl
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	LABEL *end*of*if*main*1*0*1
 	POPFRAME
 	EXIT int@0
 
