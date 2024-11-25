@@ -15,6 +15,17 @@ extern Parser* parser;
 
 //TODO(Sigull) Once expr parser is fleshed out add
 //             functions for expr, literals, binary...
+
+bool is_nullable_decl(Expr_Type declaration, Expr_Type expression) {
+    if (!((declaration.type == N_F64 && expression.type == R_F64) || 
+                (declaration.type == N_I32 && expression.type == R_I32) || 
+                (declaration.type == N_U8 && expression.type == R_U8) ||
+                (is_nullable(declaration) && expression.type == R_NULL))) {
+                    return false;
+        }
+    return true;
+}
+
 void check_func_call_stmt(AST_Node* node) {
     if (node->type == FUNC_CALL) {
         Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
@@ -151,6 +162,10 @@ Expr_Type sem_func_call(AST_Node* node, sem_state* state) {
     
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 
+    if (func_entry == NULL) {
+        ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+    }
+
     if (func_entry != NULL) {
         size_t expected_params = func_entry->as.function_args->length;
         size_t actual_params = node->as.func_data->arr->length;
@@ -166,7 +181,9 @@ Expr_Type sem_func_call(AST_Node* node, sem_state* state) {
             Function_Arg* arg_node = (Function_Arg*)func_entry->as.function_args->data[i];
 
             if (current_expr_type.type != arg_node->type && arg_node->type != R_VOID) {
-                ERROR_RET(ERR_SEM_PARAMS);    
+                if (!is_nullable_decl((Expr_Type){arg_node->type, false}, current_expr_type)) {
+                    ERROR_RET(ERR_SEM_PARAMS);    
+                }
             }
         }
     }
@@ -223,11 +240,8 @@ Expr_Type sem_var_decl(AST_Node* node, sem_state* state) {
         } else if (declared_type.type == R_F64 && expression_type.type == R_I32) {
 
         } else {
-            if (!((declared_type.type == N_F64 && expression_type.type == R_F64) || 
-                (declared_type.type == N_I32 && expression_type.type == R_I32) || 
-                (declared_type.type == N_U8 && expression_type.type == R_U8) ||
-                (is_nullable(declared_type) && expression_type.type == R_NULL))) {
-                    ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+            if (!is_nullable_decl(declared_type, expression_type)) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
             }
         }
     }
@@ -247,11 +261,8 @@ Expr_Type sem_var_assignment(AST_Node* node, sem_state* state) {
         }
 
         if (declared_type.type != expression_type.type || expression_type.type == R_STRING) {
-            if (!((declared_type.type == N_F64 && expression_type.type == R_F64) || 
-                (declared_type.type == N_I32 && expression_type.type == R_I32) || 
-                (declared_type.type == N_U8 && expression_type.type == R_U8) ||
-                (is_nullable(declared_type) && expression_type.type == R_NULL))) {
-                    ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+            if (!is_nullable_decl(declared_type, expression_type)) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
             }
         }
 
@@ -299,7 +310,9 @@ Expr_Type sem_return(AST_Node* node, sem_state* state) {
         Expr_Type expression_type = check_node(node->left, state);
 
         if (expression_type.type != entry->ret_type.type) {
-            ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
+            if (!is_nullable_decl(expression_type, entry->ret_type)) {
+                ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);   
+            }
         }
     }
 
@@ -623,7 +636,9 @@ Ret val_var_decl(AST_Node* node) {
     if(ret.type != R_VOID && 
        ret.type != entry->ret_type.type && 
        entry->ret_type.type != IMPLICIT) {
-        ERROR_RET(ERR_SEM_TYPE_CONTROL); 
+        if (!is_nullable_decl(entry->ret_type, (Expr_Type){ret.type, false})) {
+                ERROR_RET(ERR_SEM_TYPE_CONTROL);   
+            }
     }
 
     if(ret.type != R_VOID && entry->as.can_mut == false && !is_nullable(entry->ret_type)) {

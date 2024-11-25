@@ -20,13 +20,13 @@ typedef struct sem_state {
     bool assigned_func_call;
 } sem_state;
 
-void parse_check(AST_Node* node, sem_state* state);
 void check_func_call_stmt(AST_Node* node);
 void check_semantics(AST_Node* node);
 void check_var_usage_traverse(Node* node);
 void check_var_usage(Tree* table);
 bool is_nullable(Expr_Type type);
 bool is_numeric_type(Expr_Type type);
+bool is_nullable_decl(Expr_Type declaration, Expr_Type expression);
 Expr_Type check_node(AST_Node* node, sem_state* state);
 Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state);
 Expr_Type sem_func_call(AST_Node* node, sem_state* state);
