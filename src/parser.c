@@ -71,91 +71,6 @@ bool check(T_Type type) {
 	return parser->next->type == type;
 }
 
-bool is_hexa(char x) {
-	return isdigit(x) || (x >= 'A' && x <= 'F') || (x >= 'a' && x <= 'f');
-}
-
-int parse_escape(const char* in, char* out) {
-	int x;
-	if (is_hexa(in[2]) && is_hexa(in[3])) {
-		sscanf(in + 2, "%2x", &x);
-
-    } else {
-        ERROR_RET(ERR_LEX);
-    }
-
-	return x;
-}
-
-char* parse_string_value(const char* string) {
-	int len = strlen(string);
-	int new_len = len;
-
-    for(int i=0; i < len; i++) {
-        if(string[i] == '\\') {
-            switch(string[i+1]) {
-                case 'x':
-                    if(i+3 >= len) {
-                        ERROR_RET(ERR_LEX);
-                    }
-                    break;
-                case 'n':
-                case 'r':
-                case 't':
-                case '"':
-                    new_len--;
-                    break;
-                case '\\':
-                    new_len--;
-                    i++;
-                    break;
-                default:
-                    ERROR_RET(ERR_LEX);
-                    break;
-            }
-        }
-    }
-
-	char* new_string = malloc(sizeof(char) * new_len + 1);
-	char* out = new_string;
-
-	for (int i = 0; i < len; i++) {
-		if (string[i] == '\\') {
-			switch (string[i + 1]) {
-			case 'x': {
-				int x = parse_escape(string + i, new_string);
-				new_string[0] = (char) (x);
-				i += 2;
-				break;
-			}
-			case 'n':
-				new_string[0] = '\n';
-				break;
-			case '\\':
-				new_string[0] = '\\';
-				break;
-			case '"':
-				new_string[0] = '"';
-				break;
-			case 'r':
-				new_string[0] = '\r';
-				break;
-			case 't':
-				new_string[0] = '\t';
-				break;
-			}
-			i++;
-			new_string++;
-
-		} else {
-			new_string[0] = string[i];
-			new_string += 1;
-		}
-	}
-	new_string[0] = '\0';
-
-	return out;
-}
 
 char* string_to_assembly(const char* string) {
 	int len = strlen(string);
@@ -187,7 +102,7 @@ char* string_to_assembly(const char* string) {
 
 AST_Node* string() {
 	AST_Node* node = node_init(STRING);
-	node->as.string = parse_string_value(parser->prev->value);
+	node->as.string = parser->prev->value;
 
 	return node;
 }

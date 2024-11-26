@@ -192,17 +192,29 @@ Expr_Type sem_check_binary_expression(AST_Node* node, Sem_State* state) {
     }
 }
 
+bool is_writeable(AST_Node* node){
+    if(node->type == FUNC_CALL){
+        Entry* entry = tree_find(parser->s_table, node->as.func_data->var_name);
+        if(entry->ret_type.type == R_VOID){
+            return false;
+        }
+    }
+    return true;
+}
+
 Expr_Type sem_func_call(AST_Node* node, Sem_State* state) {
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 
     if (func_entry == NULL) {
         ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
     }
-
     if (func_entry != NULL) {
         size_t expected_params = func_entry->as.function_args->length;
         size_t actual_params = node->as.func_data->arr->length;
         if (expected_params != actual_params) {
+            ERROR_RET(ERR_SEM_PARAMS);
+        }
+        if(!strcmp(node->as.func_data->var_name, "*write") && !is_writeable((AST_Node*)node->as.func_data->arr->data[0])){
             ERROR_RET(ERR_SEM_PARAMS);
         }
 
@@ -276,6 +288,8 @@ Expr_Type sem_var_decl(AST_Node* node, Sem_State* state) {
                 ERROR_RET(ERR_SEM_TYPE_CONTROL);
             }
         }
+    } else if (expression_type.type == R_VOID) {
+        ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
 
     return (Expr_Type){-1, false};
@@ -421,7 +435,7 @@ Expr_Type sem_if(AST_Node* node, Sem_State* state) {
                 check_func_call_stmt(stmt);
             }
         } else {
-			if (is_nullable(cond_type)) {
+			if (cond_type.type != R_BOOLEAN) {
 				ERROR_RET(ERR_SEM_TYPE_CONTROL)
 			}
             for (size_t i = 0; i < node->as.arr->length; i++) {
@@ -431,7 +445,7 @@ Expr_Type sem_if(AST_Node* node, Sem_State* state) {
             }
         }
     } else {
-		if (is_nullable(cond_type)) {
+		if (cond_type.type != R_BOOLEAN) {
 			ERROR_RET(ERR_SEM_TYPE_CONTROL);
 		}
 	}

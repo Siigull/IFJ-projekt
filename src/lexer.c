@@ -72,6 +72,93 @@ void lexer_skip_whitespace(Lexer* lexer) {
 	}
 }
 
+bool is_hexa(char x) {
+	return isdigit(x) || (x >= 'A' && x <= 'F') || (x >= 'a' && x <= 'f');
+}
+
+int parse_escape(const char* in, char* out) {
+	int x;
+	if (is_hexa(in[2]) && is_hexa(in[3])) {
+		sscanf(in + 2, "%2x", &x);
+
+    } else {
+        ERROR_RET(ERR_LEX);
+    }
+
+	return x;
+}
+
+
+char* parse_string_value(const char* string) {
+	int len = strlen(string);
+	int new_len = len;
+
+    for(int i=0; i < len; i++) {
+        if(string[i] == '\\') {
+            switch(string[i+1]) {
+                case 'x':
+                    if(i+3 >= len) {
+                        ERROR_RET(ERR_LEX);
+                    }
+                    break;
+                case 'n':
+                case 'r':
+                case 't':
+                case '"':
+                    new_len--;
+                    break;
+                case '\\':
+                    new_len--;
+                    i++;
+                    break;
+                default:
+                    ERROR_RET(ERR_LEX);
+                    break;
+            }
+        }
+    }
+
+	char* new_string = malloc(sizeof(char) * new_len + 1);
+	char* out = new_string;
+
+	for (int i = 0; i < len; i++) {
+		if (string[i] == '\\') {
+			switch (string[i + 1]) {
+			case 'x': {
+				int x = parse_escape(string + i, new_string);
+				new_string[0] = (char) (x);
+				i += 2;
+				break;
+			}
+			case 'n':
+				new_string[0] = '\n';
+				break;
+			case '\\':
+				new_string[0] = '\\';
+				break;
+			case '"':
+				new_string[0] = '"';
+				break;
+			case 'r':
+				new_string[0] = '\r';
+				break;
+			case 't':
+				new_string[0] = '\t';
+				break;
+			}
+			i++;
+			new_string++;
+
+		} else {
+			new_string[0] = string[i];
+			new_string += 1;
+		}
+	}
+	new_string[0] = '\0';
+
+	return out;
+}
+
 void lexer_skip_space(Lexer* lexer) {
 	char c = lexer->input[lexer->idr];
 	while (is_whitespace(c)) {
@@ -286,32 +373,38 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 	}
 
 	if (type == T_STRING) {
-		if (value[0] == '\\' && value[1] == '\\') {
-			int last_newline = -1;
+		        if (value[0] == '\\' && value[1] == '\\') {
+            int last_newline = -1;
 
-			for (int i = 0; i < len; i++) {
-				if (value[i] == '\n' && last_newline == -1) {
-					last_newline = i;
+            for (int i = 0; i < len; i++) {
+                if (value[i] == '\n' && last_newline == -1) {
+                    last_newline = i;
 
-				} else if (value[i] == '\\' && value[i + 1] == '\\' && last_newline != -1) {
-					memmove(value + last_newline + 1, value + i + 2, len - (i + 1));
-					i = last_newline;
-					last_newline = -1;
-				}
-			}
+                } else if (value[i-1] == '\\' && value[i] == '\\' && last_newline != -1) {
+                    memmove(value + last_newline + 1, value + i + 1, len - i - 1);
+                    len -= i - last_newline;
+                    i = last_newline;
+                    last_newline = -1;
+                }
+            }
 
-			if (last_newline != -1) {
-				value[last_newline] = '\0';
-			}
+            if(last_newline != -1) {
+                value[last_newline] = '\0';
+            
+            } else {
+                value[len-1] = '\0';
+            }
 
-			memmove(value, value + 2, len - 1);
+            memmove(value, value + 2, len);
+            len -= 2;
 
-		} else {
-			lexer_advance(lexer);
-		}
+        } else {
+            lexer_advance(lexer);
+			token->value = parse_string_value(token->value);
+        }
 
-		token->length = strlen(token->value);
-		return token;
+        token->length = strlen(token->value);
+        return token;
 	}
 
 	if (type == T_BUILDIN) {
