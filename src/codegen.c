@@ -95,12 +95,12 @@ void generate_builtins(){
     fprintf(stdout, "\tPOPS LF@*first\n");
     fprintf(stdout, "\tDEFVAR LF@*ord*length\n");
     fprintf(stdout, "\tSTRLEN LF@*ord*length LF@*first\n");
+    fprintf(stdout, "\tJUMPIFEQ *ord*err LF@*ord*length int@0\n");
     fprintf(stdout, "\tSUB LF@*ord*length LF@*ord*length int@1\n");
     fprintf(stdout, "\tLT GF@*tmp*res LF@*second int@0\n");
     fprintf(stdout, "\tJUMPIFEQ *ord*err GF@*tmp*res bool@true\n");
     fprintf(stdout, "\tGT GF@*tmp*res LF@*second LF@*ord*length\n");
     fprintf(stdout, "\tJUMPIFEQ *ord*err GF@*tmp*res bool@true\n");
-    fprintf(stdout, "\tJUMPIFEQ *ord*err LF@*ord*length int@0\n");
     fprintf(stdout, "\tSTRI2INT LF@*return*value LF@*first LF@*second\n");
     fprintf(stdout, "\tLABEL *ord*end\n");
     fprintf(stdout, "\tMOVE GF@*return*val LF@*return*value\n");
