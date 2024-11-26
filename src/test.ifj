@@ -1,7 +1,20 @@
 const ifj = @import("ifj24.zig");
 
+pub fn test1() i32 {
+    var y = 10.0 + 10;
+    y = y;
+    return y;
+}
+
+pub fn test2(x : i32, y : i32) i32 {
+    return x + y;
+}
+
 pub fn main() void {
-    const x = 1 == 1;
+    const x = 1;
+
+    _ = test2(1.0, 2);
+
     if(x == 1) {
         ifj.write((0 - 5) / 3);
  

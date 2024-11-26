@@ -199,7 +199,7 @@ LABEL main
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write
-	PUSHS LF@y?g0eRR2Cm
+	PUSHS int@24
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write

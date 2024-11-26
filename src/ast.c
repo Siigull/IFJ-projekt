@@ -30,6 +30,7 @@ AST_Node* node_init(AST_Type type) {
         case VAR_DECL:
             break;
         default:
+            node->as.expr_type = (Expr_Type){R_VOID, false};
             break;
     }
 

@@ -2,8 +2,8 @@
  * IFJ PROJEKT 2024
  * @file parser.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief 
- * 
+ * @brief
+ *
  */
 
 #include "parser.h"
@@ -22,6 +22,14 @@ AST_Node* binary();
 AST_Node* func_call();
 AST_Node* stmt();
 Ret_Type_ get_ret_type();
+
+Expr_Type null_to_nnul(Expr_Type type) {
+    if(type.type == N_I32 || type.type == N_F64 || type.type == N_U8) {
+        return (Expr_Type){type.type - 1, type.is_const_literal};
+    }
+
+    return type;
+}
 
 void parser_reset() {
     parser->next = NULL;
@@ -210,7 +218,7 @@ AST_Node* string() {
          AST_Node* node = string();
          return node;
 
-     } else if (check(T_I32) || check(T_F64) || 
+     } else if (check(T_I32) || check(T_F64) ||
                 check(T_U8)  || check(T_NULL)) {
         advance();
 
@@ -242,7 +250,7 @@ bool check_operator() {
              return true;
          }
      }
-    
+
      return false;
  }
 
@@ -284,7 +292,7 @@ AST_Node* literal() {
         char* end;
         AST_Node* node = node_init(I32);
         node->as.i32 = strtol(parser->prev->value, &end, 10);
-        if(errno == ERANGE || *end != '\0' || 
+        if(errno == ERANGE || *end != '\0' ||
            node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
             ERROR_RET(ERR_SEM_OTHER);
         }
@@ -295,12 +303,12 @@ AST_Node* literal() {
         errno = 0;
         char* end;
         AST_Node* node = node_init(F64);
-        node->as.f64 = strtof(parser->prev->value, &end);
+        node->as.f64 = strtod(parser->prev->value, &end);
         if(errno == ERANGE || *end != '\0') {
             ERROR_RET(ERR_SEM_OTHER);
         }
         return node;
-    
+
     } else if (check(T_NULL)) {
         advance();
         AST_Node* node = node_init(NIL);
@@ -538,7 +546,7 @@ Ret_Type_ type() {
 	if(check(T_QUESTMARK)){
 		advance();
 	}
-	
+
 	Ret_Type_ type = get_ret_type();
 	advance();
 
@@ -675,7 +683,7 @@ AST_Node* stmt() {
 		return _return();
 
 	case T_WHILE:
-		return _while();	
+		return _while();
 
         default:
             // TODO(Sigull) Add error message
@@ -782,19 +790,19 @@ void prolog() {
 	consume(T_LPAR);
 	consume(T_SEMI);
 
-	Entry* read_str = entry_init("*readstr", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
-	Entry* read_int = entry_init("*readi32", E_FUNC, (Expr_Type){N_I32, false}, false, false, false);
-	Entry* read_float = entry_init("*readf64", E_FUNC, (Expr_Type){N_F64, false}, false, false, false);
-	Entry* write = entry_init("*write", E_FUNC, (Expr_Type){R_VOID, false}, false, false, false);
-	Entry* int_to_float = entry_init("*i2f", E_FUNC, (Expr_Type){R_F64, false}, false, false, false);
-	Entry* float_to_int = entry_init("*f2i", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* string_func = entry_init("*string", E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
-	Entry* length = entry_init ("*length", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* concat = entry_init("*concat", E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
-	Entry* sub_string = entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
-	Entry* string_cmp = entry_init("*strcmp", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* ord_func = entry_init("*ord", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* chr_func = entry_init("*chr", E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* read_str =     entry_init("*readstr",   E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
+	Entry* read_int =     entry_init("*readi32",   E_FUNC, (Expr_Type){N_I32, false}, false, false, false);
+	Entry* read_float =   entry_init("*readf64",   E_FUNC, (Expr_Type){N_F64, false}, false, false, false);
+	Entry* write =        entry_init("*write",     E_FUNC, (Expr_Type){R_VOID, false}, false, false, false);
+	Entry* int_to_float = entry_init("*i2f",       E_FUNC, (Expr_Type){R_F64, false}, false, false, false);
+	Entry* float_to_int = entry_init("*f2i",       E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* string_func =  entry_init("*string",    E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* length =       entry_init("*length",    E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* concat =       entry_init("*concat",    E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* sub_string =   entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
+	Entry* string_cmp =   entry_init("*strcmp",    E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* ord_func =     entry_init("*ord",       E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* chr_func =     entry_init("*chr",       E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
 
 	// write to stdout
 	Function_Arg* arg_write = malloc(sizeof(Function_Arg));
@@ -830,7 +838,7 @@ void prolog() {
 	strcpy(arg_length->arg_name, "s");
 	arg_length->type = R_U8;
 	arr_append(length->as.function_args, (size_t)arg_length);
-	
+
 	// string concatenation
 	Function_Arg* arg_concat = malloc(sizeof(Function_Arg));
 	arg_concat->arg_name = malloc(sizeof(char) * 2);
@@ -928,7 +936,7 @@ void func_head() {
 
     if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
-    } 
+    }
     entry->ret_type = (Expr_Type){type(), false};
 
     tree_insert(parser->s_table, entry);
@@ -965,12 +973,13 @@ void parse(char* orig_input) {
 	if (!tree_find(parser->s_table, "main")) {
 		ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 	}
-
+#if DEBUG
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
     if(f == NULL) return;
     fclose(f);
+#endif
 
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
@@ -981,7 +990,7 @@ void parse(char* orig_input) {
 #endif
         arr_append(nodes, (size_t)node);
     }
-	
+
 	check_var_usage(parser->s_table);
     generate_code(nodes, parser->s_table);
 }

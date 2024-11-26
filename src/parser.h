@@ -34,5 +34,6 @@ typedef struct Parser {
 void parse(char* input);
 int compile(char* input);
 char* string_to_assembly(const char* string);
+Expr_Type null_to_nnul(Expr_Type type);
 
 #endif

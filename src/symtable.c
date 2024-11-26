@@ -508,7 +508,7 @@ bool context_pop(C_Stack* stack) {
 		}
 
 		while(true) {
-			char* path = get_path(stack);
+			char* path = get_path();
 			memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 2);
 			
 			if(tree_find(stack->global_table, entry->key) == NULL) { 
