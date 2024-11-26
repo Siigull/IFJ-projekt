@@ -686,47 +686,15 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
     Ret ret_right = check_node_2(node->right, state);
 
     switch (node->type) {
-        case PLUS: {
-            implicit_f64_i32(&ret_left, &ret_right, node);
-            implicit_i32_f64_lit(&ret_left, &ret_right, node);
-
-            OPERATE(ret_left, ret_right, +);
-            break;
-        }
-        case MINUS: {
-            implicit_f64_i32(&ret_left, &ret_right, node);
-            implicit_i32_f64_lit(&ret_left, &ret_right, node);
-
-            OPERATE(ret_left, ret_right, -);
-            break;
-        }
+        case PLUS: 
+        case MINUS:
         case MUL: {
             implicit_f64_i32(&ret_left, &ret_right, node);
             implicit_i32_f64_lit(&ret_left, &ret_right, node);
-
-            OPERATE(ret_left, ret_right, *);
             break;
         }
         case DIV: {
-            Ret left_og;
-            memcpy(&left_og, &ret_left, sizeof(Ret));
-
             implicit_f64_i32(&ret_left, &ret_right, node);
-
-            if(ret_left.type != ret_right.type) {
-                return (Ret){R_VOID, false, 0};
-            }
-
-            OPERATE(ret_left, ret_right, /);
-
-            // div floor
-            if(ret_left.type == R_I32 &&
-            left_og.as.i32 != 0 &&
-            ret_left.as.i32 <= 0) {
-                if(left_og.as.i32 % ret_right.as.i32) {
-                    ret_left.as.i32--;
-                }
-            }
             break;
         }
         case ISEQ:
@@ -737,18 +705,60 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
         case ISMOREEQ:
             implicit_f64_i32(&ret_left, &ret_right, node);
             implicit_i32_f64(&ret_left, &ret_right, node);
-
+            
             return (Ret){R_BOOLEAN, false, 0};
         default:
             break;
     }
 
+    if(ret_left.is_const && ret_right.is_const) {
+        switch (node->type) {
+            case PLUS: {
+                OPERATE(ret_left, ret_right, +);
+                break;
+            }
+            case MINUS: {
+                OPERATE(ret_left, ret_right, -);
+                break;
+            }
+            case MUL: {
+                OPERATE(ret_left, ret_right, *);
+                break;
+            }
+            case DIV: {
+                Ret left_og;
+                memcpy(&left_og, &ret_left, sizeof(Ret)); 
 
+                if(ret_left.type != ret_right.type) {
+                    return (Ret){R_VOID, false, 0};
+                }
 
-    if(!ret_left.is_const || !ret_right.is_const) {
-        ret_left.is_const = false;
-
-    } else {
+                OPERATE(ret_left, ret_right, /);
+                
+                // div floor
+                if(ret_left.type == R_I32 && 
+                left_og.as.i32 != 0 &&
+                ret_left.as.i32 <= 0) {
+                    if(left_og.as.i32 % ret_right.as.i32) {
+                        ret_left.as.i32--;
+                    }
+                }
+                break;
+            }
+            case ISEQ:
+            case ISNEQ:
+            case ISLESS:
+            case ISLESSEQ:
+            case ISMORE:
+            case ISMOREEQ:
+                implicit_f64_i32(&ret_left, &ret_right, node);
+                implicit_i32_f64(&ret_left, &ret_right, node);
+                
+                return (Ret){R_BOOLEAN, false, 0};
+            default:
+                break;
+        }
+        
         if(ret_left.type == R_I32) {
             node->type = I32;
             node->as.i32 = ret_left.as.i32;
@@ -761,6 +771,9 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
             node->left = NULL;
             node->right = NULL;
         }
+
+    } else {
+        ret_left.is_const = false;
     }
 
     return ret_left;
