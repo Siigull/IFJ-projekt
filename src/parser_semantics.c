@@ -714,7 +714,8 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
                 // div floor
                 if(ret_left.type == R_I32 &&
                 left_og.as.i32 != 0 &&
-                ret_left.as.i32 <= 0) {
+                ret_left.as.i32 <= 0 &&
+                (ret_left.as.i32 > 0 != ret_right.as.i32 > 0)) {
                     if(left_og.as.i32 % ret_right.as.i32) {
                         ret_left.as.i32--;
                     }
