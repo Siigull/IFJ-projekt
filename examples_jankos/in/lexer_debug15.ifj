@@ -2,4 +2,4 @@ const ifj = @import("ifj24.zig");
 pub fn main() void{
      const a : f64 = 0.52;
      ifj.pepik(a);
-}   
+}

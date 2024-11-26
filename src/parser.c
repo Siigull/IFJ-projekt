@@ -692,7 +692,7 @@ AST_Node* stmt() {
 
 Ret_Type_ get_ret_type() {
 	bool has_null = parser->prev->type == T_QUESTMARK;
-	if(check(R_VOID)) {
+	if(check(T_VOID)) {
 		advance();
 		
 	} else {
@@ -705,13 +705,13 @@ Ret_Type_ get_ret_type() {
 		}
 		return R_VOID;
 	} else if (!strcmp(parser->prev->value, "i32")) {
-		return N_I32 + has_null;
+		return R_I32 + has_null;
 
 	} else if (!strcmp(parser->prev->value, "f64")) {
-		return N_F64 + has_null;
+		return R_F64 + has_null;
 		
 	} else if (!strcmp(parser->prev->value, "[]u8")) {
-		return N_U8 + has_null;
+		return R_U8 + has_null;
 	}
 
     ERROR_RET(ERR_PARSE);

@@ -1,15 +1,11 @@
 const ifj = @import("ifj24.zig");
 
-pub fn test1() i32 {
-    var y = 10.0 + 10;
-    y = y;
-    return y;
-}
-
-pub fn test2(x : i32, y : i322) i32 {
-    return x + y;
-}
-
 pub fn main() void {
+    var board = ifj.string("----------------------------------------------------------------");
 
+    var running = 1;
+    while(running == 1) {
+        ifj.write("Zadej tah:");
+        ifj.readi32();
+    }
 }
