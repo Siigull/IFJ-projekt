@@ -548,7 +548,6 @@ Ret_Type_ type() {
 	}
 
 	Ret_Type_ type = get_ret_type();
-	advance();
 
 	return type;
 }
@@ -692,32 +691,30 @@ AST_Node* stmt() {
 }
 
 Ret_Type_ get_ret_type() {
-	if (!strcmp(parser->next->value, "void")) {
-		if(parser->prev->type == T_QUESTMARK) {
+	bool has_null = parser->prev->type == T_QUESTMARK;
+	if(check(R_VOID)) {
+		advance();
+		
+	} else {
+		consume(T_DTYPE);
+	}
+
+	if (!strcmp(parser->prev->value, "void")) {
+		if(has_null) {
 			ERROR_RET(ERR_PARSE);
 		}
 		return R_VOID;
-	} else if (!strcmp(parser->next->value, "i32")) {
-		if(parser->prev->type == T_QUESTMARK) {
-			return N_I32;
-		} else {
-			return R_I32;
-		}
-	} else if (!strcmp(parser->next->value, "f64")) {
-		if(parser->prev->type == T_QUESTMARK) {
-			return N_F64;
-		} else {
-			return R_F64;
-		}
-	} else if (!strcmp(parser->next->value, "[]u8")) {
-		if(parser->prev->type == T_QUESTMARK) {
-			return N_U8;
-		} else {
-			return R_U8;
-		}
+	} else if (!strcmp(parser->prev->value, "i32")) {
+		return N_I32 + has_null;
+
+	} else if (!strcmp(parser->prev->value, "f64")) {
+		return N_F64 + has_null;
+		
+	} else if (!strcmp(parser->prev->value, "[]u8")) {
+		return N_U8 + has_null;
 	}
 
-    ERROR_RET(ERR_SEM_RET_TYPE_DISCARD);
+    ERROR_RET(ERR_PARSE);
 }
 
 AST_Node* func_decl() {
@@ -735,12 +732,16 @@ AST_Node* func_decl() {
 	Function_Arg** args = (Function_Arg**)func->as.function_args->data;
 
     consume(T_RPAR);
+
+	// loop for parsing arguments
     while(check(T_ID)) {
         advance();
 		char* var_name = parser->prev->value;
+
         consume(T_DDOT);
 		Ret_Type_ r_type = type();
 
+		// Adding arguments to func symtable entry
 		Entry* entry = entry_init(var_name, E_VAR, (Expr_Type){r_type, false}, false, false, false);
 		(*args++)->arg_name = var_name;
 		if(context_find(&(parser->c_stack), entry->key, true) != NULL) {
@@ -756,6 +757,7 @@ AST_Node* func_decl() {
 	}
 	consume(T_LPAR);
 
+	// Function has to have type
     if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
     }
@@ -768,10 +770,12 @@ AST_Node* func_decl() {
 }
 
 AST_Node* decl() {
+	// Global variables don't exist only functions
 	return func_decl();
 }
 
 void prolog() {
+	// Parsing if prolog is correctly imported in program
 	consume(T_CONST);
 	consume(T_ID);
 	if (strcmp(parser->prev->value, "ifj")) {
@@ -790,6 +794,7 @@ void prolog() {
 	consume(T_LPAR);
 	consume(T_SEMI);
 
+	// Adding builtin functions to symtable
 	Entry* read_str =     entry_init("*readstr",   E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
 	Entry* read_int =     entry_init("*readi32",   E_FUNC, (Expr_Type){N_I32, false}, false, false, false);
 	Entry* read_float =   entry_init("*readf64",   E_FUNC, (Expr_Type){N_F64, false}, false, false, false);
@@ -986,7 +991,7 @@ void parse(char* orig_input) {
         AST_Node* node = decl();
 		check_semantics(node);
 #if DEBUG
-        generate_graph(node, graph_filename);
+        generate_graph(node, graph_filename, parser->s_table);
 #endif
         arr_append(nodes, (size_t)node);
     }

@@ -15,6 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 
-void generate_graph(AST_Node* node, const char* filepath);
+void generate_graph(AST_Node* node, const char* filepath, Tree* s_table_);
 
 #endif

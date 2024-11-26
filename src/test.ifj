@@ -6,19 +6,10 @@ pub fn test1() i32 {
     return y;
 }
 
-pub fn test2(x : i32, y : i32) i32 {
+pub fn test2(x : i32, y : i322) i32 {
     return x + y;
 }
 
 pub fn main() void {
-    const x = 1;
 
-    _ = test2(1.0, 2);
-
-    if(x == 1) {
-        ifj.write((0 - 5) / 3);
- 
-    } else {
-       ifj.write(x);
-    }
 }
