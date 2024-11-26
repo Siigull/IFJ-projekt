@@ -2,11 +2,8 @@ const ifj = @import("ifj24.zig");
 
 // Main Program
 pub fn main() void {
-	const a : f64 = 5.5;
-	const b : i32 = 5;
-	if (a == b) {
-		ifj.write(10);
-	} else {
-		ifj.write(2);
-	}
+	const a : []u8 = ifj.string("kokot");
+	const b = ifj.string(a);
+	ifj.write(a); ifj.write("\n");
+	ifj.write(b); ifj.write("\n");
 }

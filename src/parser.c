@@ -834,7 +834,7 @@ void prolog() {
 	Function_Arg* arg_string = malloc(sizeof(Function_Arg));
 	arg_string->arg_name = malloc(sizeof(char) * 5);
 	strcpy(arg_string->arg_name, "term");
-	arg_string->type = R_STRING;
+	arg_string->type = R_TERM_STRING;
 	arr_append(string_func->as.function_args, (size_t)arg_string);
 
 	// length of string

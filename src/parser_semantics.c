@@ -216,7 +216,11 @@ Expr_Type sem_func_call(AST_Node* node, Sem_State* state) {
             Expr_Type current_expr_type = check_node(current_node, state);
             Function_Arg* arg_node = (Function_Arg*)func_entry->as.function_args->data[i];
 
-            if (current_expr_type.type != arg_node->type && arg_node->type != R_VOID) {
+			if (arg_node->type == R_TERM_STRING) {
+				if (current_expr_type.type != R_STRING && current_expr_type.type != R_U8) {
+					ERROR_RET(ERR_SEM_PARAMS);
+				}
+			} else if (current_expr_type.type != arg_node->type && arg_node->type != R_VOID) {
                 if (!is_nullable_decl((Expr_Type){arg_node->type, false}, current_expr_type)) {
                     ERROR_RET(ERR_SEM_PARAMS);
                 }

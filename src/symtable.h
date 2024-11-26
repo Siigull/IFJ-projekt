@@ -31,6 +31,7 @@ typedef enum {
 	R_STRING,
 	R_BOOLEAN,
 	R_NULL,
+	R_TERM_STRING,
 	IMPLICIT,
 } Ret_Type_;
 
@@ -46,7 +47,7 @@ typedef struct {
 
 typedef struct Entry {
 	Entry_Type type;
-	
+
 	const char* key; // TODO(Sigull): change const char* string to our own type
 	Expr_Type ret_type;
 	bool has_null;
@@ -81,7 +82,7 @@ typedef struct Tree {
 typedef struct Context_Stack {
 	int cur_nest;
 	int max_nest;
-	
+
 	Tree** arr;
 	Tree* global_table;
 } C_Stack;
