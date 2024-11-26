@@ -7,7 +7,7 @@ UseTab: ForIndentation
 Language: Cpp
 PointerAlignment: Left
 AlignAfterOpenBracket: BlockIndent
-AlignConsecutiveAssignments: true
+AlignConsecutiveAssignments: false
 AlignOperands: true
 AlignEscapedNewlinesLeft: true
 AlignTrailingComments: true
@@ -15,7 +15,18 @@ AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: false
 BinPackParameters: false
-BreakBeforeBraces: GNU
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterControlStatement: Never
+    AfterEnum: false
+    AfterFunction: false
+    AfterStruct: false
+    AfterExternBlock: true
+    BeforeElse: false
+    BeforeWhile: false
+
+BinPackParameters: true
 ColumnLimit: 80
 IndentCaseLabels: true
 SpaceBeforeParens: ControlStatements
