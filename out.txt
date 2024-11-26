@@ -190,370 +190,314 @@ LABEL *substring
 LABEL main
 	CREATEFRAME
 	PUSHFRAME
-	PUSHS string@Vitaj\032v\032komplexnom\032testovacom\032programe\032pre\032jazyk\032IFJ24!\010
+	DEFVAR LF@viewportWidth?2B5Wz8VG
+	PUSHS float@0x1.4p+4
 	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	DEFVAR LF@a?FcOOMyxq
-	PUSHS int@42
-	POPS GF@*expression*result
-	MOVE LF@a?FcOOMyxq GF@*expression*result
+	MOVE LF@viewportWidth?2B5Wz8VG GF@*expression*result
 
-	DEFVAR LF@b?jaxbgxaW
-	PUSHS int@13
+	DEFVAR LF@viewportHeight?JTpymIoJ
+	PUSHS float@0x1.4p+3
 	POPS GF@*expression*result
-	MOVE LF@b?jaxbgxaW GF@*expression*result
+	MOVE LF@viewportHeight?JTpymIoJ GF@*expression*result
 
-	DEFVAR LF@result?yAaJEQFX
-	PUSHS int@55
+	DEFVAR LF@sphereX?hCUBSDSh
+	PUSHS float@0x0p+0
 	POPS GF@*expression*result
-	MOVE LF@result?yAaJEQFX GF@*expression*result
+	MOVE LF@sphereX?hCUBSDSh GF@*expression*result
 
-	PUSHS string@Sucet\032cisel:\032
+	DEFVAR LF@sphereY?TKAipTd1
+	PUSHS float@0x0p+0
 	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS LF@result?yAaJEQFX
+	MOVE LF@sphereY?TKAipTd1 GF@*expression*result
+
+	DEFVAR LF@sphereRadius?RJaTYdoY
+	PUSHS float@0x1.4p+2
 	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS string@\010
+	MOVE LF@sphereRadius?RJaTYdoY GF@*expression*result
+
+	DEFVAR LF@lightX?MQieeQtS
+	PUSHS float@0x1.4p+3
 	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS LF@result?yAaJEQFX
+	MOVE LF@lightX?MQieeQtS GF@*expression*result
+
+	DEFVAR LF@lightY?UZJbezF9
+	PUSHS float@0x1.4p+3
+	POPS GF@*expression*result
+	MOVE LF@lightY?UZJbezF9 GF@*expression*result
+
+	DEFVAR LF@y?Ks0gLe4f
+	PUSHS float@-0x1.4p+2
+	POPS GF@*expression*result
+	MOVE LF@y?Ks0gLe4f GF@*expression*result
+
+	DEFVAR LF@x?feHBRfV5
+	DEFVAR LF@rayX?C1vvHGqq
+	DEFVAR LF@rayY?yAaJEQFX
+	DEFVAR LF@dx?ot5pSQsQ
+	DEFVAR LF@dy?jaxbgxaW
+	DEFVAR LF@distSq?TxyavRV7
+	DEFVAR LF@nx?AjSKVF07
+	DEFVAR LF@ny?03VlBjVE
+	DEFVAR LF@lx?OTF22H99
+	DEFVAR LF@ly?mP73H9d6
+	DEFVAR LF@input?FcOOMyxq
+	DEFVAR LF@lenL?Hu3WxKOu
+	DEFVAR LF@normLx?1P2JpiCJ
+	DEFVAR LF@normLy?g0eRR2Cm
+	DEFVAR LF@dot?96OdJvkl
+	LABEL *while*main*8*0*1
+	PUSHS LF@y?Ks0gLe4f
 	POPS GF@*expression*result
 	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@50
+	PUSHS float@0x1.4p+2
+	POPS GF@*expression*result
+	MOVE GF@*rhs GF@*expression*result
+	LT GF@*tmp*res GF@*lhs GF@*rhs
+	EQ GF@*expression*result GF@*lhs GF@*rhs
+	OR GF@*expression*result GF@*expression*result GF@*tmp*res
+	MOVE GF@*tmp*res GF@*expression*result
+	JUMPIFEQ *end*loop*main*8*0*1 GF@*expression*result bool@false
+	PUSHS float@-0x1.4p+3
+	POPS GF@*expression*result
+	MOVE LF@x?feHBRfV5 GF@*expression*result
+
+	LABEL *while*main*1*1*2
+	PUSHS LF@x?feHBRfV5
+	POPS GF@*expression*result
+	MOVE GF@*lhs GF@*expression*result
+	PUSHS float@0x1.4p+3
+	POPS GF@*expression*result
+	MOVE GF@*rhs GF@*expression*result
+	LT GF@*tmp*res GF@*lhs GF@*rhs
+	EQ GF@*expression*result GF@*lhs GF@*rhs
+	OR GF@*expression*result GF@*expression*result GF@*tmp*res
+	MOVE GF@*tmp*res GF@*expression*result
+	JUMPIFEQ *end*loop*main*1*1*2 GF@*expression*result bool@false
+	PUSHS LF@x?feHBRfV5
+	PUSHS float@0x1p+0
+	MULS
+	POPS GF@*expression*result
+	MOVE LF@rayX?C1vvHGqq GF@*expression*result
+
+	PUSHS LF@y?Ks0gLe4f
+	PUSHS float@0x1p+0
+	MULS
+	POPS GF@*expression*result
+	MOVE LF@rayY?yAaJEQFX GF@*expression*result
+
+	PUSHS LF@rayX?C1vvHGqq
+	PUSHS float@0x0p+0
+	SUBS
+	POPS GF@*expression*result
+	MOVE LF@dx?ot5pSQsQ GF@*expression*result
+
+	PUSHS LF@rayY?yAaJEQFX
+	PUSHS float@0x0p+0
+	SUBS
+	POPS GF@*expression*result
+	MOVE LF@dy?jaxbgxaW GF@*expression*result
+
+	PUSHS LF@dx?ot5pSQsQ
+	PUSHS LF@dx?ot5pSQsQ
+	MULS
+	PUSHS LF@dy?jaxbgxaW
+	PUSHS LF@dy?jaxbgxaW
+	MULS
+	ADDS
+	POPS GF@*expression*result
+	MOVE LF@distSq?TxyavRV7 GF@*expression*result
+
+	PUSHS LF@distSq?TxyavRV7
+	POPS GF@*expression*result
+	MOVE GF@*lhs GF@*expression*result
+	PUSHS float@0x1.9p+4
+	POPS GF@*expression*result
+	MOVE GF@*rhs GF@*expression*result
+	LT GF@*tmp*res GF@*lhs GF@*rhs
+	EQ GF@*expression*result GF@*lhs GF@*rhs
+	OR GF@*expression*result GF@*expression*result GF@*tmp*res
+	MOVE GF@*tmp*res GF@*expression*result
+	JUMPIFEQ *else*main*5*2*3 GF@*expression*result bool@false
+	PUSHS LF@dx?ot5pSQsQ
+	PUSHS float@0x1.4p+2
+	DIVS
+	POPS GF@*expression*result
+	MOVE LF@nx?AjSKVF07 GF@*expression*result
+
+	PUSHS LF@dy?jaxbgxaW
+	PUSHS float@0x1.4p+2
+	DIVS
+	POPS GF@*expression*result
+	MOVE LF@ny?03VlBjVE GF@*expression*result
+
+	PUSHS float@0x1.4p+3
+	PUSHS LF@rayX?C1vvHGqq
+	SUBS
+	POPS GF@*expression*result
+	MOVE LF@lx?OTF22H99 GF@*expression*result
+
+	PUSHS float@0x1.4p+3
+	PUSHS LF@rayY?yAaJEQFX
+	SUBS
+	POPS GF@*expression*result
+	MOVE LF@ly?mP73H9d6 GF@*expression*result
+
+	PUSHS LF@lx?OTF22H99
+	PUSHS LF@lx?OTF22H99
+	MULS
+	PUSHS LF@ly?mP73H9d6
+	PUSHS LF@ly?mP73H9d6
+	MULS
+	ADDS
+	POPS GF@*expression*result
+	MOVE LF@input?FcOOMyxq GF@*expression*result
+
+	PUSHS LF@input?FcOOMyxq
+	POPS GF@*expression*result
+	PUSHS GF@*expression*result
+	CALL sqrt
+	PUSHS GF@*return*val
+	POPS GF@*expression*result
+	MOVE LF@lenL?Hu3WxKOu GF@*expression*result
+
+	PUSHS LF@lenL?Hu3WxKOu
+	POPS GF@*expression*result
+	MOVE GF@*lhs GF@*expression*result
+	PUSHS float@0x0p+0
 	POPS GF@*expression*result
 	MOVE GF@*rhs GF@*expression*result
 	GT GF@*expression*result GF@*lhs GF@*rhs
 	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*main*7*0*1 GF@*expression*result bool@false
-	PUSHS int@10
+	JUMPIFEQ *else*main*6*3*4 GF@*expression*result bool@false
+	PUSHS LF@lx?OTF22H99
+	PUSHS LF@lenL?Hu3WxKOu
+	DIVS
 	POPS GF@*expression*result
-	MOVE LF@result?yAaJEQFX GF@*expression*result
+	MOVE LF@normLx?1P2JpiCJ GF@*expression*result
 
-	PUSHS string@Vysledok\032je\032vacsi\032ako\03250.\010
+	PUSHS LF@ly?mP73H9d6
+	PUSHS LF@lenL?Hu3WxKOu
+	DIVS
 	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	JUMP *end*of*if*main*7*0*1
-	LABEL *else*main*7*0*1
-	PUSHS string@Vysledok\032je\032mensi\032alebo\032rovny\03250.\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	LABEL *end*of*if*main*7*0*1
-	PUSHS string@Vypis\032cisel\032od\0321\032do\0325:\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	DEFVAR LF@i?RJaTYdoY
-	PUSHS int@1
-	POPS GF@*expression*result
-	MOVE LF@i?RJaTYdoY GF@*expression*result
+	MOVE LF@normLy?g0eRR2Cm GF@*expression*result
 
-	LABEL *while*main*10*0*2
-	PUSHS LF@i?RJaTYdoY
-	POPS GF@*expression*result
-	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@5
-	POPS GF@*expression*result
-	MOVE GF@*rhs GF@*expression*result
-	LT GF@*tmp*res GF@*lhs GF@*rhs
-	EQ GF@*expression*result GF@*lhs GF@*rhs
-	OR GF@*expression*result GF@*expression*result GF@*tmp*res
-	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *end*loop*main*10*0*2 GF@*expression*result bool@false
-	PUSHS LF@i?RJaTYdoY
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS string@\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS LF@i?RJaTYdoY
-	PUSHS int@1
+	PUSHS LF@nx?AjSKVF07
+	PUSHS LF@normLx?1P2JpiCJ
+	MULS
+	PUSHS LF@ny?03VlBjVE
+	PUSHS LF@normLy?g0eRR2Cm
+	MULS
 	ADDS
 	POPS GF@*expression*result
-	MOVE LF@i?RJaTYdoY GF@*expression*result
+	MOVE LF@dot?96OdJvkl GF@*expression*result
 
-	JUMP *while*main*10*0*2
-	LABEL *end*loop*main*10*0*2
-	DEFVAR LF@factorialInput?TxyavRV7
-	PUSHS int@5
-	POPS GF@*expression*result
-	MOVE LF@factorialInput?TxyavRV7 GF@*expression*result
-
-	DEFVAR LF@factorialResult?AjSKVF07
-	PUSHS int@5
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL factorial
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@factorialResult?AjSKVF07 GF@*expression*result
-
-	PUSHS string@Faktorial\032cisla\032
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS int@5
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS string@\032je\032
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS LF@factorialResult?AjSKVF07
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS string@.\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	DEFVAR LF@str1?MQieeQtS
-	PUSHS string@Testovanie\032prace\032s\032retazcami.
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *string
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@str1?MQieeQtS GF@*expression*result
-
-	DEFVAR LF@str2?feHBRfV5
-	PUSHS string@\032IFJ24\032je\032super!
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *string
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@str2?feHBRfV5 GF@*expression*result
-
-	DEFVAR LF@combined?03VlBjVE
-	PUSHS LF@str1?MQieeQtS
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	PUSHS LF@str2?feHBRfV5
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *concat
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@combined?03VlBjVE GF@*expression*result
-
-	PUSHS string@Spojeny\032retazec:\032
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS LF@combined?03VlBjVE
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS string@\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	DEFVAR LF@sum?C1vvHGqq
-	PUSHS int@0
-	POPS GF@*expression*result
-	MOVE LF@sum?C1vvHGqq GF@*expression*result
-
-	PUSHS string@Zadajte\032cisla\032na\032scitanie\032(0\032ukonci\032vstup):\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	DEFVAR LF@break?mP73H9d6
-	PUSHS int@1
-	POPS GF@*expression*result
-	MOVE LF@break?mP73H9d6 GF@*expression*result
-
-	DEFVAR LF@input?g0eRR2Cm
-	DEFVAR LF@num?96OdJvkl
-	LABEL *while*main*27*0*3
-	PUSHS LF@break?mP73H9d6
+	PUSHS LF@dot?96OdJvkl
 	POPS GF@*expression*result
 	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@0
+	PUSHS float@0x0p+0
 	POPS GF@*expression*result
 	MOVE GF@*rhs GF@*expression*result
-	EQ GF@*expression*result GF@*lhs GF@*rhs
-	NOT GF@*expression*result GF@*expression*result
+	GT GF@*expression*result GF@*lhs GF@*rhs
 	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *end*loop*main*27*0*3 GF@*expression*result bool@false
-	CALL *readi32
-	PUSHS GF@*return*val
+	JUMPIFEQ *else*main*3*4*5 GF@*expression*result bool@false
+	PUSHS string@*
 	POPS GF@*expression*result
-	MOVE LF@input?g0eRR2Cm GF@*expression*result
-
-	MOVE GF@*tmp*res LF@input?g0eRR2Cm
-	EQ GF@*expression*result LF@input?g0eRR2Cm nil@nil
-	NOT GF@*expression*result GF@*expression*result
-	JUMPIFEQ *else*main*1*1*4 GF@*expression*result bool@false
-	MOVE LF@num?96OdJvkl GF@*tmp*res
-	PUSHS LF@num?96OdJvkl
+	PUSHS GF@*expression*result
+	CALL *write
+	JUMP *end*of*if*main*3*4*5
+	LABEL *else*main*3*4*5
+	PUSHS string@.
 	POPS GF@*expression*result
-	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@0
+	PUSHS GF@*expression*result
+	CALL *write
+	LABEL *end*of*if*main*3*4*5
+	JUMP *end*of*if*main*6*3*4
+	LABEL *else*main*6*3*4
+	PUSHS string@.
 	POPS GF@*expression*result
-	MOVE GF@*rhs GF@*expression*result
-	EQ GF@*expression*result GF@*lhs GF@*rhs
-	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*main*1*2*5 GF@*expression*result bool@false
-	PUSHS int@0
+	PUSHS GF@*expression*result
+	CALL *write
+	LABEL *end*of*if*main*6*3*4
+	JUMP *end*of*if*main*5*2*3
+	LABEL *else*main*5*2*3
+	PUSHS string@\032
 	POPS GF@*expression*result
-	MOVE LF@break?mP73H9d6 GF@*expression*result
-
-	JUMP *end*of*if*main*1*2*5
-	LABEL *else*main*1*2*5
-	PUSHS LF@sum?C1vvHGqq
-	PUSHS LF@num?96OdJvkl
+	PUSHS GF@*expression*result
+	CALL *write
+	LABEL *end*of*if*main*5*2*3
+	PUSHS LF@x?feHBRfV5
+	PUSHS float@0x1p+0
 	ADDS
 	POPS GF@*expression*result
-	MOVE LF@sum?C1vvHGqq GF@*expression*result
+	MOVE LF@x?feHBRfV5 GF@*expression*result
 
-	LABEL *end*of*if*main*1*2*5
-	JUMP *end*of*if*main*1*1*4
-	LABEL *else*main*1*1*4
-	PUSHS string@Neplatny\032vstup!\032Skuste\032znova.\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	LABEL *end*of*if*main*1*1*4
-	JUMP *while*main*27*0*3
-	LABEL *end*loop*main*27*0*3
-	PUSHS string@Sucet\032zadanych\032cisel\032je:\032
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	PUSHS LF@sum?C1vvHGqq
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
+	JUMP *while*main*1*1*2
+	LABEL *end*loop*main*1*1*2
 	PUSHS string@\010
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write
-	PUSHS string@Zadajte\032'ahoj',\032aby\032ste\032pokracovali:\010
+	PUSHS LF@y?Ks0gLe4f
+	PUSHS float@0x1p+0
+	ADDS
 	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	DEFVAR LF@inputStr?ot5pSQsQ
-	CALL *readstr
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@inputStr?ot5pSQsQ GF@*expression*result
+	MOVE LF@y?Ks0gLe4f GF@*expression*result
 
-	DEFVAR LF@expected?OTF22H99
-	PUSHS string@ahoj
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *string
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@expected?OTF22H99 GF@*expression*result
-
-	DEFVAR LF@in_str?Hu3WxKOu
-	DEFVAR LF@same?1P2JpiCJ
-	MOVE GF@*tmp*res LF@inputStr?ot5pSQsQ
-	EQ GF@*expression*result LF@inputStr?ot5pSQsQ nil@nil
-	NOT GF@*expression*result GF@*expression*result
-	JUMPIFEQ *else*main*34*0*6 GF@*expression*result bool@false
-	MOVE LF@in_str?Hu3WxKOu GF@*tmp*res
-	PUSHS LF@in_str?Hu3WxKOu
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	PUSHS LF@expected?OTF22H99
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *strcmp
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@same?1P2JpiCJ GF@*expression*result
-
-	PUSHS LF@same?1P2JpiCJ
-	POPS GF@*expression*result
-	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@0
-	POPS GF@*expression*result
-	MOVE GF@*rhs GF@*expression*result
-	EQ GF@*expression*result GF@*lhs GF@*rhs
-	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*main*2*1*7 GF@*expression*result bool@false
-	PUSHS string@Zadany\032retazec\032je\032spravny!\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	JUMP *end*of*if*main*2*1*7
-	LABEL *else*main*2*1*7
-	PUSHS string@Nespravny\032retazec.\032Koncim\032program.\0321\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	POPFRAME
-	EXIT int@0
-	LABEL *end*of*if*main*2*1*7
-	JUMP *end*of*if*main*34*0*6
-	LABEL *else*main*34*0*6
-	PUSHS string@Nespravny\032retazec.\032Koncim\032program.\0322\010
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL *write
-	POPFRAME
-	EXIT int@0
-	LABEL *end*of*if*main*34*0*6
-	PUSHS string@Testovaci\032program\032ukonceny\032uspesne.\010
+	JUMP *while*main*8*0*1
+	LABEL *end*loop*main*8*0*1
+	PUSHS string@Raytracing\032complete.\010
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write
 	POPFRAME
 	EXIT int@0
 
-LABEL factorial
+LABEL sqrt
 	CREATEFRAME
 	PUSHFRAME
 	DEFVAR LF@*return*value
 	MOVE LF@*return*value nil@nil
-	DEFVAR LF@n?TKAipTd1
-	POPS LF@n?TKAipTd1
-	PUSHS LF@n?TKAipTd1
+	DEFVAR LF@x?IxmRPevH
+	POPS LF@x?IxmRPevH
+	DEFVAR LF@guess?K6Ib7a8F
+	PUSHS LF@x?IxmRPevH
+	PUSHS float@0x1p+1
+	DIVS
+	POPS GF@*expression*result
+	MOVE LF@guess?K6Ib7a8F GF@*expression*result
+
+	DEFVAR LF@tolerance?gqdTowZv
+	PUSHS float@0x1.0c6f7a0b5ed8dp-20
+	POPS GF@*expression*result
+	MOVE LF@tolerance?gqdTowZv GF@*expression*result
+
+	LABEL *while*sqrt*2*0*1
+	PUSHS LF@guess?K6Ib7a8F
+	PUSHS LF@guess?K6Ib7a8F
+	MULS
 	POPS GF@*expression*result
 	MOVE GF@*lhs GF@*expression*result
-	PUSHS int@1
+	PUSHS LF@x?IxmRPevH
+	PUSHS float@0x1.0c6f7a0b5ed8dp-20
+	ADDS
 	POPS GF@*expression*result
 	MOVE GF@*rhs GF@*expression*result
-	LT GF@*tmp*res GF@*lhs GF@*rhs
-	EQ GF@*expression*result GF@*lhs GF@*rhs
-	OR GF@*expression*result GF@*expression*result GF@*tmp*res
+	GT GF@*expression*result GF@*lhs GF@*rhs
 	MOVE GF@*tmp*res GF@*expression*result
-	JUMPIFEQ *else*factorial*0*0*1 GF@*expression*result bool@false
-	PUSHS int@1
+	JUMPIFEQ *end*loop*sqrt*2*0*1 GF@*expression*result bool@false
+	PUSHS LF@guess?K6Ib7a8F
+	PUSHS LF@x?IxmRPevH
+	PUSHS LF@guess?K6Ib7a8F
+	DIVS
+	ADDS
+	PUSHS float@0x1p+1
+	DIVS
 	POPS GF@*expression*result
-	MOVE GF@*return*val GF@*expression*result
-	POPFRAME
-	RETURN
+	MOVE LF@guess?K6Ib7a8F GF@*expression*result
 
-	JUMP *end*of*if*factorial*0*0*1
-	LABEL *else*factorial*0*0*1
-	LABEL *end*of*if*factorial*0*0*1
-	DEFVAR LF@a?UZJbezF9
-	PUSHS LF@n?TKAipTd1
-	PUSHS int@1
-	SUBS
-	POPS GF@*expression*result
-	PUSHS GF@*expression*result
-	CALL factorial
-	PUSHS GF@*return*val
-	POPS GF@*expression*result
-	MOVE LF@a?UZJbezF9 GF@*expression*result
-
-	PUSHS LF@n?TKAipTd1
-	PUSHS LF@a?UZJbezF9
-	MULS
+	JUMP *while*sqrt*2*0*1
+	LABEL *end*loop*sqrt*2*0*1
+	PUSHS LF@guess?K6Ib7a8F
 	POPS GF@*expression*result
 	MOVE GF@*return*val GF@*expression*result
 	POPFRAME

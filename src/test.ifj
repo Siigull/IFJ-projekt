@@ -1,11 +1,9 @@
 const ifj = @import("ifj24.zig");
 
-pub fn main() void {
-    var board = ifj.string("----------------------------------------------------------------");
+pub fn toto() void {
+}
 
-    var running = 1;
-    while(running == 1) {
-        ifj.write("Zadej tah:");
-        ifj.readi32();
-    }
+pub fn main() void {
+    var tito = toto();
+    tito = tito;
 }
