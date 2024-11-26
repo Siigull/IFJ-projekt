@@ -87,9 +87,9 @@ int mainasd() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	const char path[] = "examples_jankos/in/test_raytrace.ifj";
+	const char path[] = "src/test.ifj";
 
-	// generate_debug_token_arr(path);
+	generate_debug_token_arr(path);
 
 	char* temp = load_inputos(path);
 	compile(temp);

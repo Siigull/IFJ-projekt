@@ -546,6 +546,8 @@ Ret val_literal_type(AST_Node* node, Sem_State* state) {
             t.type = entry->ret_type.type;
 
             entry->was_used = true;
+
+            // Replace with value if var contains const expression
             if(entry->is_const_val && !is_nullable(entry->ret_type)) {
                
                 if(t.type == R_I32) {
@@ -658,6 +660,7 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
                 }
 
                 OPERATE(ret_left, ret_right, /);
+                
                 // div floor
                 if(ret_left.type == R_I32 && 
                 left_og.as.i32 != 0 &&
