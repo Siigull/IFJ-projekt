@@ -542,6 +542,9 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
     else if(arg_entry->ret_type.type == R_VOID){
         fprintf(stdout, "\tPOPFRAME\n");
         fprintf(stdout, "\tRETURN\n");
+    
+    } else {
+        fprintf(stdout, "\tEXIT int@6\n");
     }
 
     return;

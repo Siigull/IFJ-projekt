@@ -1,13 +1,19 @@
 const ifj = @import("ifj24.zig");
 
+// Main Program
+pub fn main() void {
+	const a : []u8 = ifj.string("kokot");
+	const b = ifj.string(a);
+	ifj.write(a); ifj.write("\n");
+	ifj.write(b); ifj.write("\n");
 
-pub fn main() void{
-     const d : i32 = 0;
-     const e : i32 = 1;
-     if(null == null){
-         ifj.write(e);
-     }
-     else{
-         ifj.write(d);
-     }
+	const x : ?i32 = 3;
+    const y : i32 = 3;
+
+    if(null == null){
+        ifj.write("hura");
+    }else{}
+    if(x == y){
+        ifj.write("hura");
+    }else{}
 }
