@@ -3,9 +3,9 @@
  * @file parser_semantics.h
  * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @brief Header file of IFJ24 semantic analysis
- * 
+ *
  * @date 2024-11-21
- * 
+ *
  */
 
 #ifndef PARSER_SEMANTICS_H
@@ -26,6 +26,7 @@ void check_var_usage_traverse(Node* node);
 void check_var_usage(Tree* table);
 bool is_nullable(Expr_Type type);
 bool is_numeric_type(Expr_Type type);
+bool check_nullable_condition(Expr_Type left_side, Expr_Type right_side);
 bool is_nullable_decl(Expr_Type declaration, Expr_Type expression);
 Expr_Type check_node(AST_Node* node, sem_state* state);
 Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state);

@@ -206,7 +206,7 @@ LABEL main
 	MOVE LF@c?g0eRR2Cm GF@*expression*result
 
 	DEFVAR LF@d?Hu3WxKOu
-	PUSHS float@0x1.d33334p+2
+	PUSHS float@0x1.d333333333333p+2
 	POPS GF@*expression*result
 	MOVE LF@d?Hu3WxKOu GF@*expression*result
 
@@ -220,16 +220,16 @@ LABEL main
 	PUSHS float@0x1.a4p+5
 	PUSHS float@0x1p+1
 	PUSHS float@0x1.a4p+4
-	PUSHS float@0x1.d33334p+2
+	PUSHS float@0x1.d333333333333p+2
 	PUSHS int@3
-	PUSHS float@0x1.5e6667p+4
-	PUSHS float@0x1.8133338p+5
+	PUSHS float@0x1.5e66666666666p+4
+	PUSHS float@0x1.8133333333333p+5
 	PUSHS int@10
 	PUSHS int@5
 	PUSHS int@15
 	PUSHS float@0x1.4p+1
 	PUSHS float@0x1.8p+2
-	PUSHS float@0x1.5133338p+5
+	PUSHS float@0x1.5133333333333p+5
 	POPS GF@*expression*result
 	MOVE LF@result?1P2JpiCJ GF@*expression*result
 

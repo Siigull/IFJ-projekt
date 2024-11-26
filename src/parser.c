@@ -295,7 +295,7 @@ AST_Node* literal() {
         errno = 0;
         char* end;
         AST_Node* node = node_init(F64);
-        node->as.f64 = strtof(parser->prev->value, &end);
+        node->as.f64 = strtod(parser->prev->value, &end);
         if(errno == ERANGE || *end != '\0') {
             ERROR_RET(ERR_SEM_OTHER);
         }

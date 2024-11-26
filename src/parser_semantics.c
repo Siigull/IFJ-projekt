@@ -26,6 +26,21 @@ bool is_nullable_decl(Expr_Type declaration, Expr_Type expression) {
     return true;
 }
 
+bool check_nullable_condition(Expr_Type left_side, Expr_Type right_side) {
+	if (!((left_side.type == N_F64 && right_side.type == R_F64) ||
+                (left_side.type == N_I32 && right_side.type == R_I32) ||
+                (left_side.type == N_U8 && right_side.type == R_U8) ||
+                (is_nullable(left_side) && right_side.type == R_NULL) ||
+				(left_side.type == R_NULL && right_side.type == R_NULL)) ||
+				!((left_side.type == R_F64 && right_side.type == N_F64) ||
+                (left_side.type == R_I32 && right_side.type == N_I32) ||
+                (left_side.type == R_U8 && right_side.type == N_U8) ||
+                (left_side.type == R_NULL && is_nullable(right_side)))) {
+                    return false;
+        }
+    return true;
+}
+
 void check_func_call_stmt(AST_Node* node) {
     if (node->type == FUNC_CALL) {
         Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
@@ -73,12 +88,13 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
     Expr_Type left_type = check_node(node->left, state);
     Expr_Type right_type = check_node(node->right, state);
 
-    if (!is_numeric_type(left_type) || !is_numeric_type(right_type) || is_nullable(left_type) || is_nullable(right_type)) {
+    if (!is_numeric_type(left_type) || !is_numeric_type(right_type)) {
         ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
 
     bool has_int = (left_type.type == R_I32 || right_type.type == R_I32);
     bool has_float = (left_type.type == R_F64 || right_type.type == R_F64);
+	bool has_nullable = (is_nullable(left_type) || is_nullable(right_type));
 
     if (left_type.is_const_literal == true && left_type.is_const_literal == true) {
         node->as.expr_type.is_const_literal = true;
@@ -90,6 +106,10 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
         case PLUS:
         case MINUS:
         case MUL: {
+			if (has_nullable) {
+				ERROR_RET(ERR_SEM_TYPE_CONTROL);
+			}
+
             if (has_float) {
                 if (left_type.type == R_I32) {
                     if(node->left->type == ID) {
@@ -115,9 +135,9 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
             }
         }
         case DIV: {
-            if (has_float && has_int) {
-                ERROR_RET(ERR_SEM_TYPE_CONTROL);
-            }
+			if (has_nullable || (has_float && has_int)) {
+        		ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    		}
             else if (has_float) {
                 node->as.expr_type = (Expr_Type){R_F64, is_node_const};
                 return (Expr_Type){R_F64, is_node_const};
@@ -130,7 +150,10 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
         case ISLESS:
         case ISLESSEQ:
         case ISMORE:
-        case ISMOREEQ:
+        case ISMOREEQ: {
+			if (has_nullable && node->type != ISEQ && node->type != ISNEQ) {
+        		ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    		}
             if (left_type.type == right_type.type) {
                 node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
                 return (Expr_Type){R_BOOLEAN, is_node_const};
@@ -153,7 +176,14 @@ Expr_Type sem_check_binary_expression(AST_Node* node, sem_state* state) {
 
                 node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
                 return (Expr_Type){R_BOOLEAN, is_node_const};
-            }
+
+            } else if (left_type.type != right_type.type) {
+				if (has_nullable && check_nullable_condition(left_type, right_type)) {
+					node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
+					return (Expr_Type){R_BOOLEAN, is_node_const};
+				}
+			}
+		}
         default: ERROR_RET(ERR_SEM_TYPE_CONTROL);
     }
 }
@@ -378,13 +408,20 @@ Expr_Type sem_if(AST_Node* node, sem_state* state) {
                 check_func_call_stmt(stmt);
             }
         } else {
+			if (is_nullable(cond_type)) {
+				ERROR_RET(ERR_SEM_TYPE_CONTROL)
+			}
             for (size_t i = 0; i < node->as.arr->length; i++) {
                 AST_Node* stmt = (AST_Node*)node->as.arr->data[i];
                 check_node(stmt, state);
                 check_func_call_stmt(stmt);
             }
         }
-    }
+    } else {
+		if (is_nullable(cond_type)) {
+			ERROR_RET(ERR_SEM_TYPE_CONTROL);
+		}
+	}
 
     if (node->right == NULL) {
         ERROR_RET(ERR_PARSE);

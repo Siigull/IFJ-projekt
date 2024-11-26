@@ -1,9 +1,12 @@
 const ifj = @import("ifj24.zig");
 
-pub fn void_fnc() void {}
-
 // Main Program
 pub fn main() void {
-	var bomba = 1;
-	bomba = void_fnc();
+	const a : f64 = 5.5;
+	const b : i32 = 5;
+	if (a == b) {
+		ifj.write(10);
+	} else {
+		ifj.write(2);
+	}
 }

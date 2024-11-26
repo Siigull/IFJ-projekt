@@ -220,7 +220,7 @@ LABEL main
 	CALL *write
 	JUMP *end*of*if*main*2*0*1
 	LABEL *else*main*2*0*1
-	PUSHS float@0x1.4cccccp+2
+	PUSHS float@0x1.4cccccccccccdp+2
 	POPS GF@*expression*result
 	MOVE LF@b?1P2JpiCJ GF@*expression*result
 
