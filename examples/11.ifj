@@ -1,0 +1,21 @@
+const ifj = @import("ifj24.zig");
+
+// Function to find the maximum of two numbers
+pub fn max(a: i32, b: i32) i32 {
+    if (a > b) {
+        return a;  // If a is greater, return a
+    } else {
+        return b;  // Otherwise, return b
+    }
+}
+
+// Main function
+pub fn main() void {
+    var num1: i32 = 5;  // Input first number
+    var num2: i32 = 6;  // Input second number
+    var result: i32 = max(num1, num2);  // Find the maximum number
+
+    ifj.write("Maximum: ");
+    ifj.write(result);
+    ifj.write("\n");
+}

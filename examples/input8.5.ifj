@@ -1,0 +1,17 @@
+const ifj = @import("ifj24.zig");
+
+pub fn main() void {
+    var i = 0 ;
+    while (i < 2) {
+        var j = 0 ;
+        const a = 1 ;
+        i = i + a ;
+        while (j < 2) {
+            j = j + i ;
+            //const i = 9 ;
+            const f = 3;
+            ifj.write(j);
+        }
+        ifj.write(i);
+    }
+}

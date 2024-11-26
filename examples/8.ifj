@@ -1,0 +1,28 @@
+const ifj = @import("ifj24.zig");
+
+pub fn reverse_string(s: []u8) []u8 {
+    var length: i32 = ifj.length(s);  // Get the length of the string
+    var reversed: []u8 = ifj.string("");  // Initialize an empty string
+    var i: i32 = length - 1;   // Start from the last character
+
+    // Loop to reverse the string
+    while (i >= 0) {
+        var b: i32 = ifj.ord(s, i);
+        var char: []u8 = ifj.chr(b);
+
+        reversed = ifj.concat(reversed, char); // Add to reversed string
+        i = i - 1;   // Move to the previous character
+    }
+
+    return reversed;  // Return the reversed string
+}
+
+// Main function
+pub fn main() void {
+    var input: []u8 = ifj.string("hello");  // Input string
+    var reversed_string: []u8 = reverse_string(input);             // Variable to store reversed string
+
+    ifj.write(reversed_string);               // Output the reversed string
+
+    return;
+}

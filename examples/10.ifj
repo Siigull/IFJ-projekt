@@ -1,0 +1,46 @@
+const ifj = @import("ifj24.zig");
+
+// Function to check if a number is even
+pub fn is_even(n: i32) i32 {
+    var num2: i32 = n;
+
+    while (num2 >= 2) {
+        num2 = num2 - 2;  // Subtract 2 from the number until it's less than 2
+    }
+
+    if (num2 == 0) {
+        return 0;  // Even number
+    } else {
+        return 1;  // Odd number
+    }
+}
+
+pub fn sum_even_up_to(n: i32) i32 {
+    var sum: i32 = 0;
+    var i: i32 = 2;
+
+    while (i <= n) {
+        if (is_even(i) == 0) {  // Check if i is even
+            sum = sum + i;  // Add even number to the sum
+        }else{}
+        i = i + 1;  // Increment i
+    }
+
+    return sum;
+}
+
+// Main function
+pub fn main() void {
+    var num: i32 = 10;   // Read input number
+    var result: i32 = is_even(num);  // Check if number is even
+    var suma : i32 = sum_even_up_to(num);
+
+    if (result == 0) {
+        ifj.write("Even number\n");
+    } else {
+        ifj.write("Odd number\n");
+    }
+    ifj.write("Sum of even numbers: ");
+    ifj.write(suma);
+    ifj.write("\n");
+}

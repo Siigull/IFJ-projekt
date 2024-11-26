@@ -1,6 +1,8 @@
 /**
- * @file bvs.c
+ * IFJ PROJEKT 2024
+ * @file symtable.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
+ * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief Implementation of red-black tree and helper function for creation and deletion of entries
  * @date 2024-09-21
  *
@@ -10,22 +12,38 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bvs.h"
+#include "symtable.h"
 
-Entry* entry_create(const char* key) {
+#define HASH_CHARS 8
+
+Entry* entry_init(const char* key, Entry_Type type,
+				  Expr_Type ret_type, bool can_mut, bool was_used, bool was_assigned) {
 	Entry* entry = malloc(sizeof(Entry));
 
-	entry->key = key;
+	entry->type = type;
+	entry->key = (char*)key;
+	entry->ret_type = ret_type;
+	entry->is_const_val = false;
+
+	if (type == E_FUNC) {
+		entry->as.function_args = arr_init();
+	} else if (type == E_VAR) {
+		entry->as.can_mut = can_mut;
+		entry->was_used = was_used;
+	}
 
 	return entry;
 }
 
-Node* node_init(Entry* entry, Node* parent) {
+Node* bvs_node_init(Entry* entry, Node* parent) {
 	Node* node = malloc(sizeof(Node));
 
 	node->parent = parent;
 	node->entry = entry;
 	node->color = RED;
+
+	node->left = NULL;
+	node->right = NULL;
 
 	return node;
 }
@@ -157,7 +175,7 @@ void node_insert(Node* node, Entry* entry) {
 
 	if (cmp < 0) {
 		if (node->left == NULL) {
-			node->left = node_init(entry, node);
+			node->left = bvs_node_init(entry, node);
 			node_fix(node->left);
 
 		} else {
@@ -166,7 +184,7 @@ void node_insert(Node* node, Entry* entry) {
 
 	} else if (cmp > 0) {
 		if (node->right == NULL) {
-			node->right = node_init(entry, node);
+			node->right = bvs_node_init(entry, node);
 			node_fix(node->right);
 
 		} else {
@@ -184,10 +202,10 @@ void node_insert(Node* node, Entry* entry) {
 
 void tree_insert(Tree* tree, Entry* entry) {
 	if (tree->root == NULL) {
-		tree->root = node_init(entry, NULL);
+		tree->root = bvs_node_init(entry, NULL);
 		tree->root->color = BLACK;
 
-		tree->root->parent = node_init(NULL, NULL);
+		tree->root->parent = bvs_node_init(NULL, NULL);
 		tree->root->parent->left = tree->root;
 
 	} else {
@@ -220,7 +238,43 @@ Node* tree_find_traverse(Node* node, const char* key) {
 }
 
 Entry* tree_find(Tree* tree, const char* key) {
-	return tree_find_traverse(tree->root, key)->entry;
+	Node* node = tree_find_traverse(tree->root, key);
+	if (node == NULL) {
+		return NULL;
+	}
+
+	return node->entry;
+}
+
+Entry* tree_pop_traverse(Node** node) {
+	if (*node == NULL) {
+		return NULL;
+	}
+
+	if((*node)->left == NULL && (*node)->right == NULL) {
+		Entry* entry = (*node)->entry;
+		(*node) = NULL; 
+		return entry;
+	}
+
+	Entry* entry = tree_pop_traverse(&((*node)->left));
+	if(entry != NULL) return entry;
+
+	return tree_pop_traverse(&((*node)->right));
+}
+
+Entry* tree_pop(Tree* tree) {
+	Entry* entry_old = tree_pop_traverse(&(tree->root));
+	if(entry_old == NULL) {
+		return NULL;
+	}
+	
+	Entry* entry = malloc(sizeof(Entry));
+	memcpy(entry, entry_old, sizeof(Entry));
+
+	// tree_delete(tree, entry->key);
+
+	return entry;
 }
 
 Node* transplant(Node* from, Node* to) {
@@ -363,7 +417,15 @@ bool tree_delete(Tree* tree, const char* key) {
 	if (node == NULL)
 		return false;
 
-	node_delete(node);
+	if(tree->root == node){
+		entry_destroy(node->entry);
+		free(node->parent);
+		free(node);
+		tree->root = NULL;
+	
+	} else {
+		node_delete(node);
+	}	
 
 	return true;
 }
@@ -382,6 +444,112 @@ void node_print(Node* node, int depth) {
 
 	node_print(node->left, depth + 1);
 	node_print(node->right, depth + 1);
+}
+
+C_Stack init_c_stack(Tree* global_tree) {
+	C_Stack stack;
+
+	stack.max_nest = 8;
+	stack.arr = malloc(sizeof(Tree*) * stack.max_nest);
+	stack.cur_nest = -1;
+
+	stack.global_table = global_tree;
+
+	return stack;
+}
+
+void context_push(C_Stack* stack) {
+	if(stack->cur_nest >= stack->max_nest - 2) {
+		stack->max_nest *= 2;
+		Tree** data = realloc(stack->arr, stack->max_nest * sizeof(Tree*));
+		
+		if(data == NULL) {
+			free(stack->arr);
+			exit(99);
+		}
+
+		stack->arr = data;
+	}
+
+	stack->cur_nest++;
+	stack->arr[stack->cur_nest] = tree_init();
+}
+
+char* get_path() {
+	const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	char* out = calloc(HASH_CHARS + 2, sizeof(char));
+
+	out[0] = '?';
+	for(int i=1; i < 9; i++) {
+		int base64_index = rand() % 62;
+		out[i] = (char)base64_chars[base64_index];
+	}
+
+	out[9] = '\0';
+
+	return out;
+}
+
+bool context_pop(C_Stack* stack) {
+	if(stack->cur_nest < 0) {
+		return false;
+	}
+
+	Entry* entry;
+	while (true){
+		entry = tree_pop(stack->arr[stack->cur_nest]);
+		if(entry == NULL) {
+			break;
+		}
+
+		int orig_len = strlen(entry->key);
+		if(entry->key == NULL) {
+			exit(99);
+		}
+
+		while(true) {
+			char* path = get_path();
+			memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 2);
+			
+			if(tree_find(stack->global_table, entry->key) == NULL) { 
+				tree_insert(stack->global_table, entry);
+				break;
+			}
+		}
+	}
+
+	stack->cur_nest--;
+
+	return true;
+}
+
+Entry* context_find(C_Stack* stack, const char* key, bool global) {
+	int cur_nest = stack->cur_nest;
+	
+	while(cur_nest >= 0) {
+		Entry* entry = tree_find(stack->arr[cur_nest], key);
+		
+		if(entry != NULL) {
+			return entry;
+		}
+
+		cur_nest--;
+	}
+
+	if(global) {
+		return tree_find(stack->global_table, key);
+	
+	} else {
+		return NULL;
+	}
+}
+
+void context_put(C_Stack* stack, Entry* entry) {
+	if(stack->cur_nest < 0) {
+		tree_insert(stack->global_table, entry);
+	}
+
+	tree_insert(stack->arr[stack->cur_nest], entry);
 }
 
 void tree_print(Tree* tree) {

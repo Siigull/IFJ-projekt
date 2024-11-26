@@ -1,0 +1,11 @@
+const ifj = @import("ifj24.zig");
+
+pub fn func(x : i32, y : i32) i32{
+    x = 5;
+    y = 7
+    return x + y;
+}
+
+pub fn main() void{
+    _ = func(5 2);
+}

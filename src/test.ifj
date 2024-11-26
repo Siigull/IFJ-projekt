@@ -1,0 +1,9 @@
+const ifj = @import("ifj24.zig");
+
+pub fn toto() void {
+}
+
+pub fn main() void {
+    var tito = toto();
+    tito = tito;
+}

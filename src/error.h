@@ -1,4 +1,5 @@
 /**
+ * IFJ PROJEKT 2024
  * @file error.h
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @brief Error handling file
@@ -9,6 +10,8 @@
 
 #ifndef __ERROR_H__
 #define __ERROR_H__
+
+#include <stdio.h>
 
 /**
  * @brief enumeration of errors which can happen during compilation
@@ -39,7 +42,7 @@ enum error {
 #define ERROR_RET(err)                                                                             \
 	{                                                                                              \
 		fprintf(stderr, "Returned error code: %d\n", err);                                         \
-		return err;                                                                                \
+		exit(err);                                                                                \
 	}
 
 #endif /* __ERROR_H__ */

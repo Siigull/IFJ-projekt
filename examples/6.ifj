@@ -1,0 +1,29 @@
+const ifj = @import("ifj24.zig");
+
+// Function to calculate the nth Fibonacci number
+pub fn fibonacci (n : i32) i32 {
+    if (n == 0){
+        return 0;
+    }
+    else{
+        //nic
+    }
+    if (n == 1){
+        return 1;
+    }
+    else{
+        //taky nic lololoolloloollolool
+        // co je tohle za syntax else bez niceho
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Main function
+pub fn main() void {
+    const num: i32 = 1;   // Input for Fibonacci index
+    const fib: i32 = fibonacci(num);       // Variable to store the result
+    ifj.write("\n");
+    ifj.write(fib);       // Output the result
+    ifj.write("\n");
+    return;
+}

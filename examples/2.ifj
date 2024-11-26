@@ -1,0 +1,14 @@
+//comment
+const ifj = @import("ifj24.zig");
+
+// Main Program
+pub fn main() void {
+    var i : i32 = 5;
+    var f : f64 = ifj.i2f(i);
+    ifj.write(f);              // Print the float value
+    i = ifj.f2i(f);
+    ifj.write("\n");
+    ifj.write(i);
+    ifj.write("\n");
+}
+

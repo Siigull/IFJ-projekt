@@ -1,0 +1,232 @@
+.IFJcode24
+DEFVAR GF@*expression*result
+DEFVAR GF@*return*val
+DEFVAR GF@*rhs
+DEFVAR GF@*lhs
+DEFVAR GF@*tmp*res
+
+
+JUMP main
+
+LABEL *write
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*to*write
+	POPS LF@*to*write
+	WRITE LF@*to*write
+	POPFRAME
+	RETURN
+
+LABEL *i2f
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	POPS LF@*return*value
+	INT2FLOAT LF@*return*value LF@*return*value
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *f2i
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	POPS LF@*return*value
+	FLOAT2INT LF@*return*value LF@*return*value
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *length
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*strlen
+	POPS LF@*strlen
+	STRLEN LF@*strlen LF@*strlen
+	MOVE GF@*return*val LF@*strlen
+	POPFRAME
+	RETURN
+
+LABEL *concat
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	DEFVAR LF@*second
+	POPS LF@*second
+	DEFVAR LF@*first
+	POPS LF@*first
+	CONCAT LF@*return*value LF@*first LF@*second
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *readstr
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	READ LF@*return*value string
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *readi32
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	READ LF@*return*value int
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *readf64
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	READ LF@*return*value float
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *ord
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	DEFVAR LF@*second
+	POPS LF@*second
+	DEFVAR LF@*first
+	POPS LF@*first
+	STRI2INT LF@*return*value LF@*first LF@*second
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *chr
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	POPS LF@*return*value
+	INT2CHAR LF@*return*value LF@*return*value
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *string
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	POPS LF@*return*value
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *strcmp
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	DEFVAR LF@*res
+	DEFVAR LF@*second
+	POPS LF@*second
+	DEFVAR LF@*first
+	POPS LF@*first
+	EQ LF@*res LF@*first LF@*second
+	JUMPIFEQ *strcmp*skipeq LF@*res bool@false
+	MOVE LF@*return*value int@0
+	JUMP *strcmp*end
+	LABEL *strcmp*skipeq
+	LT LF@*res LF@*first LF@*second
+	JUMPIFEQ *strcmp*skiplt LF@*res bool@false
+	MOVE LF@*return*value int@-1
+	JUMP *strcmp*end
+	LABEL *strcmp*skiplt
+	MOVE LF@*return*value int@1
+	LABEL *strcmp*end
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+LABEL *substring
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@*return*value
+	DEFVAR LF@*third
+	POPS LF@*third
+	DEFVAR LF@*second
+	POPS LF@*second
+	DEFVAR LF@*first
+	POPS LF@*first
+	LT GF@*tmp*res LF@*second int@0
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	LT GF@*tmp*res LF@*third int@0
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	GT GF@*tmp*res LF@*second LF@*third
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	STRLEN GF@*tmp*res LF@*first
+	GT GF@*tmp*res LF@*third GF@*tmp*res
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	STRLEN GF@*tmp*res LF@*first
+	EQ GF@*expression*result LF@*second GF@*tmp*res
+	GT GF@*tmp*res LF@*second GF@*tmp*res
+	OR GF@*tmp*res GF@*expression*result GF@*tmp*res
+	JUMPIFEQ *substring*err GF@*tmp*res bool@true
+	MOVE LF@*return*value string@
+	DEFVAR LF@*start*index
+	DEFVAR LF@*res
+	MOVE LF@*start*index LF@*second
+	LABEL *substring*while
+	EQ LF@*res LF@*start*index LF@*third
+	JUMPIFEQ *substring*loop*end LF@*res bool@true
+	GETCHAR LF@*res LF@*first LF@*start*index
+	CONCAT LF@*return*value LF@*return*value LF@*res
+	ADD LF@*start*index LF@*start*index int@1
+	JUMP *substring*while
+	LABEL *substring*loop*end
+	MOVE GF@*return*val LF@*return*value
+	POPFRAME
+	RETURN
+
+	LABEL *substring*err
+	MOVE LF@*return*value nil@nil
+	JUMP *substring*loop*end
+LABEL main
+	CREATEFRAME
+	PUSHFRAME
+	DEFVAR LF@y?g0eRR2Cm
+	PUSHS int@24
+	POPS GF@*expression*result
+	MOVE LF@y?g0eRR2Cm GF@*expression*result
+
+	PUSHS string@Hello\032from\032IFJ
+	POPS GF@*expression*result
+	PUSHS GF@*expression*result
+	CALL *write
+	PUSHS int@24
+	POPS GF@*expression*result
+	PUSHS GF@*expression*result
+	CALL *write
+	PUSHS string@\010
+	POPS GF@*expression*result
+	PUSHS GF@*expression*result
+	CALL *write
+	DEFVAR LF@b?1P2JpiCJ
+	PUSHS int@5
+	POPS GF@*expression*result
+	MOVE LF@b?1P2JpiCJ GF@*expression*result
+
+	PUSHS int@0
+	POPS GF@*expression*result
+	MOVE LF@b?1P2JpiCJ GF@*expression*result
+
+	DEFVAR LF@a?96OdJvkl
+	PUSHS int@5
+	PUSHS LF@b?1P2JpiCJ
+	IDIVS
+	POPS GF@*expression*result
+	MOVE LF@a?96OdJvkl GF@*expression*result
+
+	PUSHS int@1
+	POPS GF@*expression*result
+	MOVE LF@a?96OdJvkl GF@*expression*result
+
+	POPFRAME
+	EXIT int@0
+

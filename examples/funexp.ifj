@@ -1,0 +1,15 @@
+const ifj = @import("ifj24.zig");
+
+pub fn foo(x1 : i32, y1 : i32) i32 {
+    const l2 : i32 = x1 + y1;
+    return l2;
+}
+pub fn lol(x : i32, y : i32) i32 {
+    const l1 : i32 = x - y;
+    return l1;
+}
+pub fn main() void {
+    const num1 = 5;
+    const num2 = 2;
+    _ = lol(foo(num2, lol(num2, num1)), num2);
+}

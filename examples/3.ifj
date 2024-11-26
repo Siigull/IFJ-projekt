@@ -1,0 +1,25 @@
+                            
+                            const ifj = @import("ifj24.zig");
+
+// Main Program
+pub fn main() void {
+    var s1 : []u8 = ifj.string("Hello ");    // Convert string literal to dynamic array
+    var s2 : []u8 = ifj.string("World!");   // Convert another string literal
+
+      const s3 : []u8 = ifj.string( 
+    \\M 
+    \\  u
+    \\      l
+    \\          t
+    \\              i
+    \\                  l
+    \\                      i
+    \\                          n
+    \\                              e
+      );
+    var result : []u8 = ifj.concat(s1, s2); // Concatenate the two strings
+    ifj.write(result);           // Print the concatenated result
+    ifj.write("\n");
+    ifj.write(s3);
+    ifj.write("\n");
+}

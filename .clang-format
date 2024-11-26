@@ -3,19 +3,32 @@ BasedOnStyle: LLVM
 
 IndentWidth: 4
 TabWidth: 4
-
-ColumnLimit: 100
+UseTab: ForIndentation
+Language: Cpp
 PointerAlignment: Left
-BreakBeforeBinaryOperators: None
-SpaceInEmptyBlock: false
-SpaceAfterCStyleCast: true
-KeepEmptyLinesAtTheStartOfBlocks: false
-AlwaysBreakBeforeMultilineStrings: true
-AlignAfterOpenBracket: Align
-AllowAllArgumentsOnNextLine: false
-AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortFunctionsOnASingleLine: Inline
-BinPackArguments: false
+AlignAfterOpenBracket: BlockIndent
+AlignConsecutiveAssignments: false
+AlignOperands: true
+AlignEscapedNewlinesLeft: true
+AlignTrailingComments: true
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
+BinPackParameters: false
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterControlStatement: Never
+    AfterEnum: false
+    AfterFunction: false
+    AfterStruct: false
+    AfterExternBlock: true
+    BeforeElse: false
+    BeforeWhile: false
+
 BinPackParameters: true
-UseTab: ForContinuationAndIndentation
+ColumnLimit: 80
+IndentCaseLabels: true
+SpaceBeforeParens: ControlStatements
+SpacesBeforeTrailingComments: 1
+SpacesInCStyleCastParentheses: false
