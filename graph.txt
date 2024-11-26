@@ -1,0 +1,30 @@
+root -> FUNC_DECL(0) : functions
+FUNC_DECL(0).shape: rectangle
+VAR_DECL(0): {tooltip: i1?g0eRR2Cm R_I32}
+FUNC_DECL(0) -> VAR_DECL(0) : body
+VAR_DECL(0).shape: rectangle
+I32(0): {tooltip: 1}
+I32(0).shape: rectangle
+I32(0).style{ border-radius: 999 }
+VAR_DECL(0) -> I32(0) : expr
+VAR_DECL(1): {tooltip: i9?96OdJvkl R_I32}
+FUNC_DECL(0) -> VAR_DECL(1) : body
+VAR_DECL(1).shape: rectangle
+I32(1): {tooltip: 9}
+I32(1).shape: rectangle
+I32(1).style{ border-radius: 999 }
+VAR_DECL(1) -> I32(1) : expr
+FUNC_CALL(0): {tooltip: *write}
+FUNC_CALL(0).shape: rectangle
+FUNC_DECL(0) -> FUNC_CALL(0) : body
+I32(2): {tooltip: 0}
+I32(2).shape: rectangle
+I32(2).style{ border-radius: 999 }
+FUNC_CALL(0) -> I32(2) : args
+FUNC_CALL(1): {tooltip: *write}
+FUNC_CALL(1).shape: rectangle
+FUNC_DECL(0) -> FUNC_CALL(1) : body
+STRING(0).shape: rectangle
+STRING(0).style{ border-radius: 999 }
+STRING(0): {tooltip: \\010}
+FUNC_CALL(1) -> STRING(0) : args

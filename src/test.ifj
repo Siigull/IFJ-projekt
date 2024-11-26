@@ -4,9 +4,9 @@ pub fn print_board(board : []u8) void {
     var row = 0;
     var col = 0;
 
-    ifj.write("  ");
+    ifj.write("\n  ");
     while(col < 8) {
-        ifj.chr(col + 97);
+        ifj.write(ifj.chr(col + 97));
         ifj.write(" ");
         col = col + 1;
     }
@@ -69,6 +69,8 @@ pub fn check_win(board : []u8, row : i32, col : []u8) i32 {
         i = i + 1;
     }
 
+    ifj.write(count);
+
     if(count == 5) {
         return 1;
     } else {
@@ -104,7 +106,7 @@ pub fn main() void {
     var board = ifj.string("----------------------------------------------------------------");
 
     var p_turn = 1;
-    while(p_turn != 0) {
+    while(p_turn >= 0) {
         print_board(board);
         ifj.write("Zadej radek tahu  (1 - 8):");
         const row = ifj.readi32();
@@ -119,7 +121,7 @@ pub fn main() void {
                     if(ifj.strcmp(board, new_board) != 0) {
                         board = new_board;
                         if(check_win(board, ROW, COL) == 1) {
-                            
+                            p_turn = 0 - p_turn;
                         } else {
 
                         }
@@ -143,6 +145,10 @@ pub fn main() void {
             ifj.write("cislo je spatne\n");
         }
     }
+
+    ifj.write("Player ");
+    ifj.write(0 - p_turn);
+    ifj.write(" won!!");
 
     board = board;
 }
