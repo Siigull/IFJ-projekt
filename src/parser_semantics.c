@@ -665,81 +665,88 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
         } else {                             \
             ERROR_RET(7);                    \
         }                                    \
-    } else {                                 \
+    } else if((left).type == R_I32){         \
         if((right).type == R_I32) {          \
             (left).as.i32 = (left).as.i32 op (right).as.i32; \
             (left).type = R_I32;             \
         } else {                             \
             ERROR_RET(7);                    \
         }                                    \
-    }
+    } else {                                 \
+        ERROR_RET(7);                        \
+    }                                        \
 
     Ret ret_left = check_node_2(node->left, state);
     Ret ret_right = check_node_2(node->right, state);
 
-    if(ret_left.is_const == true && ret_right.is_const == true) {
-        switch (node->type) {
-            case PLUS: {
-                implicit_f64_i32(&ret_left, &ret_right, node);
-                implicit_i32_f64_lit(&ret_left, &ret_right, node);
+    switch (node->type) {
+        case PLUS: {
+            implicit_f64_i32(&ret_left, &ret_right, node);
+            implicit_i32_f64_lit(&ret_left, &ret_right, node);
 
-                OPERATE(ret_left, ret_right, +);
-                break;
-            }
-            case MINUS: {
-                implicit_f64_i32(&ret_left, &ret_right, node);
-                implicit_i32_f64_lit(&ret_left, &ret_right, node);
-
-                OPERATE(ret_left, ret_right, -);
-                break;
-            }
-            case MUL: {
-                implicit_f64_i32(&ret_left, &ret_right, node);
-                implicit_i32_f64_lit(&ret_left, &ret_right, node);
-
-                OPERATE(ret_left, ret_right, *);
-                break;
-            }
-            case DIV: {
-                Ret left_og;
-                memcpy(&left_og, &ret_left, sizeof(Ret)); 
-
-                implicit_f64_i32(&ret_left, &ret_right, node);
-
-                if(ret_left.type != ret_right.type) {
-                    return (Ret){R_VOID, false, 0};
-                }
-
-                OPERATE(ret_left, ret_right, /);
-                
-                // div floor
-                if(ret_left.type == R_I32 && 
-                left_og.as.i32 != 0 &&
-                ret_left.as.i32 <= 0) {
-                    if(left_og.as.i32 % ret_right.as.i32) {
-                        ret_left.as.i32--;
-                    }
-                }
-                break;
-            }
-            case ISEQ:
-            case ISNEQ:
-            case ISLESS:
-            case ISLESSEQ:
-            case ISMORE:
-            case ISMOREEQ:
-                implicit_f64_i32(&ret_left, &ret_right, node);
-                implicit_i32_f64(&ret_left, &ret_right, node);
-                
-                return (Ret){R_BOOLEAN, false, 0};
-            default:
-                break;
+            OPERATE(ret_left, ret_right, +);
+            break;
         }
+        case MINUS: {
+            implicit_f64_i32(&ret_left, &ret_right, node);
+            implicit_i32_f64_lit(&ret_left, &ret_right, node);
 
+            OPERATE(ret_left, ret_right, -);
+            break;
+        }
+        case MUL: {
+            implicit_f64_i32(&ret_left, &ret_right, node);
+            implicit_i32_f64_lit(&ret_left, &ret_right, node);
+
+            OPERATE(ret_left, ret_right, *);
+            break;
+        }
+        case DIV: {
+            Ret left_og;
+            memcpy(&left_og, &ret_left, sizeof(Ret)); 
+
+            implicit_f64_i32(&ret_left, &ret_right, node);
+
+            if(ret_left.type != ret_right.type) {
+                return (Ret){R_VOID, false, 0};
+            }
+
+            OPERATE(ret_left, ret_right, /);
+            
+            // div floor
+            if(ret_left.type == R_I32 && 
+            left_og.as.i32 != 0 &&
+            ret_left.as.i32 <= 0) {
+                if(left_og.as.i32 % ret_right.as.i32) {
+                    ret_left.as.i32--;
+                }
+            }
+            break;
+        }
+        case ISEQ:
+        case ISNEQ:
+        case ISLESS:
+        case ISLESSEQ:
+        case ISMORE:
+        case ISMOREEQ:
+            implicit_f64_i32(&ret_left, &ret_right, node);
+            implicit_i32_f64(&ret_left, &ret_right, node);
+            
+            return (Ret){R_BOOLEAN, false, 0};
+        default:
+            break;
+    }
+
+
+
+    if(!ret_left.is_const || !ret_right.is_const) {
+        ret_left.is_const = false;
+
+    } else {
         if(ret_left.type == R_I32) {
             node->type = I32;
             node->as.i32 = ret_left.as.i32;
-            node->left = NULL; 
+            node->left = NULL;
             node->right = NULL;
 
         } else {
@@ -747,11 +754,6 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
             node->as.f64 = ret_left.as.f64;
             node->left = NULL; 
             node->right = NULL;
-        }
-    } else {
-        ret_left.is_const = false;
-        if(ret_left.type != ret_right.type) {
-            ERROR_RET(ERR_SEM_TYPE_CONTROL);
         }
     }
 

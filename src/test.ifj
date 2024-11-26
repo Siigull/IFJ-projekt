@@ -4,7 +4,6 @@ pub fn print_board(board : []u8) void {
     var row = 0;
     var col = 0;
 
-
     ifj.write("  ");
     while(col < 8) {
         ifj.chr(col + 97);
@@ -60,7 +59,6 @@ pub fn check_win(board : []u8, row : i32, col : []u8) i32 {
     var i = 0;
     var count = 0;
 
-
     while(i < 5) {
         if(ifj.ord(board, start_i + i) == p_char){
             count = count + 1;
@@ -73,9 +71,30 @@ pub fn check_win(board : []u8, row : i32, col : []u8) i32 {
 
     if(count == 5) {
         return 1;
-
     } else {
 
+    }
+
+    return 0;
+}
+
+pub fn check_input(row : i32, col : []u8) i32 {
+    if(row > 0) {
+        if(row <= 8) {
+            if(ifj.ord(col, 0) >= ifj.ord(ifj.string("a"), 0)) {
+                if(ifj.ord(col, 0) <= ifj.ord(ifj.string("h"), 0)) {
+                    return 1;
+                } else {
+                    ifj.write("Col too big");
+                }
+            } else {
+                ifj.write("Col too small");
+            }
+        } else {
+            ifj.write("Row too big");
+        }
+    } else {
+        ifj.write("Row too small");
     }
 
     return 0;
@@ -94,24 +113,28 @@ pub fn main() void {
 
         if(row) |ROW| {
             if(col) |COL| {
-                const new_board = play_move(board, p_turn, ROW, COL);
+                if(check_input(ROW, COL) == 1) {
+                    const new_board = play_move(board, p_turn, ROW, COL);
 
-                if(ifj.strcmp(board, new_board) != 0) {
-                    board = new_board;
-                    if(check_win(board, ROW, COL) == 1) {
+                    if(ifj.strcmp(board, new_board) != 0) {
+                        board = new_board;
+                        if(check_win(board, ROW, COL) == 1) {
+                            
+                        } else {
 
+                        }
+
+                        if(p_turn == 1) {
+                            p_turn = 2;
+
+                        } else {
+                            p_turn = 1;
+                        }
                     } else {
-
-                    }
-
-                    if(p_turn == 1) {
-                        p_turn = 2;
-
-                    } else {
-                        p_turn = 1;
+                        ifj.write("Nevalidni tazik\n");
                     }
                 } else {
-                    ifj.write("Nevalidni tazik\n");
+
                 }
             } else {
                 ifj.write("pismenko je spatne\n");
