@@ -205,8 +205,6 @@ LABEL main
 	MOVE LF@b?TxyavRV7 GF@*expression*result
 
 	DEFVAR LF@result?ot5pSQsQ
-	PUSHS int@42
-	PUSHS int@13
 	PUSHS int@55
 	POPS GF@*expression*result
 	MOVE LF@result?ot5pSQsQ GF@*expression*result
