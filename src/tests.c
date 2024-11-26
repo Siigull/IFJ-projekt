@@ -37,8 +37,8 @@ char* load_inputos(const char* filepath) {
 	return input;
 }
 
-void generate_debug_token_arr() {
-	FILE* f = fopen("src/example_multiline.ifj", "r");
+void generate_debug_token_arr(const char* path) {
+	FILE* f = fopen(path, "r");
 	if (f == NULL) {
 		return;
 	}
@@ -81,16 +81,17 @@ void generate_debug_token_arr() {
 	printf("}\n");
 }
 
-int main123() {
+int mainasd() {
 	// const ifj = @import("ifj24.zig"); jeden token
 	// char input1[50] = "456e2 7.89E-2 test1iden _identf";
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
+	const char path[] = "examples_jankos/in/lexer_debug13.ifj";
 
-	generate_debug_token_arr();
+	generate_debug_token_arr(path);
 
-	char* temp = load_inputos("examples_jankos/in/test_null_def.ifj");
-	compile(temp);
+	// char* temp = load_inputos(path);
+	// compile(temp);
 	return 0;
 };

@@ -551,11 +551,15 @@ Ret val_literal_type(AST_Node* node, Sem_State* state) {
                 if(t.type == R_I32) {
                     node->type = I32;
                     node->as.i32 = entry->const_val.i32;
+                    node->left = NULL;
+                    node->right = NULL;
                     t.as.i32 = entry->const_val.i32;
 
                 } else if(t.type == R_F64) {
                     node->type = F64;
                     node->as.f64 = entry->const_val.f64;
+                    node->left = NULL;
+                    node->right = NULL;
                     t.as.f64 = entry->const_val.f64;
 
                 } else {
@@ -678,10 +682,14 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
         if(ret_left.type == R_I32) {
             node->type = I32;
             node->as.i32 = ret_left.as.i32;
+            node->left = NULL; 
+            node->right = NULL;
 
         } else {
             node->type = F64;
             node->as.f64 = ret_left.as.f64;
+            node->left = NULL; 
+            node->right = NULL;
         }
     } else {
         if(ret_left.type == R_VOID || ret_right.type == R_VOID) {
@@ -744,6 +752,9 @@ Ret val_var_decl(AST_Node* node, Sem_State* state) {
     }
 
     if(entry->ret_type.type == IMPLICIT) {
+        if(ret.type == R_NULL) {
+            ERROR_RET(8);
+        }
         entry->ret_type.type = ret.type;
 
     } else if(can_implicit(ret) && entry->ret_type.type == R_I32) {

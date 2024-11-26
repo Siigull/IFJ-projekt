@@ -973,12 +973,13 @@ void parse(char* orig_input) {
 	if (!tree_find(parser->s_table, "main")) {
 		ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 	}
-
+#if DEBUG
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
     if(f == NULL) return;
     fclose(f);
+#endif
 
     Arr* nodes = arr_init();
     while(parser->next->type != T_EOF) {
