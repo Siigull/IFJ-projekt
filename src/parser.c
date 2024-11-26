@@ -790,19 +790,19 @@ void prolog() {
 	consume(T_LPAR);
 	consume(T_SEMI);
 
-	Entry* read_str = entry_init("*readstr", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
-	Entry* read_int = entry_init("*readi32", E_FUNC, (Expr_Type){N_I32, false}, false, false, false);
-	Entry* read_float = entry_init("*readf64", E_FUNC, (Expr_Type){N_F64, false}, false, false, false);
-	Entry* write = entry_init("*write", E_FUNC, (Expr_Type){R_VOID, false}, false, false, false);
-	Entry* int_to_float = entry_init("*i2f", E_FUNC, (Expr_Type){R_F64, false}, false, false, false);
-	Entry* float_to_int = entry_init("*f2i", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* string_func = entry_init("*string", E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
-	Entry* length = entry_init ("*length", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* concat = entry_init("*concat", E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
-	Entry* sub_string = entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
-	Entry* string_cmp = entry_init("*strcmp", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* ord_func = entry_init("*ord", E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* chr_func = entry_init("*chr", E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* read_str =     entry_init("*readstr",   E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
+	Entry* read_int =     entry_init("*readi32",   E_FUNC, (Expr_Type){N_I32, false}, false, false, false);
+	Entry* read_float =   entry_init("*readf64",   E_FUNC, (Expr_Type){N_F64, false}, false, false, false);
+	Entry* write =        entry_init("*write",     E_FUNC, (Expr_Type){R_VOID, false}, false, false, false);
+	Entry* int_to_float = entry_init("*i2f",       E_FUNC, (Expr_Type){R_F64, false}, false, false, false);
+	Entry* float_to_int = entry_init("*f2i",       E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* string_func =  entry_init("*string",    E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* length =       entry_init("*length",    E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* concat =       entry_init("*concat",    E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* sub_string =   entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
+	Entry* string_cmp =   entry_init("*strcmp",    E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* ord_func =     entry_init("*ord",       E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
+	Entry* chr_func =     entry_init("*chr",       E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
 
 	// write to stdout
 	Function_Arg* arg_write = malloc(sizeof(Function_Arg));
