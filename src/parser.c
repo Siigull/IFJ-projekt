@@ -986,7 +986,7 @@ void parse(char* orig_input) {
         AST_Node* node = decl();
 		check_semantics(node);
 #if DEBUG
-        generate_graph(node, graph_filename);
+        generate_graph(node, graph_filename, parser->s_table);
 #endif
         arr_append(nodes, (size_t)node);
     }

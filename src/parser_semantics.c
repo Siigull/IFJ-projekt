@@ -756,21 +756,34 @@ Ret val_var_decl(AST_Node* node, Sem_State* state) {
             ERROR_RET(8);
         }
         entry->ret_type.type = ret.type;
+    }
 
-    } else if(can_implicit(ret) && entry->ret_type.type == R_I32) {
-        node->left->type = I32;
-        node->left->as.i32 = (int)ret.as.f64;
+    if(ret.is_const) {
+        if(can_implicit(ret) && entry->ret_type.type == R_I32) {
+            node->left->type = I32;
+            node->left->as.i32 = (int)ret.as.f64;
 
-        ret.type = R_I32;
-        ret.as.i32 = (int)ret.as.f64;
-        
-    } else if(ret.type != R_VOID && ret.is_const && !entry->as.can_mut) {
-        entry->is_const_val = true;
-        if(ret.type == R_I32 && entry->ret_type.type == R_I32) {
-            entry->const_val.i32 = ret.as.i32;
+            ret.type = R_I32;
+            ret.as.i32 = (int)ret.as.f64;
 
-        } else if(ret.type == R_F64 && entry->ret_type.type == R_F64){
-            entry->const_val.f64 = ret.as.f64;
+        } else if(ret.type == R_I32 && entry->ret_type.type == R_F64) {
+            node->left->type = F64;
+            node->left->as.f64 = node->left->as.i32;
+
+            ret.type = R_F64;
+            ret.as.f64 = (double)ret.as.i32;
+        } 
+
+        if(ret.type != R_VOID && ret.is_const && !entry->as.can_mut) {
+            
+            if(ret.type == R_I32 && entry->ret_type.type == R_I32) {
+                entry->is_const_val = true;
+                entry->const_val.i32 = ret.as.i32;
+
+            } else if(ret.type == R_F64 && entry->ret_type.type == R_F64){
+                entry->is_const_val = true;
+                entry->const_val.f64 = ret.as.f64;
+            }
         }
     }
 

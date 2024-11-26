@@ -38,6 +38,8 @@ int DIV_count = 0;
 int in_expr = 0;
 FILE* file = NULL;
 
+Tree* s_table;
+
 void generate_graph_node(AST_Node* node, char* last_node, char* path);
 
 char* string_write(const char* string) {
@@ -157,7 +159,12 @@ void generate_graph_var_decl(AST_Node* node, char* last_node, char* path) {
     char current_node[30];
     sprintf(current_node, "%s(%d)", "VAR_DECL", var_decl_count++);
     
-    write_data(current_node, node->as.var_name);
+    Entry* entry = tree_find(s_table, node->as.var_name);
+
+    char data_buf[50];
+    sprintf(data_buf, "%s %s", node->as.var_name, ret_type_to_string[entry->ret_type.type]);
+
+    write_data(current_node, data_buf);
     write_connection(last_node, current_node, path);
     set_shape(current_node, BASE);
 
@@ -294,7 +301,13 @@ void generate_graph_id(AST_Node* node, char* last_node, char* path) {
     }
 
     set_shape(current_node, PILL);
-    write_data(current_node, new_name);
+    
+    Entry* entry = tree_find(s_table, node->as.var_name);
+
+    char data_buf[50];
+    sprintf(data_buf, "%s %s", new_name, ret_type_to_string[entry->ret_type.type]);
+
+    write_data(current_node, data_buf);
     write_connection(last_node, current_node, path);
 
     free(new_name);
@@ -484,11 +497,13 @@ void generate_graph_node(AST_Node* node, char* last_node, char* path) {
     }
 }
 
-void generate_graph(AST_Node* node, const char* filepath) {
+void generate_graph(AST_Node* node, const char* filepath, Tree* s_table_) {
     file = fopen(filepath, "a");
     if(file == NULL) {
         return;
     }
+
+    s_table = s_table_;
 
     generate_graph_node(node, "root", "functions");
 
