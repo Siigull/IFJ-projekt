@@ -12,7 +12,7 @@
 
 int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
-	//   id +  -  *  /  (  )  $  == != <  >  <= >=
+//   id +  -  *  /  (  )  $  == != <  >  <= >=
 	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // id
 	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // +
 	{R, L, L, R, R, R, L, L, L, L, L, L, L, L}, // -
@@ -21,12 +21,12 @@ int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 	{R, R, R, R, R, R, M, R, R, R, R, R, R, R}, // (
 	{N, L, L, L, L, N, L, L, L, L, L, L, L, L}, // )
 	{R, R, R, R, R, R, N, R, R, R, R, R, R, R}, // $
-	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // ==
-	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // !=
-	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // <
-	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // >
-	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // <=
-	{R, R, R, R, R, R, L, L, L, L, L, L, L, L}, // >=
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // ==
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // !=
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // <
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // <=
+	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >=
 };
 
 const char* type_to_string(T_Type type) {
@@ -218,7 +218,7 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 			   type == T_DIV || type == T_LPAR || type == T_RPAR || type == T_DOLLARLIST ||
 			   type == T_I32 || type == T_F64 || type == T_STRING || type == T_DDEQ ||
 			   type == T_GETHAN || type == T_GTHAN || type == T_SETHAN || type == T_STHAN ||
-			   type == T_NEQUAL || type == T_BUILDIN) {
+			   type == T_NEQUAL || type == T_BUILDIN || type == T_NULL) {
 		return true;
 	} else {
 		ERROR_RET(2);
@@ -228,7 +228,7 @@ bool is_nonTerm(T_Type type, bool isProcessed) {
 bool is_id(T_Type type) {
 	if (type == T_ID || type == T_F64 || type == T_I32 || type == T_STRING || type == T_DDEQ ||
 		type == T_NEQUAL || type == T_GTHAN || type == T_GETHAN || type == T_SETHAN ||
-		type == T_STHAN || type == T_BUILDIN) {
+		type == T_STHAN || type == T_BUILDIN || type == T_NULL) {
 		return true;
 	}
 	return false;
