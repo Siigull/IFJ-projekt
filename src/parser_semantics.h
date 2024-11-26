@@ -27,6 +27,9 @@ void check_var_usage_traverse(Node* node);
 void check_var_usage(Tree* table);
 bool is_nullable(Expr_Type type);
 bool is_numeric_type(Expr_Type type);
+bool null_in_relation_operators(Expr_Type left_side, Expr_Type right_side);
+bool check_nullable_condition(Expr_Type left_side, Expr_Type right_side);
+bool is_nullable_decl(Expr_Type declaration, Expr_Type expression);
 Expr_Type check_node(AST_Node* node, Sem_State* state);
 Expr_Type sem_check_binary_expression(AST_Node* node, Sem_State* state);
 Expr_Type sem_func_call(AST_Node* node, Sem_State* state);
@@ -37,8 +40,6 @@ Expr_Type sem_else(AST_Node* node, Sem_State* state);
 Expr_Type sem_return(AST_Node* node, Sem_State* state);
 Expr_Type sem_if(AST_Node* node, Sem_State* state);
 Expr_Type sem_while(AST_Node* node, Sem_State* state);
-bool check_nullable_condition(Expr_Type left_side, Expr_Type right_side);
-bool is_nullable_decl(Expr_Type declaration, Expr_Type expression);
 Expr_Type get_literal_type(AST_Node* node);
 
 #endif
