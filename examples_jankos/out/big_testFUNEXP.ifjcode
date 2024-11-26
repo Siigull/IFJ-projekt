@@ -290,7 +290,7 @@ LABEL main
 	MOVE LF@factorialInput?AjSKVF07 GF@*expression*result
 
 	DEFVAR LF@factorialResult?03VlBjVE
-	PUSHS LF@factorialInput?AjSKVF07
+	PUSHS int@5
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL factorial
@@ -302,7 +302,7 @@ LABEL main
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write
-	PUSHS LF@factorialInput?AjSKVF07
+	PUSHS int@5
 	POPS GF@*expression*result
 	PUSHS GF@*expression*result
 	CALL *write

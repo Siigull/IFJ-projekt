@@ -564,6 +564,7 @@ Ret val_literal_type(AST_Node* node, Sem_State* state) {
             } else {
                 t.is_const = false;
             }
+            break;
         }
         case NIL: {
             return (Ret){R_NULL, false, 0};
