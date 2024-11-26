@@ -105,6 +105,7 @@ Expr_Type sem_check_binary_expression(AST_Node* node, Sem_State* state) {
 
     bool has_int = (left_type.type == R_I32 || right_type.type == R_I32);
     bool has_float = (left_type.type == R_F64 || right_type.type == R_F64);
+	bool has_nullable = (is_nullable(left_type) || is_nullable(right_type));
 
     if (left_type.is_const_literal == true && left_type.is_const_literal == true) {
         node->as.expr_type.is_const_literal = true;
@@ -124,6 +125,9 @@ Expr_Type sem_check_binary_expression(AST_Node* node, Sem_State* state) {
 			case PLUS:
 			case MINUS:
 			case MUL: {
+				if (has_nullable) {
+					ERROR_RET(ERR_SEM_TYPE_CONTROL);
+				}
 				if (has_float) {
 					if (left_type.type == R_I32) {
 						if(node->left->type == ID) {
@@ -149,7 +153,7 @@ Expr_Type sem_check_binary_expression(AST_Node* node, Sem_State* state) {
 				}
 			}
 			case DIV: {
-				if (has_float && has_int) {
+				if (has_nullable || (has_float && has_int)) {
 					ERROR_RET(ERR_SEM_TYPE_CONTROL);
 				}
 				else if (has_float) {
@@ -165,6 +169,9 @@ Expr_Type sem_check_binary_expression(AST_Node* node, Sem_State* state) {
 			case ISLESSEQ:
 			case ISMORE:
 			case ISMOREEQ: {
+				if (has_nullable && node->type != ISEQ && node->type != ISNEQ) {
+        			ERROR_RET(ERR_SEM_TYPE_CONTROL);
+    			}
 				if (left_type.type == right_type.type) {
 					node->as.expr_type = (Expr_Type){R_BOOLEAN, is_node_const};
 					return (Expr_Type){R_BOOLEAN, is_node_const};
@@ -686,7 +693,7 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
     Ret ret_right = check_node_2(node->right, state);
 
     switch (node->type) {
-        case PLUS: 
+        case PLUS:
         case MINUS:
         case MUL: {
             implicit_f64_i32(&ret_left, &ret_right, node);
@@ -705,7 +712,7 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
         case ISMOREEQ:
             implicit_f64_i32(&ret_left, &ret_right, node);
             implicit_i32_f64(&ret_left, &ret_right, node);
-            
+
             return (Ret){R_BOOLEAN, false, 0};
         default:
             break;
@@ -727,16 +734,16 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
             }
             case DIV: {
                 Ret left_og;
-                memcpy(&left_og, &ret_left, sizeof(Ret)); 
+                memcpy(&left_og, &ret_left, sizeof(Ret));
 
                 if(ret_left.type != ret_right.type) {
                     return (Ret){R_VOID, false, 0};
                 }
 
                 OPERATE(ret_left, ret_right, /);
-                
+
                 // div floor
-                if(ret_left.type == R_I32 && 
+                if(ret_left.type == R_I32 &&
                 left_og.as.i32 != 0 &&
                 ret_left.as.i32 <= 0) {
                     if(left_og.as.i32 % ret_right.as.i32) {
@@ -753,12 +760,12 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
             case ISMOREEQ:
                 implicit_f64_i32(&ret_left, &ret_right, node);
                 implicit_i32_f64(&ret_left, &ret_right, node);
-                
+
                 return (Ret){R_BOOLEAN, false, 0};
             default:
                 break;
         }
-        
+
         if(ret_left.type == R_I32) {
             node->type = I32;
             node->as.i32 = ret_left.as.i32;

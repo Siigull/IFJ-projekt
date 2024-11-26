@@ -2,9 +2,6 @@ const ifj = @import("ifj24.zig");
 
 
 pub fn main() void{
-     const a : i32 = 62;
-     const b : i32 = 2;
-     const c : i32 = 31; 
      const d : i32 = 0;
      const e : i32 = 1;
      if(null == null){
@@ -13,4 +10,4 @@ pub fn main() void{
      else{
          ifj.write(d);
      }
-}  
+}
