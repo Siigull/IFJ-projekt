@@ -452,7 +452,7 @@ Token* get_next_token(Lexer* lexer) {
 			lexer_advance(lexer);
 			while (lexer->input[lexer->idr] != '"') {
 				if (lexer->input[lexer->idr] == '\\') {
-					if (lexer->input[lexer->idr + 1] == '"') {
+					if (lexer->input[lexer->idr + 1] == '"' && lexer->input[lexer->idr - 1] != '\\') {
 						lexer_advance(lexer);
 					}
 				}
