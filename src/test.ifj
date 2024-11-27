@@ -1,154 +1,603 @@
 const ifj = @import("ifj24.zig");
 
-pub fn print_board(board : []u8) void {
-    var row = 0;
-    var col = 0;
-
-    ifj.write("\n  ");
-    while(col < 8) {
-        ifj.write(ifj.chr(col + 97));
-        ifj.write(" ");
-        col = col + 1;
-    }
-    ifj.write("\n");
-
-    while(row < 8) {
-        col = 0;
-        ifj.write(row + 1);
-        ifj.write(" ");
-        while(col < 8) {
-            ifj.write(ifj.substring(board, row * 8 + col, row * 8 + col + 1));
-            ifj.write(" ");
-
-            col = col + 1;
-        }
-        row = row + 1;
-        ifj.write("\n");
-    }
-}
-
-pub fn play_move(board : []u8, turn : i32, row : i32, col : []u8) []u8 {
-    var move_char : []u8 = ifj.string("X");
-    const move_index : i32 = (row - 1) * 8 + (ifj.ord(col, 0) - ifj.ord(ifj.string("a"), 0));
-
-    if(turn == 2) {
-        move_char = ifj.string("O");
-    } else {
-    }
-
-    const first_half = ifj.substring(board, 0, move_index);
-    const second_half = ifj.substring(board, move_index + 1, 64);
-
-    var new_board : []u8 = ifj.string("");
-
-    if(first_half) |FH| {
-        if(second_half) |SH| {
-            new_board = ifj.concat(FH, ifj.concat(move_char, SH));
-        } else {
-        }
-    } else {
-    }
-
-    return new_board;
-}
-
-pub fn check_win(board : []u8, row : i32, col : []u8) i32 {
-    const start_i = (row - 1) * 8 + ifj.ord(col, 0) - ifj.ord(ifj.string("a"), 0);
-    const p_char = ifj.ord(board, start_i);
-
-    var i = 0;
-    var count = 0;
-
-    while(i < 5) {
-        if(ifj.ord(board, start_i + i) == p_char){
-            count = count + 1;
-        } else {
-
-        }
-
-        i = i + 1;
-    }
-
-    ifj.write(count);
-
-    if(count == 5) {
-        return 1;
-    } else {
-
-    }
-
-    return 0;
-}
-
-pub fn check_input(row : i32, col : []u8) i32 {
-    if(row > 0) {
-        if(row <= 8) {
-            if(ifj.ord(col, 0) >= ifj.ord(ifj.string("a"), 0)) {
-                if(ifj.ord(col, 0) <= ifj.ord(ifj.string("h"), 0)) {
-                    return 1;
-                } else {
-                    ifj.write("Col too big");
-                }
-            } else {
-                ifj.write("Col too small");
-            }
-        } else {
-            ifj.write("Row too big");
-        }
-    } else {
-        ifj.write("Row too small");
-    }
-
-    return 0;
-}
-
+// Main Program
 pub fn main() void {
-    var board = ifj.string("----------------------------------------------------------------");
 
-    var p_turn = 1;
-    while(p_turn >= 0) {
-        print_board(board);
-        ifj.write("Zadej radek tahu  (1 - 8):");
-        const row = ifj.readi32();
-        ifj.write("Zadej sloupec tahu  (a - h):");
-        const col = ifj.readstr();
+    const a : i32 = 10;
+    const b : f64 = 20;
+    const c = 5;
+    const d = 30.0;
+    const e : ?i32 = 10;
+    const f : ?f64 = 10;
+    const g : []u8 = ifj.string("asd");
 
-        if(row) |ROW| {
-            if(col) |COL| {
-                if(check_input(ROW, COL) == 1) {
-                    const new_board = play_move(board, p_turn, ROW, COL);
+    if(a+a){}else{}
+if(a-a){}else{}
+if(a*a){}else{}
+if(a/a){}else{}
+if(a=a){}else{}
+if(a!a){}else{}
+if(a<a){}else{}
+if(a>a){}else{}
+if(a<=a){}else{}
+if(a>=a){}else{}
+if(a==a){}else{}
+if(a!=a){}else{}
+if(a+b){}else{}
+if(a-b){}else{}
+if(a*b){}else{}
+if(a/b){}else{}
+if(a=b){}else{}
+if(a!b){}else{}
+if(a<b){}else{}
+if(a>b){}else{}
+if(a<=b){}else{}
+if(a>=b){}else{}
+if(a==b){}else{}
+if(a!=b){}else{}
+if(a+c){}else{}
+if(a-c){}else{}
+if(a*c){}else{}
+if(a/c){}else{}
+if(a=c){}else{}
+if(a!c){}else{}
+if(a<c){}else{}
+if(a>c){}else{}
+if(a<=c){}else{}
+if(a>=c){}else{}
+if(a==c){}else{}
+if(a!=c){}else{}
+if(a+d){}else{}
+if(a-d){}else{}
+if(a*d){}else{}
+if(a/d){}else{}
+if(a=d){}else{}
+if(a!d){}else{}
+if(a<d){}else{}
+if(a>d){}else{}
+if(a<=d){}else{}
+if(a>=d){}else{}
+if(a==d){}else{}
+if(a!=d){}else{}
+if(a+e){}else{}
+if(a-e){}else{}
+if(a*e){}else{}
+if(a/e){}else{}
+if(a=e){}else{}
+if(a!e){}else{}
+if(a<e){}else{}
+if(a>e){}else{}
+if(a<=e){}else{}
+if(a>=e){}else{}
+if(a==e){}else{}
+if(a!=e){}else{}
+if(a+f){}else{}
+if(a-f){}else{}
+if(a*f){}else{}
+if(a/f){}else{}
+if(a=f){}else{}
+if(a!f){}else{}
+if(a<f){}else{}
+if(a>f){}else{}
+if(a<=f){}else{}
+if(a>=f){}else{}
+if(a==f){}else{}
+if(a!=f){}else{}
+if(a+g){}else{}
+if(a-g){}else{}
+if(a*g){}else{}
+if(a/g){}else{}
+if(a=g){}else{}
+if(a!g){}else{}
+if(a<g){}else{}
+if(a>g){}else{}
+if(a<=g){}else{}
+if(a>=g){}else{}
+if(a==g){}else{}
+if(a!=g){}else{}
+if(b+a){}else{}
+if(b-a){}else{}
+if(b*a){}else{}
+if(b/a){}else{}
+if(b=a){}else{}
+if(b!a){}else{}
+if(b<a){}else{}
+if(b>a){}else{}
+if(b<=a){}else{}
+if(b>=a){}else{}
+if(b==a){}else{}
+if(b!=a){}else{}
+if(b+b){}else{}
+if(b-b){}else{}
+if(b*b){}else{}
+if(b/b){}else{}
+if(b=b){}else{}
+if(b!b){}else{}
+if(b<b){}else{}
+if(b>b){}else{}
+if(b<=b){}else{}
+if(b>=b){}else{}
+if(b==b){}else{}
+if(b!=b){}else{}
+if(b+c){}else{}
+if(b-c){}else{}
+if(b*c){}else{}
+if(b/c){}else{}
+if(b=c){}else{}
+if(b!c){}else{}
+if(b<c){}else{}
+if(b>c){}else{}
+if(b<=c){}else{}
+if(b>=c){}else{}
+if(b==c){}else{}
+if(b!=c){}else{}
+if(b+d){}else{}
+if(b-d){}else{}
+if(b*d){}else{}
+if(b/d){}else{}
+if(b=d){}else{}
+if(b!d){}else{}
+if(b<d){}else{}
+if(b>d){}else{}
+if(b<=d){}else{}
+if(b>=d){}else{}
+if(b==d){}else{}
+if(b!=d){}else{}
+if(b+e){}else{}
+if(b-e){}else{}
+if(b*e){}else{}
+if(b/e){}else{}
+if(b=e){}else{}
+if(b!e){}else{}
+if(b<e){}else{}
+if(b>e){}else{}
+if(b<=e){}else{}
+if(b>=e){}else{}
+if(b==e){}else{}
+if(b!=e){}else{}
+if(b+f){}else{}
+if(b-f){}else{}
+if(b*f){}else{}
+if(b/f){}else{}
+if(b=f){}else{}
+if(b!f){}else{}
+if(b<f){}else{}
+if(b>f){}else{}
+if(b<=f){}else{}
+if(b>=f){}else{}
+if(b==f){}else{}
+if(b!=f){}else{}
+if(b+g){}else{}
+if(b-g){}else{}
+if(b*g){}else{}
+if(b/g){}else{}
+if(b=g){}else{}
+if(b!g){}else{}
+if(b<g){}else{}
+if(b>g){}else{}
+if(b<=g){}else{}
+if(b>=g){}else{}
+if(b==g){}else{}
+if(b!=g){}else{}
+if(c+a){}else{}
+if(c-a){}else{}
+if(c*a){}else{}
+if(c/a){}else{}
+if(c=a){}else{}
+if(c!a){}else{}
+if(c<a){}else{}
+if(c>a){}else{}
+if(c<=a){}else{}
+if(c>=a){}else{}
+if(c==a){}else{}
+if(c!=a){}else{}
+if(c+b){}else{}
+if(c-b){}else{}
+if(c*b){}else{}
+if(c/b){}else{}
+if(c=b){}else{}
+if(c!b){}else{}
+if(c<b){}else{}
+if(c>b){}else{}
+if(c<=b){}else{}
+if(c>=b){}else{}
+if(c==b){}else{}
+if(c!=b){}else{}
+if(c+c){}else{}
+if(c-c){}else{}
+if(c*c){}else{}
+if(c/c){}else{}
+if(c=c){}else{}
+if(c!c){}else{}
+if(c<c){}else{}
+if(c>c){}else{}
+if(c<=c){}else{}
+if(c>=c){}else{}
+if(c==c){}else{}
+if(c!=c){}else{}
+if(c+d){}else{}
+if(c-d){}else{}
+if(c*d){}else{}
+if(c/d){}else{}
+if(c=d){}else{}
+if(c!d){}else{}
+if(c<d){}else{}
+if(c>d){}else{}
+if(c<=d){}else{}
+if(c>=d){}else{}
+if(c==d){}else{}
+if(c!=d){}else{}
+if(c+e){}else{}
+if(c-e){}else{}
+if(c*e){}else{}
+if(c/e){}else{}
+if(c=e){}else{}
+if(c!e){}else{}
+if(c<e){}else{}
+if(c>e){}else{}
+if(c<=e){}else{}
+if(c>=e){}else{}
+if(c==e){}else{}
+if(c!=e){}else{}
+if(c+f){}else{}
+if(c-f){}else{}
+if(c*f){}else{}
+if(c/f){}else{}
+if(c=f){}else{}
+if(c!f){}else{}
+if(c<f){}else{}
+if(c>f){}else{}
+if(c<=f){}else{}
+if(c>=f){}else{}
+if(c==f){}else{}
+if(c!=f){}else{}
+if(c+g){}else{}
+if(c-g){}else{}
+if(c*g){}else{}
+if(c/g){}else{}
+if(c=g){}else{}
+if(c!g){}else{}
+if(c<g){}else{}
+if(c>g){}else{}
+if(c<=g){}else{}
+if(c>=g){}else{}
+if(c==g){}else{}
+if(c!=g){}else{}
+if(d+a){}else{}
+if(d-a){}else{}
+if(d*a){}else{}
+if(d/a){}else{}
+if(d=a){}else{}
+if(d!a){}else{}
+if(d<a){}else{}
+if(d>a){}else{}
+if(d<=a){}else{}
+if(d>=a){}else{}
+if(d==a){}else{}
+if(d!=a){}else{}
+if(d+b){}else{}
+if(d-b){}else{}
+if(d*b){}else{}
+if(d/b){}else{}
+if(d=b){}else{}
+if(d!b){}else{}
+if(d<b){}else{}
+if(d>b){}else{}
+if(d<=b){}else{}
+if(d>=b){}else{}
+if(d==b){}else{}
+if(d!=b){}else{}
+if(d+c){}else{}
+if(d-c){}else{}
+if(d*c){}else{}
+if(d/c){}else{}
+if(d=c){}else{}
+if(d!c){}else{}
+if(d<c){}else{}
+if(d>c){}else{}
+if(d<=c){}else{}
+if(d>=c){}else{}
+if(d==c){}else{}
+if(d!=c){}else{}
+if(d+d){}else{}
+if(d-d){}else{}
+if(d*d){}else{}
+if(d/d){}else{}
+if(d=d){}else{}
+if(d!d){}else{}
+if(d<d){}else{}
+if(d>d){}else{}
+if(d<=d){}else{}
+if(d>=d){}else{}
+if(d==d){}else{}
+if(d!=d){}else{}
+if(d+e){}else{}
+if(d-e){}else{}
+if(d*e){}else{}
+if(d/e){}else{}
+if(d=e){}else{}
+if(d!e){}else{}
+if(d<e){}else{}
+if(d>e){}else{}
+if(d<=e){}else{}
+if(d>=e){}else{}
+if(d==e){}else{}
+if(d!=e){}else{}
+if(d+f){}else{}
+if(d-f){}else{}
+if(d*f){}else{}
+if(d/f){}else{}
+if(d=f){}else{}
+if(d!f){}else{}
+if(d<f){}else{}
+if(d>f){}else{}
+if(d<=f){}else{}
+if(d>=f){}else{}
+if(d==f){}else{}
+if(d!=f){}else{}
+if(d+g){}else{}
+if(d-g){}else{}
+if(d*g){}else{}
+if(d/g){}else{}
+if(d=g){}else{}
+if(d!g){}else{}
+if(d<g){}else{}
+if(d>g){}else{}
+if(d<=g){}else{}
+if(d>=g){}else{}
+if(d==g){}else{}
+if(d!=g){}else{}
+if(e+a){}else{}
+if(e-a){}else{}
+if(e*a){}else{}
+if(e/a){}else{}
+if(e=a){}else{}
+if(e!a){}else{}
+if(e<a){}else{}
+if(e>a){}else{}
+if(e<=a){}else{}
+if(e>=a){}else{}
+if(e==a){}else{}
+if(e!=a){}else{}
+if(e+b){}else{}
+if(e-b){}else{}
+if(e*b){}else{}
+if(e/b){}else{}
+if(e=b){}else{}
+if(e!b){}else{}
+if(e<b){}else{}
+if(e>b){}else{}
+if(e<=b){}else{}
+if(e>=b){}else{}
+if(e==b){}else{}
+if(e!=b){}else{}
+if(e+c){}else{}
+if(e-c){}else{}
+if(e*c){}else{}
+if(e/c){}else{}
+if(e=c){}else{}
+if(e!c){}else{}
+if(e<c){}else{}
+if(e>c){}else{}
+if(e<=c){}else{}
+if(e>=c){}else{}
+if(e==c){}else{}
+if(e!=c){}else{}
+if(e+d){}else{}
+if(e-d){}else{}
+if(e*d){}else{}
+if(e/d){}else{}
+if(e=d){}else{}
+if(e!d){}else{}
+if(e<d){}else{}
+if(e>d){}else{}
+if(e<=d){}else{}
+if(e>=d){}else{}
+if(e==d){}else{}
+if(e!=d){}else{}
+if(e+e){}else{}
+if(e-e){}else{}
+if(e*e){}else{}
+if(e/e){}else{}
+if(e=e){}else{}
+if(e!e){}else{}
+if(e<e){}else{}
+if(e>e){}else{}
+if(e<=e){}else{}
+if(e>=e){}else{}
+if(e==e){}else{}
+if(e!=e){}else{}
+if(e+f){}else{}
+if(e-f){}else{}
+if(e*f){}else{}
+if(e/f){}else{}
+if(e=f){}else{}
+if(e!f){}else{}
+if(e<f){}else{}
+if(e>f){}else{}
+if(e<=f){}else{}
+if(e>=f){}else{}
+if(e==f){}else{}
+if(e!=f){}else{}
+if(e+g){}else{}
+if(e-g){}else{}
+if(e*g){}else{}
+if(e/g){}else{}
+if(e=g){}else{}
+if(e!g){}else{}
+if(e<g){}else{}
+if(e>g){}else{}
+if(e<=g){}else{}
+if(e>=g){}else{}
+if(e==g){}else{}
+if(e!=g){}else{}
+if(f+a){}else{}
+if(f-a){}else{}
+if(f*a){}else{}
+if(f/a){}else{}
+if(f=a){}else{}
+if(f!a){}else{}
+if(f<a){}else{}
+if(f>a){}else{}
+if(f<=a){}else{}
+if(f>=a){}else{}
+if(f==a){}else{}
+if(f!=a){}else{}
+if(f+b){}else{}
+if(f-b){}else{}
+if(f*b){}else{}
+if(f/b){}else{}
+if(f=b){}else{}
+if(f!b){}else{}
+if(f<b){}else{}
+if(f>b){}else{}
+if(f<=b){}else{}
+if(f>=b){}else{}
+if(f==b){}else{}
+if(f!=b){}else{}
+if(f+c){}else{}
+if(f-c){}else{}
+if(f*c){}else{}
+if(f/c){}else{}
+if(f=c){}else{}
+if(f!c){}else{}
+if(f<c){}else{}
+if(f>c){}else{}
+if(f<=c){}else{}
+if(f>=c){}else{}
+if(f==c){}else{}
+if(f!=c){}else{}
+if(f+d){}else{}
+if(f-d){}else{}
+if(f*d){}else{}
+if(f/d){}else{}
+if(f=d){}else{}
+if(f!d){}else{}
+if(f<d){}else{}
+if(f>d){}else{}
+if(f<=d){}else{}
+if(f>=d){}else{}
+if(f==d){}else{}
+if(f!=d){}else{}
+if(f+e){}else{}
+if(f-e){}else{}
+if(f*e){}else{}
+if(f/e){}else{}
+if(f=e){}else{}
+if(f!e){}else{}
+if(f<e){}else{}
+if(f>e){}else{}
+if(f<=e){}else{}
+if(f>=e){}else{}
+if(f==e){}else{}
+if(f!=e){}else{}
+if(f+f){}else{}
+if(f-f){}else{}
+if(f*f){}else{}
+if(f/f){}else{}
+if(f=f){}else{}
+if(f!f){}else{}
+if(f<f){}else{}
+if(f>f){}else{}
+if(f<=f){}else{}
+if(f>=f){}else{}
+if(f==f){}else{}
+if(f!=f){}else{}
+if(f+g){}else{}
+if(f-g){}else{}
+if(f*g){}else{}
+if(f/g){}else{}
+if(f=g){}else{}
+if(f!g){}else{}
+if(f<g){}else{}
+if(f>g){}else{}
+if(f<=g){}else{}
+if(f>=g){}else{}
+if(f==g){}else{}
+if(f!=g){}else{}
+if(g+a){}else{}
+if(g-a){}else{}
+if(g*a){}else{}
+if(g/a){}else{}
+if(g=a){}else{}
+if(g!a){}else{}
+if(g<a){}else{}
+if(g>a){}else{}
+if(g<=a){}else{}
+if(g>=a){}else{}
+if(g==a){}else{}
+if(g!=a){}else{}
+if(g+b){}else{}
+if(g-b){}else{}
+if(g*b){}else{}
+if(g/b){}else{}
+if(g=b){}else{}
+if(g!b){}else{}
+if(g<b){}else{}
+if(g>b){}else{}
+if(g<=b){}else{}
+if(g>=b){}else{}
+if(g==b){}else{}
+if(g!=b){}else{}
+if(g+c){}else{}
+if(g-c){}else{}
+if(g*c){}else{}
+if(g/c){}else{}
+if(g=c){}else{}
+if(g!c){}else{}
+if(g<c){}else{}
+if(g>c){}else{}
+if(g<=c){}else{}
+if(g>=c){}else{}
+if(g==c){}else{}
+if(g!=c){}else{}
+if(g+d){}else{}
+if(g-d){}else{}
+if(g*d){}else{}
+if(g/d){}else{}
+if(g=d){}else{}
+if(g!d){}else{}
+if(g<d){}else{}
+if(g>d){}else{}
+if(g<=d){}else{}
+if(g>=d){}else{}
+if(g==d){}else{}
+if(g!=d){}else{}
+if(g+e){}else{}
+if(g-e){}else{}
+if(g*e){}else{}
+if(g/e){}else{}
+if(g=e){}else{}
+if(g!e){}else{}
+if(g<e){}else{}
+if(g>e){}else{}
+if(g<=e){}else{}
+if(g>=e){}else{}
+if(g==e){}else{}
+if(g!=e){}else{}
+if(g+f){}else{}
+if(g-f){}else{}
+if(g*f){}else{}
+if(g/f){}else{}
+if(g=f){}else{}
+if(g!f){}else{}
+if(g<f){}else{}
+if(g>f){}else{}
+if(g<=f){}else{}
+if(g>=f){}else{}
+if(g==f){}else{}
+if(g!=f){}else{}
+if(g+g){}else{}
+if(g-g){}else{}
+if(g*g){}else{}
+if(g/g){}else{}
+if(g=g){}else{}
+if(g!g){}else{}
+if(g<g){}else{}
+if(g>g){}else{}
+if(g<=g){}else{}
+if(g>=g){}else{}
+if(g==g){}else{}
+if(g!=g){}else{}
 
-                    if(ifj.strcmp(board, new_board) != 0) {
-                        board = new_board;
-                        if(check_win(board, ROW, COL) == 1) {
-                            p_turn = 0 - p_turn;
-                        } else {
-
-                        }
-
-                        if(p_turn == 1) {
-                            p_turn = 2;
-
-                        } else {
-                            p_turn = 1;
-                        }
-                    } else {
-                        ifj.write("Nevalidni tazik\n");
-                    }
-                } else {
-
-                }
-            } else {
-                ifj.write("pismenko je spatne\n");
-            }
-        } else {
-            ifj.write("cislo je spatne\n");
-        }
-    }
-
-    ifj.write("Player ");
-    ifj.write(0 - p_turn);
-    ifj.write(" won!!");
-
-    board = board;
 }
