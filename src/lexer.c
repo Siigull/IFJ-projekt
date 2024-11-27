@@ -325,14 +325,14 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 		if (is_num(value[0])) {
 			if (is_num_token(token)) {
 				if (token->length != 1 && (value[0] == '0')) {
-					exit(1);
+					ERROR_RET(1);
 				}
 				token->type = T_I32;
 				return token;
 			}
 			if (is_float_token(token)) {
-				if (token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e')) {
-					exit(1);
+				if (token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e' && value[1] != 'E')) {
+					ERROR_RET(1);
 				}
 				token->type = T_F64;
 				return token;
@@ -452,7 +452,7 @@ Token* get_next_token(Lexer* lexer) {
 			lexer_advance(lexer);
 			while (lexer->input[lexer->idr] != '"') {
 				if (lexer->input[lexer->idr] == '\\') {
-					if (lexer->input[lexer->idr + 1] == '"') {
+					if (lexer->input[lexer->idr + 1] == '"' && lexer->input[lexer->idr - 1] != '\\') {
 						lexer_advance(lexer);
 					}
 				}

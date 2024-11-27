@@ -538,7 +538,7 @@ AST_Node* assignment() {
 	} else {
 		node = node_init(VAR_ASSIGNMENT);
         Entry* entry = context_find(&(parser->c_stack), parser->prev->value, false);
-        if(entry == NULL) exit(ERR_SEM_NOT_DEF_FNC_VAR);
+        if(entry == NULL) ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 		node->as.var_name = entry->key;
 		consume(T_EQUAL);
 		node->left = expr();
