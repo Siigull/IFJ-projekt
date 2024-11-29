@@ -3,6 +3,7 @@
  * @file codegen.h
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @brief Header file for IFJ24 code generator
+ * 
  * @date 2024-11-15
  */
 
@@ -102,9 +103,8 @@ bool is_data_type(AST_Type type);
  * 
  * @param curr expression to evaluate
  * @param symtable symbolic table
- * @param inside_fnc_call says how many nestings of function calls currently in
  */
-void eval_condition(AST_Node* curr, Tree* symtable, int inside_fnc_call);
+void eval_condition(AST_Node* curr, Tree* symtable);
 
 
 
@@ -114,9 +114,8 @@ void eval_condition(AST_Node* curr, Tree* symtable, int inside_fnc_call);
  * 
  * @param curr node currently called - recursively changes
  * @param symtable symbolic table
- * @param inside_fnc_call says how many nestings of function calls currently in
  */
-void eval_exp(AST_Node* curr, Tree* symtable, int inside_fnc_call);
+void eval_exp(AST_Node* curr, Tree* symtable);
 
 
 
@@ -128,9 +127,8 @@ void eval_exp(AST_Node* curr, Tree* symtable, int inside_fnc_call);
  * 
  * @param curr root node of the expression
  * @param symtable symbolic table
- * @param inside_fnc_call says how many nestings of function calls currently in
  */
-void generate_expression(AST_Node* curr, Tree* symtable, int inside_fnc_call);
+void generate_expression(AST_Node* curr, Tree* symtable);
 
 
 
@@ -147,6 +145,7 @@ void generate_expression(AST_Node* curr, Tree* symtable, int inside_fnc_call);
  * @param stmt_index number of statement the if is (index in the function statement array)
  * @param nest level of nesting of if statement
  * @param inside_if_loop bool that says if we are nested inside if-else statement or a while loop
+ * @param label_counter global counter of labels
  */
 void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int* label_counter);
 
@@ -161,6 +160,7 @@ void generate_if(AST_Node* curr, Tree* symtable, const char* func_name, int stmt
  * @param func_name function we are currently in
  * @param stmt_index number of statement the if-else is (index in the function statement array)
  * @param nest level of nesting of if statement
+ * @param label_counter global counter of labels
  */
 void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, int* label_counter);
 
@@ -172,6 +172,7 @@ void generate_else(AST_Node* curr, Tree* symtable, const char* func_name, int st
  * 
  * @param curr return node with expression array
  * @param symtable symbolic table
+ * @param func_name ensures that main function doesnt have return, but exit
  */
 void generate_return(AST_Node* curr, Tree* symtable, const char* func_name);
 
@@ -190,6 +191,7 @@ void generate_return(AST_Node* curr, Tree* symtable, const char* func_name);
  * @param stmt_index number of statement the loop is (index in the function statement array)
  * @param nest level of nesting of if statement
  * @param inside_if_loop bool that says if we are nested inside if-else statement or a while loop
+ * @param label_counter global counter of labels
  */
 void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int* label_counter);
 
@@ -203,9 +205,8 @@ void generate_while(AST_Node* curr, Tree* symtable, const char* func_name, int s
  * 
  * @param curr node of a function to be called
  * @param symtable symbolic table
- * @param inside_fnc_call says how many nestings of function calls currently in
  */
-void generate_func_call(AST_Node* curr, Tree* symtable, int inside_fnc_call);
+void generate_func_call(AST_Node* curr, Tree* symtable);
 
 
 
@@ -259,10 +260,10 @@ void generate_var_assignment(AST_Node* curr, Tree* symtable);
  * @param stmt_index number of statement from array of statements in function data
  * @param nest level of nested loop or if statement
  * @param inside_if_loop bool that says if we are nested inside if-else statement or a while loop
- * @param inside_fnc_call says how many nestings of function calls currently in
+ * @param label_counter global counter of labels
  */
-void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, int inside_fnc_call
-                        , int* label_counter);
+void generate_statement(AST_Node* curr, Tree* symtable, const char* func_name, int stmt_index, int nest, bool inside_if_loop, 
+                        int* label_counter);
 
 
 
