@@ -15,21 +15,22 @@
 
 /**
  * @brief Return type used in semantics and s-table entries
+ * 		  N prefix means it can contain null
  * 
  */
 typedef enum {
 	R_VOID,
 	R_I32,
-	N_I32,
+	N_I32, // null or i32
 	R_F64,
-	N_F64,
+	N_F64, // null or f64
 	R_U8,
-	N_U8,
+	N_U8, // null or u8
 	R_STRING,
 	R_BOOLEAN,
 	R_NULL,
-	R_TERM_STRING,
-	IMPLICIT,
+	R_TERM_STRING, // term or string
+	IMPLICIT, // filled in by parser semantics
 } Expr_Type;
 
 /**

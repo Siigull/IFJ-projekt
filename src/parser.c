@@ -12,13 +12,11 @@
 	#include "test_generate_graph.h"
 #endif
 
+// global vars to simplify and shorten function calls 
 Lexer* lexer;
 Parser* parser;
-Token* debug_token_array;
-int token_index = 0;
 
 AST_Node* binary_load(List* tl);
-AST_Node* binary();
 AST_Node* func_call();
 AST_Node* stmt();
 Expr_Type get_ret_type();
@@ -50,12 +48,9 @@ Parser* init_parser() {
 }
 
 void advance() {
-	free(parser->prev); // TODO(Sigull): Is this really how this is freed ?
+	free(parser->prev);
 	parser->prev = parser->next;
 	parser->next = get_next_token(lexer);
-
-	// parser->prev = parser->next;
-	// parser->next = &(debug_token_array[token_index++]);
 }
 
 void consume(T_Type type) {
@@ -185,154 +180,7 @@ bool check_operator() {
      return NULL;
 }
 
-AST_Node* literal() {
-	if (check(T_ID)) {
-		advance();
-		if (check(T_RPAR)) {
-			AST_Node* node = func_call();
-			return node;
-		}
-		AST_Node* node = node_init(ID);
-		node->as.var_name = parser->prev->value;
-		return node;
-
-	} else if (check(T_STRING)) {
-		advance();
-		return string();
-
-    } else if (check(T_I32)) {
-        advance();
-        errno = 0;
-        char* end;
-        AST_Node* node = node_init(I32);
-        node->as.i32 = strtol(parser->prev->value, &end, 10);
-        if(errno == ERANGE || *end != '\0' ||
-           node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
-            ERROR_RET(ERR_SEM_OTHER);
-        }
-        return node;
-
-    } else if (check(T_F64)) {
-        advance();
-        errno = 0;
-        char* end;
-        AST_Node* node = node_init(F64);
-        node->as.f64 = strtod(parser->prev->value, &end);
-        if(errno == ERANGE || *end != '\0') {
-            ERROR_RET(ERR_SEM_OTHER);
-        }
-        return node;
-
-    } else if (check(T_NULL)) {
-        advance();
-        AST_Node* node = node_init(NIL);
-        return node;
-
-	} else if (check(T_RPAR)) {
-		advance();
-		AST_Node* node = binary();
-		consume(T_LPAR);
-		return node;
-
-	} else if (check(T_BUILDIN)) {
-		advance();
-		AST_Node* node = func_call();
-		return node;
-
-    } else {
-        ERROR_RET(ERR_PARSE);
-    }
-}
-
-AST_Node* scaling() {
-	AST_Node* left = literal();
-
-	while (true) {
-		if (check(T_MUL)) {
-			advance();
-			AST_Node* right = scaling();
-			AST_Node* node = node_init(MUL);
-			node->left = left;
-			node->right = right;
-			left = node;
-
-		} else if (check(T_DIV)) {
-			advance();
-			AST_Node* right = scaling();
-			AST_Node* node = node_init(DIV);
-			node->left = left;
-			node->right = right;
-			left = node;
-
-		} else {
-			break;
-		}
-	}
-
-	return left;
-}
-
-AST_Node* linear() {
-	AST_Node* left = scaling();
-
-	while (true) {
-		if (check(T_PLUS)) {
-			advance();
-			AST_Node* right = scaling();
-			AST_Node* node = node_init(PLUS);
-			node->left = left;
-			node->right = right;
-			left = node;
-
-		} else if (check(T_MINUS)) {
-			advance();
-			AST_Node* right = scaling();
-			AST_Node* node = node_init(MINUS);
-			node->left = left;
-			node->right = right;
-			left = node;
-
-		} else {
-			break;
-		}
-	}
-
-	return left;
-}
-
-AST_Type get_3_type() {
-	T_Type ops[] = {T_DDEQ, T_NEQUAL, T_STHAN, T_GTHAN, T_SETHAN, T_GETHAN};
-	AST_Type types[] = {ISEQ, ISNEQ, ISLESS, ISMORE, ISLESSEQ, ISMOREEQ};
-	for (int i = 0; i < 6; i++) {
-		if (check(ops[i]))
-			return types[i];
-	}
-
-	return -1;
-}
-
-AST_Node* binary() {
-	AST_Node* left = linear();
-
-	while (true) {
-		AST_Type type = get_3_type();
-		if ((int) type != -1) {
-			advance();
-			AST_Node* right = linear();
-			AST_Node* node = node_init(type);
-			node->right = right;
-			node->left = left;
-			left = node;
-
-		} else {
-			break;
-		}
-	}
-
-	return left;
-}
-
-// Expression parser
+// Expression load to expression parser
 AST_Node* expr() {
 	List* token_list = malloc(sizeof(List));
 	List_init(token_list);
@@ -343,8 +191,6 @@ AST_Node* expr() {
 	}
 
 	return node;
-
-    //return binary();
 }
 
 // Normal parser
@@ -469,7 +315,7 @@ Expr_Type type() {
 AST_Node* var_decl() {
 	AST_Node* node = node_init(VAR_DECL);
 
-	bool can_mut;
+	bool can_mut = false;
 	bool was_used = false;
 	bool was_assigned = false;
 
@@ -492,10 +338,11 @@ AST_Node* var_decl() {
 	}
 
 	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut, was_used, was_assigned);
-
+	
 	if (context_find(&(parser->c_stack), node->as.var_name, true) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
 	}
+
 	context_put(&(parser->c_stack), entry);
 
 	consume(T_EQUAL);
@@ -536,9 +383,14 @@ AST_Node* assignment() {
 
 	} else {
 		node = node_init(VAR_ASSIGNMENT);
+
         Entry* entry = context_find(&(parser->c_stack), parser->prev->value, false);
-        if(entry == NULL) ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+        if(entry == NULL) {
+			ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
+		}
+
 		node->as.var_name = entry->key;
+
 		consume(T_EQUAL);
 		node->left = expr();
 	}
@@ -599,13 +451,13 @@ AST_Node* stmt() {
 		return _while();
 
         default:
-            // TODO(Sigull) Add error message
             ERROR_RET(ERR_PARSE);
     }
 }
 
 Expr_Type get_ret_type() {
 	bool has_null = parser->prev->type == T_QUESTMARK;
+
 	if(check(T_VOID)) {
 		advance();
 		
@@ -684,7 +536,7 @@ AST_Node* func_decl() {
 }
 
 AST_Node* decl() {
-	// Global variables don't exist only functions
+	// Global variables don't exist, only functions
 	return func_decl();
 }
 
@@ -861,13 +713,13 @@ void func_head() {
     tree_insert(parser->s_table, entry);
 }
 
-void parse(char* orig_input) {
+Arr* parse(char* orig_input) {
     size_t len = strlen(orig_input) + 1;
     char* input = malloc(sizeof(char) * (len + 10));
     memcpy(input, orig_input, len * sizeof(char));
 
     // First pass
-    // Load function heads
+    // Load function heads to be able to call functions out of order
     lexer = init_lexer(input);
     parser = init_parser();
 
@@ -893,6 +745,7 @@ void parse(char* orig_input) {
 		ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
 	}
 #if DEBUG
+	// generate d2lang graph of AST
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
@@ -911,13 +764,16 @@ void parse(char* orig_input) {
     }
 
 	check_var_usage(parser->s_table);
-    generate_code(nodes, parser->s_table);
+
+	return nodes;
 }
 
 int compile(char* input) {
 	srand(28980);
 
-	parse(input);
+	Arr* nodes = parse(input);
+
+    generate_code(nodes, parser->s_table);
 
     return 0;
 }
