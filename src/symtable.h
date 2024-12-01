@@ -147,16 +147,6 @@ void tree_destroy(Tree* tree);
 void tree_insert(Tree* tree, Entry* entry);
 
 /**
- * @brief Remove node with same key in entry
- * 
- * @param tree 
- * @param key 
- * @return true if entry with key exists
- * @return false if entry with key doesnt exist
- */
-bool tree_delete(Tree* tree, const char* key);
-
-/**
  * @brief Returns entry with same key
  * 
  * @param tree 
