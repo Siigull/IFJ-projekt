@@ -77,6 +77,8 @@ char* string_to_assembly(const char* string);
 
 /////// helper parse functions ///////
 //////////////////////////////////////
+// individual function calls for var_decl, function_call...
+//   are only in parser.c
 
 /**
  * @brief Type that has null in it to equivalent type without it
@@ -116,5 +118,11 @@ bool check(T_Type type);
  */
 Expr_Type type();
 
+/**
+ * @brief parses statements inside function, if, else... block into arr
+ * 
+ * @param stmts 
+ */
+void block(Arr* stmts);
 
 #endif

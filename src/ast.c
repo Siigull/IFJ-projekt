@@ -16,6 +16,7 @@ AST_Node* node_init(AST_Type type) {
     node->left = NULL;
     node->right = NULL;
 
+    // init union based on AST_Type
     switch(type) {
         case FUNCTION_DECL:
         case FUNC_CALL:
