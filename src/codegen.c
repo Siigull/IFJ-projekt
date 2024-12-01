@@ -243,10 +243,10 @@ void eval_exp(AST_Node* curr, Tree* symtable){
                 fprintf(stdout, "\tMULS\n");
                 break;
             case DIV: // based on type of operation chooses correct division instruction
-                if(curr->as.expr_type.type == R_F64 || curr->as.expr_type.type == N_F64){
+                if(curr->as.expr_type == R_F64 || curr->as.expr_type == N_F64){
                     fprintf(stdout, "\tDIVS\n");
                 }
-                else if(curr->as.expr_type.type == R_I32 || curr->as.expr_type.type == N_I32){
+                else if(curr->as.expr_type == R_I32 || curr->as.expr_type == N_I32){
                     fprintf(stdout, "\tIDIVS\n");
                 }
                 break;
@@ -259,7 +259,7 @@ void eval_exp(AST_Node* curr, Tree* symtable){
         Entry* e = tree_find(symtable, curr->as.func_data->var_name);
         if(e != NULL){
             //user-defined functions
-            if(e->ret_type.type == R_VOID){
+            if(e->ret_type == R_VOID){
                 // void fnc implicitly pushes nil (will not be used)
                 // checked by semantic analysis
                 fprintf(stdout, "\tPUSHS nil@nil\n");
@@ -595,7 +595,7 @@ void generate_function_decl(AST_Node* curr, Tree* symtable){
         // main function should have exit instead of return
         fprintf(stdout, PROG_END);
     }
-    else if(arg_entry->ret_type.type == R_VOID){
+    else if(arg_entry->ret_type == R_VOID){
         // void function - implicit return from function
         // because the statement doesnt explicitly doesnt need to be there
         fprintf(stdout, "\tPOPFRAME\n");

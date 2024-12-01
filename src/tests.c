@@ -87,11 +87,14 @@ int mainasd() {
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	const char path[] = "src/test.ifj";
+	Tree* tree = tree_init();
 
-	generate_debug_token_arr(path);
 
-	char* temp = load_inputos(path);
-	compile(temp);
+	// const char path[] = "src/test.ifj";
+
+	// generate_debug_token_arr(path);
+
+	// char* temp = load_inputos(path);
+	// compile(temp);
 	return 0;
 };

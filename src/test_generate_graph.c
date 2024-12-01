@@ -162,7 +162,7 @@ void generate_graph_var_decl(AST_Node* node, char* last_node, char* path) {
     Entry* entry = tree_find(s_table, node->as.var_name);
 
     char data_buf[50];
-    sprintf(data_buf, "%s %s", node->as.var_name, ret_type_to_string[entry->ret_type.type]);
+    sprintf(data_buf, "%s %s", node->as.var_name, ret_type_to_string[entry->ret_type]);
 
     write_data(current_node, data_buf);
     write_connection(last_node, current_node, path);
@@ -305,7 +305,7 @@ void generate_graph_id(AST_Node* node, char* last_node, char* path) {
     Entry* entry = tree_find(s_table, node->as.var_name);
 
     char data_buf[50];
-    sprintf(data_buf, "%s %s", new_name, ret_type_to_string[entry->ret_type.type]);
+    sprintf(data_buf, "%s %s", new_name, ret_type_to_string[entry->ret_type]);
 
     write_data(current_node, data_buf);
     write_connection(last_node, current_node, path);
@@ -327,7 +327,7 @@ void generate_graph_plus(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "+", PLUS_count++);
 
     set_shape(current_node, PILL);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "left");
@@ -339,7 +339,7 @@ void generate_graph_iseq(AST_Node* node, char* last_node, char* path) {
     sprintf(current_node, "%s(%d)", "==", ISEQ_count++);
 
     set_shape(current_node, PILL);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
     write_connection(last_node, current_node, path);
 
     generate_graph_node(node->left, current_node, "left");
@@ -352,7 +352,7 @@ void generate_graph_isneq(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -364,7 +364,7 @@ void generate_graph_isless(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -376,7 +376,7 @@ void generate_graph_ismore(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -388,7 +388,7 @@ void generate_graph_islesseq(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -400,7 +400,7 @@ void generate_graph_ismoreeq(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -412,7 +412,7 @@ void generate_graph_minus(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -424,7 +424,7 @@ void generate_graph_mul(AST_Node* node, char* last_node, char* path) {
 
     write_connection(last_node, current_node, path);
     set_shape(current_node, PILL);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");
@@ -436,7 +436,7 @@ void generate_graph_div(AST_Node* node, char* last_node, char* path) {
 
     set_shape(current_node, PILL);
     write_connection(last_node, current_node, path);
-    write_data(current_node, ret_type_to_string[node->as.expr_type.type]);
+    write_data(current_node, ret_type_to_string[node->as.expr_type]);
 
     generate_graph_node(node->left, current_node, "left");
     generate_graph_node(node->right, current_node, "right");

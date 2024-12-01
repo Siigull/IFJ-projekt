@@ -21,11 +21,11 @@ AST_Node* binary_load(List* tl);
 AST_Node* binary();
 AST_Node* func_call();
 AST_Node* stmt();
-Ret_Type_ get_ret_type();
+Expr_Type get_ret_type();
 
 Expr_Type null_to_nnul(Expr_Type type) {
-    if(type.type == N_I32 || type.type == N_F64 || type.type == N_U8) {
-        return (Expr_Type){type.type - 1, type.is_const_literal};
+    if(type == N_I32 || type == N_F64 || type == N_U8) {
+        return (Expr_Type){type - 1};
     }
 
     return type;
@@ -70,7 +70,6 @@ void consume(T_Type type) {
 bool check(T_Type type) {
 	return parser->next->type == type;
 }
-
 
 char* string_to_assembly(const char* string) {
 	int len = strlen(string);
@@ -393,7 +392,7 @@ AST_Node* _while() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false, false, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, IMPLICIT, false, false, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -427,7 +426,7 @@ AST_Node* _if() {
 		consume(T_ID);
 		AST_Node* var = node_init(NNULL_VAR_DECL);
 		var->as.var_name = parser->prev->value;
-        Entry* entry = entry_init(var->as.var_name, E_VAR, (Expr_Type){IMPLICIT, false}, false, false, false);
+        Entry* entry = entry_init(var->as.var_name, E_VAR, IMPLICIT, false, false, false);
         context_put(&(parser->c_stack), entry);
 		arr_append(node->as.arr, (size_t) var);
 
@@ -457,12 +456,12 @@ AST_Node* under_var_decl() {
 	return node;
 }
 
-Ret_Type_ type() {
+Expr_Type type() {
 	if(check(T_QUESTMARK)){
 		advance();
 	}
 
-	Ret_Type_ type = get_ret_type();
+	Expr_Type type = get_ret_type();
 
 	return type;
 }
@@ -486,13 +485,13 @@ AST_Node* var_decl() {
 	consume(T_ID);
 	node->as.var_name = parser->prev->value;
 
-	Ret_Type_ ret_type = IMPLICIT;
+	Expr_Type ret_type = IMPLICIT;
 	if (check(T_DDOT)) {
 		advance();
 		ret_type = type();
 	}
 
-	Entry* entry = entry_init(node->as.var_name, E_VAR, (Expr_Type){ret_type, false}, can_mut, was_used, was_assigned);
+	Entry* entry = entry_init(node->as.var_name, E_VAR, ret_type, can_mut, was_used, was_assigned);
 
 	if (context_find(&(parser->c_stack), node->as.var_name, true) != NULL) {
 		ERROR_RET(ERR_SEM_REDEF);
@@ -605,7 +604,7 @@ AST_Node* stmt() {
     }
 }
 
-Ret_Type_ get_ret_type() {
+Expr_Type get_ret_type() {
 	bool has_null = parser->prev->type == T_QUESTMARK;
 	if(check(T_VOID)) {
 		advance();
@@ -654,10 +653,10 @@ AST_Node* func_decl() {
 		char* var_name = parser->prev->value;
 
         consume(T_DDOT);
-		Ret_Type_ r_type = type();
+		Expr_Type r_type = type();
 
 		// Adding arguments to func symtable entry
-		Entry* entry = entry_init(var_name, E_VAR, (Expr_Type){r_type, false}, false, false, false);
+		Entry* entry = entry_init(var_name, E_VAR, r_type, false, false, false);
 		(*args++)->arg_name = var_name;
 		if(context_find(&(parser->c_stack), entry->key, true) != NULL) {
 			ERROR_RET(ERR_SEM_REDEF);
@@ -710,19 +709,19 @@ void prolog() {
 	consume(T_SEMI);
 
 	// Adding builtin functions to symtable
-	Entry* read_str =     entry_init("*readstr",   E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
-	Entry* read_int =     entry_init("*readi32",   E_FUNC, (Expr_Type){N_I32, false}, false, false, false);
-	Entry* read_float =   entry_init("*readf64",   E_FUNC, (Expr_Type){N_F64, false}, false, false, false);
-	Entry* write =        entry_init("*write",     E_FUNC, (Expr_Type){R_VOID, false}, false, false, false);
-	Entry* int_to_float = entry_init("*i2f",       E_FUNC, (Expr_Type){R_F64, false}, false, false, false);
-	Entry* float_to_int = entry_init("*f2i",       E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* string_func =  entry_init("*string",    E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
-	Entry* length =       entry_init("*length",    E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* concat =       entry_init("*concat",    E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
-	Entry* sub_string =   entry_init("*substring", E_FUNC, (Expr_Type){N_U8, false}, false, false, false);
-	Entry* string_cmp =   entry_init("*strcmp",    E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* ord_func =     entry_init("*ord",       E_FUNC, (Expr_Type){R_I32, false}, false, false, false);
-	Entry* chr_func =     entry_init("*chr",       E_FUNC, (Expr_Type){R_U8, false}, false, false, false);
+	Entry* read_str =     entry_init("*readstr",   E_FUNC, N_U8, false, false, false);
+	Entry* read_int =     entry_init("*readi32",   E_FUNC, N_I32, false, false, false);
+	Entry* read_float =   entry_init("*readf64",   E_FUNC, N_F64, false, false, false);
+	Entry* write =        entry_init("*write",     E_FUNC, R_VOID, false, false, false);
+	Entry* int_to_float = entry_init("*i2f",       E_FUNC, R_F64, false, false, false);
+	Entry* float_to_int = entry_init("*f2i",       E_FUNC, R_I32, false, false, false);
+	Entry* string_func =  entry_init("*string",    E_FUNC, R_U8, false, false, false);
+	Entry* length =       entry_init("*length",    E_FUNC, R_I32, false, false, false);
+	Entry* concat =       entry_init("*concat",    E_FUNC, R_U8, false, false, false);
+	Entry* sub_string =   entry_init("*substring", E_FUNC, N_U8, false, false, false);
+	Entry* string_cmp =   entry_init("*strcmp",    E_FUNC, R_I32, false, false, false);
+	Entry* ord_func =     entry_init("*ord",       E_FUNC, R_I32, false, false, false);
+	Entry* chr_func =     entry_init("*chr",       E_FUNC, R_U8, false, false, false);
 
 	// write to stdout
 	Function_Arg* arg_write = malloc(sizeof(Function_Arg));
@@ -832,7 +831,7 @@ void func_head() {
         ERROR_RET(ERR_SEM_REDEF);
     }
 
-    Entry* entry = entry_init(func_name, E_FUNC, (Expr_Type){R_VOID, false}, false, false, false);
+    Entry* entry = entry_init(func_name, E_FUNC, R_VOID, false, false, false);
 
     consume(T_RPAR);
     while(check(T_ID)) {
@@ -857,7 +856,7 @@ void func_head() {
     if (!check(T_DTYPE) && !check(T_VOID) && !check(T_QUESTMARK)) {
         ERROR_RET(ERR_PARSE);
     }
-    entry->ret_type = (Expr_Type){type(), false};
+    entry->ret_type = type();
 
     tree_insert(parser->s_table, entry);
 }

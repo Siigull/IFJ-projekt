@@ -95,11 +95,23 @@ LABEL *ord
 	POPS LF@*second
 	DEFVAR LF@*first
 	POPS LF@*first
+	DEFVAR LF@*ord*length
+	STRLEN LF@*ord*length LF@*first
+	JUMPIFEQ *ord*err LF@*ord*length int@0
+	SUB LF@*ord*length LF@*ord*length int@1
+	LT GF@*tmp*res LF@*second int@0
+	JUMPIFEQ *ord*err GF@*tmp*res bool@true
+	GT GF@*tmp*res LF@*second LF@*ord*length
+	JUMPIFEQ *ord*err GF@*tmp*res bool@true
 	STRI2INT LF@*return*value LF@*first LF@*second
+	LABEL *ord*end
 	MOVE GF@*return*val LF@*return*value
 	POPFRAME
 	RETURN
 
+	LABEL *ord*err
+	MOVE LF@*return*value int@0
+	JUMP *ord*end
 LABEL *chr
 	CREATEFRAME
 	PUSHFRAME
