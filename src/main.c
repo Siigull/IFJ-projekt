@@ -18,7 +18,7 @@
 
 char* load_input(){
 	char buffer[100];
-    
+
     size_t curr_size = 100;
     char* input = calloc(curr_size, sizeof(char));
     if(input == NULL) ERROR_RET(ERR_INTERN);
@@ -32,7 +32,7 @@ char* load_input(){
 
         strcat(input, buffer);
 	}
-    
+
 	return input;
 }
 

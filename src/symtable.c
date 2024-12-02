@@ -84,13 +84,13 @@ void tree_destroy(Tree* tree) {
 
 /**
  * @brief  a            a
- *		   |		 	|	
+ *		   |		 	|
  *		   x     ->     y
  *		  / \          / \
  *	 	 b   y        x   d
  *		    / \      / \
  *		   c   d    b   c
- * 
+ *
  * @param node is x in diagram
  * @param recolor some rules for insertion need to invert colors of x and y
  */
@@ -117,14 +117,14 @@ void rotate_left(Node* node, bool recolor) {
 }
 
 /**
- * @brief  a        a    
- *		   |	    |		 	
- *		   x   ->   y    
- *		  / \      / \   
- *	 	 y   b    c   x  
- *		/ \          / \  
- *	   c   d        d   b 
- * 
+ * @brief  a        a
+ *		   |	    |
+ *		   x   ->   y
+ *		  / \      / \
+ *	 	 y   b    c   x
+ *		/ \          / \
+ *	   c   d        d   b
+ *
  * @param node is x in diagram
  * @param recolor some rules for insertion need to invert colors of x and y
  */
@@ -151,14 +151,14 @@ void rotate_right(Node* node, bool recolor) {
 }
 
 void node_fix(Node* node) {
-	// If node is root we just recolor root 
+	// If node is root we just recolor root
 	if (node->parent->entry == NULL) {
 		node->color = BLACK;
 		return;
 	}
 
 	// If parent is black it means that no rules were broken
-	//  
+	//
 	if (node->parent->color == BLACK) {
 		return;
 	}
@@ -184,7 +184,7 @@ void node_fix(Node* node) {
 		// Uncle is black
 		} else {
 
-			// This situation is fixed by rotation but if 
+			// This situation is fixed by rotation but if
 			//   the inserted node is larger than its parent
 			//   to first swap inserted node and its parent
 			// If we didnt do that the color rules wouldnt hold
@@ -193,7 +193,7 @@ void node_fix(Node* node) {
 				node = node->left;
 			}
 
-			// Rotation and recolor to push red up so we can 
+			// Rotation and recolor to push red up so we can
 			//   put it in to the uncles subtree and keep rules
 			rotate_right(node->parent->parent, true);
 		}
@@ -217,16 +217,16 @@ void node_fix(Node* node) {
 
 /**
  * @brief Recursive call for insert
- * 
- * @param node 
- * @param entry 
+ *
+ * @param node
+ * @param entry
  */
 void node_insert(Node* node, Entry* entry) {
 	int cmp = strcmp(entry->key, node->entry->key);
 
 	// Smaller then current
 	if (cmp < 0) {
-		
+
 		// Free space to insert
 		if (node->left == NULL) {
 			node->left = bvs_node_init(entry, node);
@@ -258,9 +258,9 @@ void node_insert(Node* node, Entry* entry) {
 
 /**
  * @brief Takes care of special cases and calls recursive insert
- * 
- * @param tree 
- * @param entry 
+ *
+ * @param tree
+ * @param entry
  */
 void tree_insert(Tree* tree, Entry* entry) {
 	// Tree is empty
@@ -315,9 +315,9 @@ Entry* tree_find(Tree* tree, const char* key) {
 
 /**
  * @brief Recursive traverse for tree_pop
- * 
- * @param node 
- * @return Entry* 
+ *
+ * @param node
+ * @return Entry*
  */
 Entry* tree_pop_traverse(Node** node) {
 	if (*node == NULL) {
@@ -326,7 +326,7 @@ Entry* tree_pop_traverse(Node** node) {
 
 	if((*node)->left == NULL && (*node)->right == NULL) {
 		Entry* entry = (*node)->entry;
-		(*node) = NULL; 
+		(*node) = NULL;
 		return entry;
 	}
 
@@ -340,16 +340,16 @@ Entry* tree_pop_traverse(Node** node) {
  * @brief For context_pop
  * 		  Takes the first node which has no children removes it from the tree
  * 			and returns its entry
- * 
- * @param node 
- * @return Entry* 
+ *
+ * @param node
+ * @return Entry*
  */
 Entry* tree_pop(Tree* tree) {
 	Entry* entry_old = tree_pop_traverse(&(tree->root));
 	if(entry_old == NULL) {
 		return NULL;
 	}
-	
+
 	Entry* entry = malloc(sizeof(Entry));
 	memcpy(entry, entry_old, sizeof(Entry));
 
@@ -358,9 +358,9 @@ Entry* tree_pop(Tree* tree) {
 
 /**
  * @brief Preorder print of tree. It also prints the current depth
- * 
- * @param node 
- * @param depth 
+ *
+ * @param node
+ * @param depth
  */
 void node_print(Node* node, int depth) {
 	if (node == NULL) {
@@ -394,7 +394,7 @@ void context_push(C_Stack* stack) {
 	if(stack->cur_nest >= stack->max_nest - 2) {
 		stack->max_nest *= 2;
 		Tree** data = realloc(stack->arr, stack->max_nest * sizeof(Tree*));
-		
+
 		if(data == NULL) {
 			free(stack->arr);
 			exit(99);
@@ -409,8 +409,8 @@ void context_push(C_Stack* stack) {
 
 /**
  * @brief Generates a random base64. Its length is determined by HASH_CHARS
- * 
- * @return char* 
+ *
+ * @return char*
  */
 char* get_path() {
 	const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -429,12 +429,12 @@ char* get_path() {
 
 /**
  * @brief Moves all variables created in the last context to global s-table
- * 		  It needs to assure every variable name is unique s it appends a 
+ * 		  It needs to assure every variable name is unique s it appends a
  * 			question mark and a random base64 string after it to var name
- * 
- * @param stack 
- * @return true 
- * @return false 
+ *
+ * @param stack
+ * @return true
+ * @return false
  */
 bool context_pop(C_Stack* stack) {
 	if(stack->cur_nest < 0) {
@@ -460,8 +460,8 @@ bool context_pop(C_Stack* stack) {
 		while(true) {
 			char* path = get_path();
 			memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 2);
-			
-			if(tree_find(stack->global_table, entry->key) == NULL) { 
+
+			if(tree_find(stack->global_table, entry->key) == NULL) {
 				tree_insert(stack->global_table, entry);
 				break;
 			}
@@ -475,18 +475,18 @@ bool context_pop(C_Stack* stack) {
 
 /**
  * @brief Find var through all levels of nest in context
- * 
- * @param stack 
- * @param key 
- * @param global 
- * @return Entry* 
+ *
+ * @param stack
+ * @param key
+ * @param global
+ * @return Entry*
  */
 Entry* context_find(C_Stack* stack, const char* key, bool global) {
 	int cur_nest = stack->cur_nest;
-	
+
 	while(cur_nest >= 0) {
 		Entry* entry = tree_find(stack->arr[cur_nest], key);
-		
+
 		if(entry != NULL) {
 			return entry;
 		}
@@ -496,7 +496,7 @@ Entry* context_find(C_Stack* stack, const char* key, bool global) {
 
 	if(global) {
 		return tree_find(stack->global_table, key);
-	
+
 	} else {
 		return NULL;
 	}
@@ -504,9 +504,9 @@ Entry* context_find(C_Stack* stack, const char* key, bool global) {
 
 /**
  * @brief Insert var into the last context nest
- * 
- * @param stack 
- * @param entry 
+ *
+ * @param stack
+ * @param entry
  */
 void context_put(C_Stack* stack, Entry* entry) {
 	if(stack->cur_nest < 0) {
@@ -516,7 +516,7 @@ void context_put(C_Stack* stack, Entry* entry) {
 
 	if(context_find(stack, entry->key, true) != NULL) {
 		fprintf(stderr, "Returned error code: %d\n", 5);
-		exit(5); // ERROR_RET(ERR_SEM_REDEF); 
+		exit(5); // ERROR_RET(ERR_SEM_REDEF);
 			     // Dont want to import because of a single possible error
 	}
 
@@ -525,8 +525,8 @@ void context_put(C_Stack* stack, Entry* entry) {
 
 /**
  * @brief Debug print tree
- * 
- * @param tree 
+ *
+ * @param tree
  */
 void tree_print(Tree* tree) {
 	node_print(tree->root, 0);
