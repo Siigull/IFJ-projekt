@@ -511,6 +511,13 @@ Entry* context_find(C_Stack* stack, const char* key, bool global) {
 void context_put(C_Stack* stack, Entry* entry) {
 	if(stack->cur_nest < 0) {
 		tree_insert(stack->global_table, entry);
+		return;
+	}
+
+	if(context_find(stack, entry->key, true) != NULL) {
+		fprintf(stderr, "Returned error code: %d\n", 5);
+		exit(5); // ERROR_RET(ERR_SEM_REDEF); 
+			     // Dont want to import because of a single possible error
 	}
 
 	tree_insert(stack->arr[stack->cur_nest], entry);
