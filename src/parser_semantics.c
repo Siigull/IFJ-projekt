@@ -665,6 +665,13 @@ Ret val_if(AST_Node* node, Sem_State* state) {
     return (Ret){R_VOID, false, 0, 0};
 }
 
+/**
+ * @brief Checks if value has zero decimal part
+ * 
+ * @param val 
+ * @return true 
+ * @return false 
+ */
 bool can_implicit(Ret val) {
     if(val.type == R_F64 && val.is_const) {
         return (val.as.f64 - (int)val.as.f64) == 0.0;
@@ -673,6 +680,13 @@ bool can_implicit(Ret val) {
     return false;
 }
 
+/**
+ * @brief Returns Ret value based on literal type
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret val_literal_type(AST_Node* node, Sem_State* state) {
     Ret t;
     t.is_const = true;
@@ -743,6 +757,14 @@ Ret val_literal_type(AST_Node* node, Sem_State* state) {
     return t;
 }
 
+/**
+ * @brief If possible retype i32 to f64
+ *        Only when decimal val is zero
+ * 
+ * @param l 
+ * @param r 
+ * @param node 
+ */
 void implicit_f64_i32(Ret* l, Ret* r, AST_Node* node) {
     if(null_to_nnul(l->type) != null_to_nnul(r->type)) {
         if(can_implicit(*l)) {
@@ -760,6 +782,14 @@ void implicit_f64_i32(Ret* l, Ret* r, AST_Node* node) {
     }
 }
 
+/**
+ * @brief If possible retype i32 to f64
+ *        Only with literal numbers, not constant values
+ * 
+ * @param l 
+ * @param r 
+ * @param node 
+ */
 void implicit_i32_f64_lit(Ret* l, Ret* r, AST_Node* node) {
     if(null_to_nnul(l->type) != null_to_nnul(r->type)) {
         if(l->type == R_I32 && l->is_lit) {
@@ -777,6 +807,13 @@ void implicit_i32_f64_lit(Ret* l, Ret* r, AST_Node* node) {
     }
 }
 
+/**
+ * @brief If possible retype constant value i32 to f64
+ * 
+ * @param l 
+ * @param r 
+ * @param node 
+ */
 void implicit_i32_f64(Ret* l, Ret* r, AST_Node* node) {
     if(null_to_nnul(l->type) != null_to_nnul(r->type)) {
         if(l->type == R_I32 && l->is_const) {
@@ -794,6 +831,15 @@ void implicit_i32_f64(Ret* l, Ret* r, AST_Node* node) {
     }
 }
 
+/**
+ * @brief Evaluates binary expression at compile time
+ *        More complex than IFJ24. 
+ *        Equivalent (when IFJ24 allows it) to comptime values in zig.
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret val_binary_expression(AST_Node* node, Sem_State* state) {
 #define OPERATE(left, right, op)             \
     if((left).type == R_F64) {               \
@@ -817,6 +863,7 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
     Ret ret_left = check_node_2(node->left, state);
     Ret ret_right = check_node_2(node->right, state);
 
+    // conversions
     switch (node->type) {
         case PLUS:
         case MINUS:
@@ -843,6 +890,7 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
             break;
     }
 
+    // relational and arithmetic operations
     if(ret_left.is_const && ret_right.is_const) {
         switch (node->type) {
             case PLUS: {
@@ -911,6 +959,13 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
 #undef OPERATE
 }
 
+/**
+ * @brief does retypes for constant values in parameters
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret val_func_call(AST_Node* node, Sem_State* state) {
     Entry* func_entry = tree_find(parser->s_table, node->as.func_data->var_name);
 
@@ -936,6 +991,13 @@ Ret val_func_call(AST_Node* node, Sem_State* state) {
     return (Ret){func_entry->ret_type, false, 0, 0};
 }
 
+/**
+ * @brief Just traverses
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret val_function_decl(AST_Node* node, Sem_State* state) {
     if (node->as.func_data->arr) {
         for (size_t i = 0; i < node->as.func_data->arr->length; i++) {
@@ -947,6 +1009,14 @@ Ret val_function_decl(AST_Node* node, Sem_State* state) {
     return (Ret){R_VOID, false, 0, 0};
 }
 
+/**
+ * @brief Does retypes for expression in var decl if it is constant value
+ *        It also loads constant value into var entry in symtable
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret val_var_decl(AST_Node* node, Sem_State* state) {
     Entry* entry = tree_find(parser->s_table, node->as.var_name);
 
@@ -1021,6 +1091,13 @@ Ret val_nnull_var_decl(AST_Node* node, Sem_State* state) {
     return (Ret){R_VOID, false, 0, 0};
 }
 
+/**
+ * @brief Retypes return value if possible and needed
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret val_return(AST_Node* node, Sem_State* state) {
     Ret ret = check_node_2(node->left, state);
     Entry* entry = tree_find(parser->s_table, state->func_name);
@@ -1036,6 +1113,14 @@ Ret val_return(AST_Node* node, Sem_State* state) {
     return (Ret){R_VOID, false, 0, 0};
 }
 
+/**
+ * @brief Main function for constant value evaluation
+ *        Calls correct function, all traversing is done through here
+ * 
+ * @param node 
+ * @param state 
+ * @return Ret 
+ */
 Ret check_node_2(AST_Node* node, Sem_State* state) {
     if (node == NULL) {
         return (Ret){R_VOID, false, 0, 0};
@@ -1077,8 +1162,14 @@ Ret check_node_2(AST_Node* node, Sem_State* state) {
     }
 }
 
+/**
+ * @brief Main enter into semantic analysis
+ * 
+ * @param node 
+ */
 void check_semantics(AST_Node* node) {
     // First pass
+    // constant value evaluation
     Sem_State state_val;
     state_val.func_name = node->as.func_data->var_name;
     check_node_2(node, &state_val);
@@ -1100,6 +1191,12 @@ void check_semantics(AST_Node* node) {
     check_node(node, &state);
 }
 
+
+/**
+ * @brief Recursive traverse for check_var_usage
+ * 
+ * @param node 
+ */
 void check_var_usage_traverse(Node* node) {
     if (node == NULL) return;
     Entry* entry = node->entry;
@@ -1112,6 +1209,12 @@ void check_var_usage_traverse(Node* node) {
     check_var_usage_traverse(node->right);
 }
 
+/**
+ * @brief Called after parsing is finished. 
+ *        Checks used and assignment
+ * 
+ * @param node 
+ */
 void check_var_usage(Tree* table) {
     if (table == NULL) return;
     check_var_usage_traverse(table->root);
