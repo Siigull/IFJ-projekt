@@ -749,7 +749,7 @@ Arr* parse(char* orig_input) {
 	char graph_filename[] = "graph.txt";
 
     FILE* f = fopen(graph_filename, "w");
-    if(f == NULL) return;
+    if(f == NULL) ERROR_RET(99);
     fclose(f);
 #endif
 
