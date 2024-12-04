@@ -9,10 +9,6 @@
  */
 
 #include "lexer.h"
-#include <ctype.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 
 Token* init_token(const char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));

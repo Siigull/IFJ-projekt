@@ -2,7 +2,7 @@
  * IFJ PROJEKT 2024
  * @file helper.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief 
+ * @brief header file for array implementation
  * @date 2024-09-27
  * 
  */

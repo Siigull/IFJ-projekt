@@ -8,10 +8,6 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "symtable.h"
 
 #define HASH_CHARS 8

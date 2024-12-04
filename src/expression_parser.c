@@ -29,121 +29,6 @@ int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 	{R, R, R, R, R, R, L, L, N, N, N, N, N, N}, // >=
 };
 
-const char* type_to_string(T_Type type) {
-	switch (type) {
-	case T_F64:
-		return "T_F64";
-	case T_I32:
-		return "T_I32";
-	case T_U8:
-		return "T_U8";
-	case T_DTYPE:
-		return "T_DTYPE";
-	case T_DOT:
-		return "T_DOT";
-	case T_QUOTATION:
-		return "T_QUOTATION";
-	case T_QUESTMARK:
-		return "T_QUESTMARK";
-	case T_EXCLEMARK:
-		return "T_EXCLEMARK";
-	case T_EXPONENT:
-		return "T_EXPONENT";
-	case T_STRING:
-		return "T_STRING";
-	case T_COMMENT:
-		return "T_COMMENT";
-	case T_BUILDIN:
-		return "T_BUILDIN";
-	case T_RPAR:
-		return "T_RPAR";
-	case T_LPAR:
-		return "T_LPAR";
-	case T_SQRBRACKET:
-		return "T_SQRBRACKET";
-	case T_SQLBRACKET:
-		return "T_SQLBRACKET";
-	case T_CUYRBRACKET:
-		return "T_CUYRBRACKET";
-	case T_CUYLBRACKET:
-		return "T_CUYLBRACKET";
-	case T_BAR:
-		return "T_BAR";
-	case T_CONST:
-		return "T_CONST";
-	case T_IF:
-		return "T_IF";
-	case T_ELSE:
-		return "T_ELSE";
-	case T_FN:
-		return "T_FN";
-	case T_PUB:
-		return "T_PUB";
-	case T_RETURN:
-		return "T_RETURN";
-	case T_VAR:
-		return "T_VAR";
-	case T_VOID:
-		return "T_VOID";
-	case T_WHILE:
-		return "T_WHILE";
-	case T_IMPORT:
-		return "T_IMPORT";
-	case T_SEMI:
-		return "T_SEMI";
-	case T_DDOT:
-		return "T_DDOT";
-	case T_COMMA:
-		return "T_COMMA";
-	case T_UNDER:
-		return "T_UNDER";
-	case T_ID:
-		return "T_ID";
-	case T_PLUS:
-		return "T_PLUS";
-	case T_MINUS:
-		return "T_MINUS";
-	case T_MUL:
-		return "T_MUL";
-	case T_DIV:
-		return "T_DIV";
-	case T_DOLLARLIST:
-		return "T_DOLLARLIST";
-	case T_DDEQ:
-		return "T_DDEQ";
-	case T_LEFTSHIFTLIST:
-		return "T_LEFTSHIFTLIST";
-	case T_RIGHTSHIFTLIST:
-		return "T_RIGHTSHIFTLIST";
-	case T_EQUAL:
-		return "T_EQUAL";
-	case T_NEQUAL:
-		return "T_NEQUAL";
-	case T_GTHAN:
-		return "T_GTHAN";
-	case T_GETHAN:
-		return "T_GETHAN";
-	case T_STHAN:
-		return "T_STHAN";
-	case T_SETHAN:
-		return "T_SETHAN";
-	case T_OPERATOR:
-		return "T_OPERATOR";
-	case T_UNDEF:
-		return "T_UNDEF";
-	case T_NULL:
-		return "T_NULL";
-	case T_EOF:
-		return "T_EOF";
-	case T_ERR:
-		return "T_ERR";
-	case T_PROLOG:
-		return "T_PROLOG";
-	default:
-		return "UNKNOWN_TYPE"; // If the type is not recognized
-	}
-}
-
 AST_Type get_type(T_Type type) {
 	switch (type) {
 	case T_I32:
@@ -238,8 +123,7 @@ int find_precedence_index(List* list) {
 	List_activeL(list);
 	// we take always last as a precedence
 	Token* current;
-	// IS DEQ CARE
-	while (1) // THIS CAN BE DONE BETTER
+	while (1) 
 	{
 		List_get_val(list, &current);
 		if (((current->type == T_ID && current->isProcessed == false) ||
@@ -321,14 +205,6 @@ void handle_rule(int rule, List* Stack) {
 		} else if (processed_token->type == T_STRING) {
 			node->as.string = processed_token->value;
 		}
-		/*
-		int errno;
-		// todo
-		if (errno == ERANGE || *end != '\0' || node->as.i32 > INT_MAX || node->as.i32 < INT_MIN) {
-			ERROR_RET(ERR_SEM_OTHER);
-		}
-		return node;
-		*/
 		adjust_stack_rule_E_ID(Stack, processed_token);
 	} else if (rule == E_E) {
 		Token* processed_token = Stack->last->previousElement->token;
@@ -425,25 +301,10 @@ void handle_precedence(int precedence, List* Stack, List* input) {
 	}
 }
 
-void print_list(const List* list) {
-	if (list == NULL || list->first == NULL) {
-		fprintf(stderr, "List is empty.\n");
-		return;
-	}
-
-	List_elem* current = list->first; // Start with the first element
-	while (current != NULL) {         // Iterate through the list
-		// Use type_to_string to print the name of the type
-		fprintf(stderr, "%s ", type_to_string(current->token->type));
-		current = current->nextElement; // Move to the next element
-	}
-	fprintf(stderr, "\n"); // Print a newline at the end
-}
-
 AST_Node* parse_expression(List* input) {
 	List* Stack = malloc(sizeof(List));
 	if (Stack == NULL) {
-		ERROR_RET(99);
+		ERROR_RET(ERR_INTERN);
 	}
 	init_stack(Stack);
 
@@ -456,8 +317,6 @@ AST_Node* parse_expression(List* input) {
 	int precedence_stack, precendence_input, precendence_operation = 0;
 
 	while (1) {
-		// print_list(Stack);
-		// print_list(input);
 		precedence_stack = find_precedence_index(Stack);
 		precendence_input = find_precedence_index(input);
 		precendence_operation = precedence_table[precedence_stack][precendence_input];

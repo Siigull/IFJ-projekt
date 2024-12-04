@@ -10,6 +10,9 @@
 
 #ifndef LEXER_H
 #define LEXER_H
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include "ast.h"
@@ -90,9 +93,6 @@ typedef struct {
 	unsigned int idr;
 	unsigned int idl;
 	size_t input_len;
-	// int error_code?
-	// size_t err_len
-	// char* err_msg
 } Lexer;
 
 /**

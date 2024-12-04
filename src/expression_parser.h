@@ -21,22 +21,25 @@
 #define TABLE_SIZE 14
 
 typedef enum {
-    N, // no precedence
+    N, // no precedence - error
     L, // left precedence
     R, // right precedence
     M, // equal precedence
 } precedence;
 
 /*
-Rules: E  → E + E
-       E  → E - E
-       E  → E * E
-        E  → E / E
-        E → E == E
-        E  → (E)
-        E  → id
-        E  → E relacni operator E
-
+Rules:  E   -> E + E
+        E   -> E - E
+        E   -> E * E
+        E   -> E / E
+        E   -> E == E
+        E   -> (E)
+        E   -> id
+        E   -> E != E
+        E   -> E >= E
+        E   -> E > E
+        E   -> E < E
+        E   -> E <= E
 */
 
 typedef enum {
@@ -52,7 +55,6 @@ typedef enum {
     E_GT_E,
     E_ST_E,
     E_SET_E,
-    E_ZAVAROKA_DEADLY_E
 } rules;
 
 

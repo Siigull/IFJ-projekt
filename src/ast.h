@@ -2,7 +2,7 @@
  * IFJ PROJEKT 2024
  * @file ast.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief
+ * @brief Header file for AST node implementation
  * @date 2024-09-27
  *
  */
@@ -88,8 +88,12 @@ typedef struct {
  *      - no children
  *      - as is func_data, params are an array of expressions
  *
- *  ------- Expression parser -------
- *
+ */
+
+/**
+ * @brief single node of our AST with data in union,
+ * described above
+ * 
  */
 typedef struct AST_Node {
 	AST_Type type;
