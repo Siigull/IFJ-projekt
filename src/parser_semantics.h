@@ -92,7 +92,7 @@ void check_var_usage_traverse(Node* node);
 void check_var_usage(Tree* table);
 
 /**
- * @brief Checks if the function is writeable, void cannot be writeable
+ * @brief Checks if the function is writeable with ifj.write, void cannot be writeable
  *
  * @param node
  * @return true

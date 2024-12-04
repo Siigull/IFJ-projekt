@@ -508,6 +508,7 @@ Token* get_next_token(Lexer* lexer) {
 					   isalpha(lexer->input[lexer->idr]) != 0) {
 					if (lexer->input[lexer->idr] != 'e' && lexer->input[lexer->idr] != 'E') {
 						lexer_advance(lexer);
+						
 					} else {
 						lexer_advance(lexer);
 						if (lexer->input[lexer->idr] == '+' || lexer->input[lexer->idr] == '-') {
