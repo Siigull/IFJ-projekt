@@ -4,6 +4,7 @@
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief Implementation of red-black tree and helper function for creation and deletion of entries
+ * 
  * @date 2024-09-21
  *
  */

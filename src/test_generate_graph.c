@@ -3,6 +3,8 @@
  * @file test_generate_graph.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @brief Visual representation of tree for IFJ 2024
+ * Note: this file is only used in debug build, meaning that
+ * the standards like not using global variables are not strictly followed
  * 
  * @date 2024-11-13
  * 

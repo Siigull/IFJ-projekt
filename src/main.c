@@ -5,6 +5,7 @@
  * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
+ * 
  * @brief Main program for IFJ24 compiler
  * @date 2024-09-15
  *

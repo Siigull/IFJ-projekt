@@ -3,8 +3,8 @@
  * @file error.h
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @brief Error handling file
+ * 
  * @date 2024-09-22
- * @todo specify more errors
  *
  */
 

@@ -3,6 +3,7 @@
  * @file symtable.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @brief Function and struct definition of red-black tree
+ * 
  * @date 2024-09-21
  *
  */

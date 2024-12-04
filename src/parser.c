@@ -2,7 +2,7 @@
  * IFJ PROJEKT 2024
  * @file parser.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief
+ * @brief Implementation of parser
  *
  */
 
