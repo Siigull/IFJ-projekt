@@ -5,7 +5,6 @@
  * @brief Implementation of IFJ24 semantic analysis
  *
  * @date 2024-11-17
- * @todo implicit float conversion
  */
 
 
@@ -575,7 +574,7 @@ Ret val_literal_type(AST_Node* node, Sem_State* state) {
             Entry* entry = tree_find(parser->s_table, node->as.var_name);
 
             if(entry == NULL) {
-                ERROR_RET(3);
+                ERROR_RET(ERR_SEM_NOT_DEF_FNC_VAR);
             }
 
             t.type = entry->ret_type;
@@ -675,17 +674,17 @@ Ret val_binary_expression(AST_Node* node, Sem_State* state) {
             (left).as.f64 = (left).as.f64 op (right).as.f64; \
             (left).type = R_F64;             \
         } else {                             \
-            ERROR_RET(7);                    \
+            ERROR_RET(ERR_SEM_TYPE_CONTROL);                    \
         }                                    \
     } else if((left).type == R_I32){         \
         if((right).type == R_I32) {          \
             (left).as.i32 = (left).as.i32 op (right).as.i32; \
             (left).type = R_I32;             \
         } else {                             \
-            ERROR_RET(7);                    \
+            ERROR_RET(ERR_SEM_TYPE_CONTROL);                    \
         }                                    \
     } else {                                 \
-        ERROR_RET(7);                        \
+        ERROR_RET(ERR_SEM_TYPE_CONTROL);                        \
     }                                        \
 
     Ret ret_left = check_node_2(node->left, state);

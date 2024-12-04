@@ -14,6 +14,10 @@
 #include "parser.h"
 #include <stdio.h>
 
+/**
+ * @brief Stores vital information for semantic analysis
+ * function name, if return was seen, if function call was assigned and type of the expression
+ */
 typedef struct Sem_State {
     const char* func_name;
     bool seen_return;
@@ -21,6 +25,10 @@ typedef struct Sem_State {
     Expr_Type expr_type;
 } Sem_State;
 
+/**
+ * @brief Holds information about values for constant value evaluation
+ *
+ */
 typedef struct {
     Expr_Type type;
     bool is_const;
