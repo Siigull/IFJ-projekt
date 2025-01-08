@@ -10,15 +10,18 @@
 
 #ifndef LEXER_H
 #define LEXER_H
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include "ast.h"
 #include "error.h"
-/// \todo ’\"’, ’\n’, ’\r’, ’\t’
+
 
 #define BACKSLASH 92
 
-/// \todo ’\"’, ’\n’, ’\r’, ’\t’
+
 typedef enum {
 	
 	T_F64,
@@ -90,9 +93,6 @@ typedef struct {
 	unsigned int idr;
 	unsigned int idl;
 	size_t input_len;
-	// int error_code?
-	// size_t err_len
-	// char* err_msg
 } Lexer;
 
 /**
@@ -103,7 +103,29 @@ typedef struct {
  *
  */
 Lexer* init_lexer(char* input);
+/**
+ * @brief Get the next token from the input
+ * 
+ * @param lexer 
+ * @return Token* 
+ */
 Token* get_next_token(Lexer* lexer);
+/**
+ * @brief initializes token
+ * 
+ * @param value, value of token
+ * @param type, type of token
+ * @param length, length of token
+ * @return Token* 
+ */
 Token* init_token(const char* value, T_Type type, unsigned int length);
+/**
+ * @brief prints token
+ * 
+ * @param token 
+ * @param out 
+ * @param string 
+ * @return char* 
+ */
 char* print_token(Token* token, FILE* out, bool string);
 #endif

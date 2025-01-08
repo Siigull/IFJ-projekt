@@ -4,13 +4,10 @@
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
  * @brief Implementation of red-black tree and helper function for creation and deletion of entries
+ * 
  * @date 2024-09-21
  *
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "symtable.h"
 
@@ -27,6 +24,7 @@ Entry* entry_init(const char* key, Entry_Type type,
 
 	if (type == E_FUNC) {
 		entry->as.function_args = arr_init();
+
 	} else if (type == E_VAR) {
 		entry->as.can_mut = can_mut;
 		entry->was_used = was_used;
@@ -81,6 +79,18 @@ void tree_destroy(Tree* tree) {
 	destroy_traverse(tree->root);
 }
 
+/**
+ * @brief  a            a
+ *		   |		 	|
+ *		   x     ->     y
+ *		  / \          / \
+ *	 	 b   y        x   d
+ *		    / \      / \
+ *		   c   d    b   c
+ *
+ * @param node is x in diagram
+ * @param recolor some rules for insertion need to invert colors of x and y
+ */
 void rotate_left(Node* node, bool recolor) {
 	Node* temp = node->right;
 	node->right = temp->left;
@@ -103,6 +113,18 @@ void rotate_left(Node* node, bool recolor) {
 	}
 }
 
+/**
+ * @brief  a        a
+ *		   |	    |
+ *		   x   ->   y
+ *		  / \      / \
+ *	 	 y   b    c   x
+ *		/ \          / \
+ *	   c   d        d   b
+ *
+ * @param node is x in diagram
+ * @param recolor some rules for insertion need to invert colors of x and y
+ */
 void rotate_right(Node* node, bool recolor) {
 	Node* temp = node->left;
 	node->left = temp->right;
@@ -126,33 +148,53 @@ void rotate_right(Node* node, bool recolor) {
 }
 
 void node_fix(Node* node) {
+	// If node is root we just recolor root
 	if (node->parent->entry == NULL) {
 		node->color = BLACK;
 		return;
 	}
 
-	if (node->parent->parent->entry == NULL) {
-		return;
-	}
-
+	// If parent is black it means that no rules were broken
+	//
 	if (node->parent->color == BLACK) {
 		return;
 	}
 
+	// If its only ancestor is root which is black
+	// Is taken care of by the previous rule. Here just for exhaustiveness
+	if (node->parent->parent->entry == NULL) {
+		return;
+	}
+
+	// Uncle is on right side
 	if (node->parent->parent->left == node->parent) {
+
+		// Uncle is red we just need to recolor nodes
+		// The root node of this subtree is recolored to red
+		//   which means we need to fix it recursively
 		if (node->parent->parent->right != NULL && node->parent->parent->right->color == RED) {
 			node->parent->color = BLACK;
 			node->parent->parent->color = RED;
 			node->parent->parent->right->color = BLACK;
 			node_fix(node->parent->parent);
 
+		// Uncle is black
 		} else {
+
+			// This situation is fixed by rotation but if
+			//   the inserted node is larger than its parent
+			//   to first swap inserted node and its parent
+			// If we didnt do that the color rules wouldnt hold
 			if (node->parent->right == node) {
 				rotate_left(node->parent, false);
 				node = node->left;
 			}
+
+			// Rotation and recolor to push red up so we can
+			//   put it in to the uncles subtree and keep rules
 			rotate_right(node->parent->parent, true);
 		}
+
 	} else {
 		if (node->parent->parent->left != NULL && node->parent->parent->left->color == RED) {
 			node->parent->color = BLACK;
@@ -170,15 +212,25 @@ void node_fix(Node* node) {
 	}
 }
 
+/**
+ * @brief Recursive call for insert
+ *
+ * @param node
+ * @param entry
+ */
 void node_insert(Node* node, Entry* entry) {
 	int cmp = strcmp(entry->key, node->entry->key);
 
+	// Smaller then current
 	if (cmp < 0) {
+
+		// Free space to insert
 		if (node->left == NULL) {
 			node->left = bvs_node_init(entry, node);
 			node_fix(node->left);
 
 		} else {
+			// recursive call. We cant insert yet
 			node_insert(node->left, entry);
 		}
 
@@ -192,6 +244,7 @@ void node_insert(Node* node, Entry* entry) {
 		}
 
 	} else {
+		// Same key. Destroy cur replace with insertee
 		if (node->entry != NULL) {
 			entry_destroy(node->entry);
 		}
@@ -200,7 +253,14 @@ void node_insert(Node* node, Entry* entry) {
 	}
 }
 
+/**
+ * @brief Takes care of special cases and calls recursive insert
+ *
+ * @param tree
+ * @param entry
+ */
 void tree_insert(Tree* tree, Entry* entry) {
+	// Tree is empty
 	if (tree->root == NULL) {
 		tree->root = bvs_node_init(entry, NULL);
 		tree->root->color = BLACK;
@@ -209,10 +269,14 @@ void tree_insert(Tree* tree, Entry* entry) {
 		tree->root->parent->left = tree->root;
 
 	} else {
+		// Root has a parent which doesnt have an entry
+		// It is needed when a rotation happens with root
 		Node* temp = tree->root->parent;
 
 		node_insert(tree->root, entry);
 
+		// If a rotation happened on root and it has changed
+		//   we need to relink tree->root to the new root
 		if (tree->root != temp->left) {
 			tree->root = temp->left;
 		}
@@ -246,6 +310,12 @@ Entry* tree_find(Tree* tree, const char* key) {
 	return node->entry;
 }
 
+/**
+ * @brief Recursive traverse for tree_pop
+ *
+ * @param node
+ * @return Entry*
+ */
 Entry* tree_pop_traverse(Node** node) {
 	if (*node == NULL) {
 		return NULL;
@@ -253,7 +323,7 @@ Entry* tree_pop_traverse(Node** node) {
 
 	if((*node)->left == NULL && (*node)->right == NULL) {
 		Entry* entry = (*node)->entry;
-		(*node) = NULL; 
+		(*node) = NULL;
 		return entry;
 	}
 
@@ -263,173 +333,32 @@ Entry* tree_pop_traverse(Node** node) {
 	return tree_pop_traverse(&((*node)->right));
 }
 
+/**
+ * @brief For context_pop
+ * 		  Takes the first node which has no children removes it from the tree
+ * 			and returns its entry
+ *
+ * @param node
+ * @return Entry*
+ */
 Entry* tree_pop(Tree* tree) {
 	Entry* entry_old = tree_pop_traverse(&(tree->root));
 	if(entry_old == NULL) {
 		return NULL;
 	}
-	
+
 	Entry* entry = malloc(sizeof(Entry));
 	memcpy(entry, entry_old, sizeof(Entry));
-
-	// tree_delete(tree, entry->key);
 
 	return entry;
 }
 
-Node* transplant(Node* from, Node* to) {
-	if (to->parent->left == to) {
-		to->parent->left = from;
-
-	} else {
-		to->parent->right = from;
-	}
-
-	if (from != NULL) {
-		from->parent = to->parent;
-	}
-
-	node_destroy(to);
-
-	return from;
-}
-
-Node* find_smallest_node(Node* node) {
-	if (node->left == NULL) {
-		return node;
-	}
-
-	return find_smallest_node(node->left);
-}
-
-void node_delete_fix(Node* parent, bool dir) {
-	if (parent->entry == NULL) {
-		if (parent->left != NULL) {
-			parent->left->color = BLACK;
-			return;
-		}
-	}
-
-	if (dir == 0) {
-		if (parent->left != NULL && parent->left->color == RED) {
-			parent->left->color = BLACK;
-			return;
-		}
-
-		Node* sibling = parent->right;
-		if (sibling != NULL && sibling->color == RED) {
-			sibling->color = BLACK;
-			parent->color = RED;
-			sibling = sibling->left;
-			rotate_left(parent, false);
-		}
-
-		if ((sibling->right == NULL || sibling->right->color == BLACK) &&
-			(sibling->left == NULL || sibling->left->color == BLACK)) {
-			sibling->color = RED;
-			node_delete_fix(parent->parent, parent->parent->right == parent);
-
-		} else {
-			if (sibling->right == NULL || sibling->right->color == BLACK) {
-				sibling->right->color = BLACK;
-				sibling->color = RED;
-				sibling = sibling->left;
-				rotate_right(sibling, false);
-			}
-
-			sibling->color = parent->color;
-			parent->color = BLACK;
-			sibling->left->color = BLACK;
-			rotate_left(parent, false);
-			return;
-		}
-
-	} else {
-		if (parent->right != NULL && parent->right->color == RED) {
-			parent->right->color = BLACK;
-			return;
-		}
-
-		Node* sibling = parent->left;
-		if (sibling != NULL && sibling->color == RED) {
-			sibling->color = BLACK;
-			parent->color = RED;
-			sibling = sibling->right;
-			rotate_right(parent, false);
-		}
-
-		if ((sibling->right == NULL || sibling->right->color == BLACK) &&
-			(sibling->left == NULL || sibling->left->color == BLACK)) {
-			sibling->color = RED;
-			node_delete_fix(parent->parent, parent->parent->right == parent);
-
-		} else {
-			if (sibling->left == NULL || sibling->left->color == BLACK) {
-				sibling->right->color = BLACK;
-				sibling->color = RED;
-				sibling = sibling->right;
-				rotate_left(sibling, false);
-			}
-
-			sibling->color = parent->color;
-			parent->color = BLACK;
-			sibling->left->color = BLACK;
-			rotate_right(parent, false);
-			return;
-		}
-	}
-}
-
-void node_delete(Node* node) {
-	bool orig_color = node->color;
-
-	Node* from_parent = node->parent;
-	bool child_dir = node->parent->right == node;
-
-	if (node->left == NULL) {
-		transplant(node->right, node);
-
-	} else if (node->right == NULL) {
-		transplant(node->left, node);
-
-	} else {
-		Node* smallest = find_smallest_node(node->right);
-		orig_color = smallest->color;
-		from_parent = smallest->parent;
-		child_dir = 0;
-		if (smallest == node->right) {
-			child_dir = 1;
-		}
-		Entry* temp = node->entry;
-		node->entry = smallest->entry;
-		smallest->entry = temp;
-		transplant(smallest->right, smallest);
-	}
-
-	if (orig_color == BLACK) {
-		node_delete_fix(from_parent, child_dir);
-	}
-}
-
-bool tree_delete(Tree* tree, const char* key) {
-	Node* node = tree_find_traverse(tree->root, key);
-
-	if (node == NULL)
-		return false;
-
-	if(tree->root == node){
-		entry_destroy(node->entry);
-		free(node->parent);
-		free(node);
-		tree->root = NULL;
-	
-	} else {
-		node_delete(node);
-	}	
-
-	return true;
-}
-
+/**
+ * @brief Preorder print of tree. It also prints the current depth
+ *
+ * @param node
+ * @param depth
+ */
 void node_print(Node* node, int depth) {
 	if (node == NULL) {
 		return;
@@ -462,7 +391,7 @@ void context_push(C_Stack* stack) {
 	if(stack->cur_nest >= stack->max_nest - 2) {
 		stack->max_nest *= 2;
 		Tree** data = realloc(stack->arr, stack->max_nest * sizeof(Tree*));
-		
+
 		if(data == NULL) {
 			free(stack->arr);
 			exit(99);
@@ -475,12 +404,17 @@ void context_push(C_Stack* stack) {
 	stack->arr[stack->cur_nest] = tree_init();
 }
 
+/**
+ * @brief Generates a random base64. Its length is determined by HASH_CHARS
+ *
+ * @return char*
+ */
 char* get_path() {
 	const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	char* out = calloc(HASH_CHARS + 2, sizeof(char));
 
 	out[0] = '?';
-	for(int i=1; i < 9; i++) {
+	for(int i=1; i < HASH_CHARS + 1; i++) {
 		int base64_index = rand() % 62;
 		out[i] = (char)base64_chars[base64_index];
 	}
@@ -490,6 +424,15 @@ char* get_path() {
 	return out;
 }
 
+/**
+ * @brief Moves all variables created in the last context to global s-table
+ * 		  It needs to assure every variable name is unique s it appends a
+ * 			question mark and a random base64 string after it to var name
+ *
+ * @param stack
+ * @return true
+ * @return false
+ */
 bool context_pop(C_Stack* stack) {
 	if(stack->cur_nest < 0) {
 		return false;
@@ -497,21 +440,25 @@ bool context_pop(C_Stack* stack) {
 
 	Entry* entry;
 	while (true){
+		// Get any var from context
 		entry = tree_pop(stack->arr[stack->cur_nest]);
 		if(entry == NULL) {
 			break;
 		}
 
-		int orig_len = strlen(entry->key);
 		if(entry->key == NULL) {
 			exit(99);
 		}
+		int orig_len = strlen(entry->key);
 
+		// Append base64 to var name
+		// Even though the chance is very low. If a name with the same name and
+	 	//   the same base64 string already exists, generate base64 again
 		while(true) {
 			char* path = get_path();
 			memcpy(((char*)entry->key) + orig_len, path, HASH_CHARS + 2);
-			
-			if(tree_find(stack->global_table, entry->key) == NULL) { 
+
+			if(tree_find(stack->global_table, entry->key) == NULL) {
 				tree_insert(stack->global_table, entry);
 				break;
 			}
@@ -523,12 +470,20 @@ bool context_pop(C_Stack* stack) {
 	return true;
 }
 
+/**
+ * @brief Find var through all levels of nest in context
+ *
+ * @param stack
+ * @param key
+ * @param global
+ * @return Entry*
+ */
 Entry* context_find(C_Stack* stack, const char* key, bool global) {
 	int cur_nest = stack->cur_nest;
-	
+
 	while(cur_nest >= 0) {
 		Entry* entry = tree_find(stack->arr[cur_nest], key);
-		
+
 		if(entry != NULL) {
 			return entry;
 		}
@@ -538,20 +493,38 @@ Entry* context_find(C_Stack* stack, const char* key, bool global) {
 
 	if(global) {
 		return tree_find(stack->global_table, key);
-	
+
 	} else {
 		return NULL;
 	}
 }
 
+/**
+ * @brief Insert var into the last context nest
+ *
+ * @param stack
+ * @param entry
+ */
 void context_put(C_Stack* stack, Entry* entry) {
 	if(stack->cur_nest < 0) {
 		tree_insert(stack->global_table, entry);
+		return;
+	}
+
+	if(context_find(stack, entry->key, true) != NULL) {
+		fprintf(stderr, "Returned error code: %d\n", 5);
+		exit(5); // ERROR_RET(ERR_SEM_REDEF);
+			     // Dont want to import because of a single possible error
 	}
 
 	tree_insert(stack->arr[stack->cur_nest], entry);
 }
 
+/**
+ * @brief Debug print tree
+ *
+ * @param tree
+ */
 void tree_print(Tree* tree) {
 	node_print(tree->root, 0);
 }

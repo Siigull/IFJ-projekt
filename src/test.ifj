@@ -1,9 +1,14 @@
 const ifj = @import("ifj24.zig");
 
-pub fn toto() void {
-}
-
+// Main Program
 pub fn main() void {
-    var tito = toto();
-    tito = tito;
+
+    const a : ?i32 = 10;
+
+    if(a) |a| {
+        ifj.write(a);
+        
+    } else {
+
+    }
 }

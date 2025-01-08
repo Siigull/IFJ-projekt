@@ -2,7 +2,8 @@
  * IFJ PROJEKT 2024
  * @file ast.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief 
+ * @brief AST node implementation
+ * 
  * @date 2024-09-27
  * 
  */
@@ -16,6 +17,7 @@ AST_Node* node_init(AST_Type type) {
     node->left = NULL;
     node->right = NULL;
 
+    // init union based on AST_Type
     switch(type) {
         case FUNCTION_DECL:
         case FUNC_CALL:
@@ -30,7 +32,7 @@ AST_Node* node_init(AST_Type type) {
         case VAR_DECL:
             break;
         default:
-            node->as.expr_type = (Expr_Type){R_VOID, false};
+            node->as.expr_type = R_VOID;
             break;
     }
 

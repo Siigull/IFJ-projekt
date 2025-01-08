@@ -2,7 +2,8 @@
  * IFJ PROJEKT 2024
  * @file helper.c
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief 
+ * @brief Implementation used for arrays holding AST nodes in our AST
+ * 
  * @date 2024-09-27
  * 
  */

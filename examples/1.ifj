@@ -6,4 +6,14 @@ pub fn main() void {
 	const b = ifj.string(a);
 	ifj.write(a); ifj.write("\n");
 	ifj.write(b); ifj.write("\n");
+
+	const x : ?i32 = 3;
+    const y : i32 = 3;
+
+    if(null == null){
+        ifj.write("hura");
+    }else{}
+    if(x == y){
+        ifj.write("hura");
+    }else{}
 }

@@ -1,0 +1,11 @@
+const ifj = @import("ifj24.zig");
+
+// Main Program
+pub fn main() void {
+    const i1 = 1;
+    const i9 = 9;
+    ifj.write(i1 / i9);                                    
+    ifj.write("\n");
+}
+
+

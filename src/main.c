@@ -5,7 +5,8 @@
  * @author David Bujzaš (xbujzad00@stud.fit.vutbr.cz)
  * @author Jakub Havlík (xhavlij00@stud.fit.vutbr.cz)
  * @author Martin Vaculík (xvaculm00@stud.fit.vutbr.cz)
- * @brief
+ * 
+ * @brief Main program for IFJ24 compiler
  * @date 2024-09-15
  *
  */
@@ -18,7 +19,7 @@
 
 char* load_input(){
 	char buffer[100];
-    
+
     size_t curr_size = 100;
     char* input = calloc(curr_size, sizeof(char));
     if(input == NULL) ERROR_RET(ERR_INTERN);
@@ -32,7 +33,7 @@ char* load_input(){
 
         strcat(input, buffer);
 	}
-    
+
 	return input;
 }
 

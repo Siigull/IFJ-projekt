@@ -2,7 +2,8 @@
  * IFJ PROJEKT 2024
  * @file ast.h
  * @author Daniel Pelánek (xpeland00@stud.fit.vutbr.cz)
- * @brief
+ * @brief Header file for AST node implementation
+ * 
  * @date 2024-09-27
  *
  */
@@ -12,6 +13,10 @@
 #include "symtable.h"
 #include "helper.h"
 
+/**
+ * @brief Type for AST_Node
+ * 
+ */
 typedef enum {
 	FUNC_CALL,
 	FUNCTION_DECL,
@@ -39,34 +44,9 @@ typedef enum {
 	DIV,
 } AST_Type;
 
-// typedef enum {
-//     F64,
-//     I32,
-//     STRING,
-//     NIL,
-// } Literal_Type;
-
-// typedef struct {
-//     Literal_Type type;
-
-// } Literal_value;
-
-// typedef enum {
-//     PLUS, MINUS, MUL, DIV,
-//     EQUAL, NOT_EQUAL,
-//     SMALLER, LARGER,
-//     SMALLER_EQUAL, LARGER_EQUAL
-// } Operator_Type;
-
-// typedef struct {
-//     Arr*
-//     AST_Node* expr;
-//     AST_Node* without_null;
-// } If_Data;
-
 typedef struct {
 	const char* var_name;
-	Arr* arr;
+	Arr* arr; // arguments or parameters
 } Func_Data;
 
 /**
@@ -109,8 +89,12 @@ typedef struct {
  *      - no children
  *      - as is func_data, params are an array of expressions
  *
- *  ------- Expression parser -------
- *
+ */
+
+/**
+ * @brief single node of our AST with data in union,
+ * described above
+ * 
  */
 typedef struct AST_Node {
 	AST_Type type;
@@ -118,9 +102,9 @@ typedef struct AST_Node {
 	struct AST_Node* right;
 
 	union {
-		const char* string;
-		const char* var_name;
-		Arr* arr;
+		const char* string; // for string literal
+		const char* var_name; // for var decl, nnul_var_decl and id
+		Arr* arr; 
 		Expr_Type expr_type;
 		Func_Data* func_data;
 		int i32;
@@ -129,6 +113,12 @@ typedef struct AST_Node {
 
 } AST_Node;
 
+/**
+ * @brief Inits AST_Node based on what is needed for the type
+ * 
+ * @param type 
+ * @return AST_Node* 
+ */
 AST_Node* node_init(AST_Type type);
 
 #endif

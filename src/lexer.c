@@ -9,10 +9,6 @@
  */
 
 #include "lexer.h"
-#include <ctype.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 
 Token* init_token(const char* value, T_Type type, unsigned int length) {
 	Token* token = malloc(sizeof(Token));
@@ -73,6 +69,7 @@ void lexer_skip_whitespace(Lexer* lexer) {
 }
 
 bool is_hexa(char x) {
+	// checks if tis hexa
 	return isdigit(x) || (x >= 'A' && x <= 'F') || (x >= 'a' && x <= 'f');
 }
 
@@ -90,6 +87,7 @@ int parse_escape(const char* in, char* out) {
 
 
 char* parse_string_value(const char* string) {
+	// finds and parsers string value
 	int len = strlen(string);
 	int new_len = len;
 
@@ -160,6 +158,7 @@ char* parse_string_value(const char* string) {
 }
 
 void lexer_skip_space(Lexer* lexer) {
+	// initializes pointer to next non whitespace char
 	char c = lexer->input[lexer->idr];
 	while (is_whitespace(c)) {
 		lexer_advance(lexer);
@@ -177,6 +176,7 @@ bool is_num(char c) {
 }
 
 bool is_num_token(Token* token) {
+	//err count represents false ,true on mismatch
 	int err_count = 0;
 	for (unsigned int i = 0; i < token->length; i++) {
 		if (is_num(token->value[i]) == false) {
@@ -212,6 +212,7 @@ bool is_id_token(Token* token) {
 }
 
 bool is_float_token(Token* token) {
+	// handles all possible floats , with E with dot with everything, returns if its bool 
 	int i = 0;
 	int prefix_match = 0;
 	while (token->value[i] == '-') {
@@ -259,6 +260,7 @@ bool is_float_token(Token* token) {
 };
 
 Token* find_token_value(Lexer* lexer, T_Type type) {
+	// find token value
 	if (type == T_U8) {
 		Token* token = init_token("[]u8", T_DTYPE, 4);
 		return token;
@@ -325,14 +327,14 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 		if (is_num(value[0])) {
 			if (is_num_token(token)) {
 				if (token->length != 1 && (value[0] == '0')) {
-					exit(1);
+					ERROR_RET(1);
 				}
 				token->type = T_I32;
 				return token;
 			}
 			if (is_float_token(token)) {
-				if (token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e')) {
-					exit(1);
+				if (token->length != 1 && (value[0] == '0' && value[1] != '.' && value[1] != 'e' && value[1] != 'E')) {
+					ERROR_RET(1);
 				}
 				token->type = T_F64;
 				return token;
@@ -371,7 +373,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
 			}
 		}
 	}
-
+	// looking for value of string 
 	if (type == T_STRING) {
 		        if (value[0] == '\\' && value[1] == '\\') {
             int last_newline = -1;
@@ -406,7 +408,7 @@ Token* find_token_value(Lexer* lexer, T_Type type) {
         token->length = strlen(token->value);
         return token;
 	}
-
+	// loading value of buildin to token for parser and gen 
 	if (type == T_BUILDIN) {
 		int last_space = -1;
 		int i, len = strlen(value);
@@ -452,7 +454,7 @@ Token* get_next_token(Lexer* lexer) {
 			lexer_advance(lexer);
 			while (lexer->input[lexer->idr] != '"') {
 				if (lexer->input[lexer->idr] == '\\') {
-					if (lexer->input[lexer->idr + 1] == '"') {
+					if (lexer->input[lexer->idr + 1] == '"' && lexer->input[lexer->idr - 1] != '\\') {
 						lexer_advance(lexer);
 					}
 				}
@@ -502,6 +504,7 @@ Token* get_next_token(Lexer* lexer) {
 					   isalpha(lexer->input[lexer->idr]) != 0) {
 					if (lexer->input[lexer->idr] != 'e' && lexer->input[lexer->idr] != 'E') {
 						lexer_advance(lexer);
+						
 					} else {
 						lexer_advance(lexer);
 						if (lexer->input[lexer->idr] == '+' || lexer->input[lexer->idr] == '-') {
@@ -512,7 +515,7 @@ Token* get_next_token(Lexer* lexer) {
 				return find_token_value(lexer, T_UNDEF);
 			}
 		}
-
+		// u8 char
 		if (lexer->input[lexer->idr] == '[') {
 			lexer_advance(lexer);
 			lexer_skip_whitespace(lexer);
@@ -592,7 +595,7 @@ Token* get_next_token(Lexer* lexer) {
 
 char* print_token(Token* token, FILE* out, bool string) {
 	char* buffer;
-
+	// buffer for printing tokens 
 	if (string) {
 		buffer = calloc(30, sizeof(char));
 		out = fmemopen(buffer, 30, "w");

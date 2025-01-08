@@ -81,17 +81,20 @@ void generate_debug_token_arr(const char* path) {
 	printf("}\n");
 }
 
-int mainasd() {
+int main123() {
 	// const ifj = @import("ifj24.zig"); jeden token
 	// char input1[50] = "456e2 7.89E-2 test1iden _identf";
 	// char expected_result1[2] = {1};
 	// test_input(input1, expected_result1);
 
-	const char path[] = "src/test.ifj";
+	Tree* tree = tree_init();
 
-	generate_debug_token_arr(path);
 
-	char* temp = load_inputos(path);
-	compile(temp);
+	// const char path[] = "src/test.ifj";
+
+	// generate_debug_token_arr(path);
+
+	// char* temp = load_inputos(path);
+	// compile(temp);
 	return 0;
 };
