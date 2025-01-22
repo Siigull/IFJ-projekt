@@ -1,3 +1,5 @@
+#IFJ Projekt 2024/25
+
 Je potřeba:
 * make
 
