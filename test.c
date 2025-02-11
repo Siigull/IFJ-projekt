@@ -1,5 +1,6 @@
 #include <stdio.h>
 
 int main() {
-    float x = 10.5;
+    float x = 10.25;
+    
 }
